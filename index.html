@@ -8,13 +8,13 @@
 </head>
 <body>
 
-  <!-- Navbar -->
+  <!-- Nav -->
   <div id="navbar-placeholder"></div>
 
-  <!-- Main Section: Blog List + About -->
+  <!-- Two-column layout starts here -->
   <main class="main-flex container">
-    
-    <!-- 📚 Blog List Left -->
+
+    <!-- Blog list (left) -->
     <section class="blog-list">
       <ul>
         <li><a href="post1.html">How I Fine-Tuned an LLM</a></li>
@@ -22,7 +22,7 @@
       </ul>
     </section>
 
-    <!-- 👤 About Me Right -->
+    <!-- About Me (right) -->
     <aside class="about-box">
       <img src="images/akash.jpg" alt="Akash's Photo" class="profile-pic">
       <h2>About Me</h2>
@@ -36,6 +36,7 @@
     <p>© 2025 Akash D</p>
   </footer>
 
+  <!-- JS to load navbar -->
   <script>
     fetch("navbar.html")
       .then(response => response.text())
@@ -43,5 +44,6 @@
         document.getElementById("navbar-placeholder").innerHTML = data;
       });
   </script>
+
 </body>
 </html>
