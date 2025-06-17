@@ -1,95 +1,73 @@
-/* Global body styles */
-body {
-  margin: 0;
-  padding: 0;
-  font-family: Arial, sans-serif;
-  background-color: #f9f9f9;
-  color: #333;
-}
-
-/* Container for centering and max-width layout */
-.container {
-  width: 100%;
-  max-width: 1200px;
-  margin: auto;
-  padding: 20px;
-}
-
-/* Header and Footer */
-header, footer {
-  text-align: center;
-  padding: 20px 0;
-  background-color: #fff;
-  border-bottom: 1px solid #eee;
-}
-
-/* Navigation Bar */
-nav {
-  background-color: #fff;
-  padding: 10px 20px;
-  border-bottom: 1px solid #ddd;
+/* Flex container for main content */
+.main-flex {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-nav .brand {
-  font-size: 22px;
-  font-weight: bold;
-  color: #007acc;
-}
-nav ul {
-  list-style: none;
-  display: flex;
-  gap: 20px;
-  margin: 0;
-  padding: 0;
-}
-nav ul li a {
-  text-decoration: none;
-  color: #333;
-  font-weight: 500;
-}
-nav ul li a:hover {
-  color: #007acc;
+  gap: 40px;
+  margin-top: 30px;
 }
 
-/* Blog post list layout */
-main ul {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
+/* Blog list section */
+.blog-list {
+  flex: 2;
+}
+.blog-list ul {
   list-style: none;
   padding: 0;
-  margin: 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
-
-main ul li {
-  flex: 1 1 calc(50% - 20px);
+.blog-list ul li {
   background: #fff;
   padding: 20px;
   border-radius: 8px;
   border: 1px solid #ddd;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s ease;
 }
-main ul li:hover {
-  transform: scale(1.02);
-}
-
-main ul li a {
-  color: #007acc;
-  text-decoration: none;
+.blog-list ul li a {
   font-size: 18px;
   font-weight: bold;
+  color: #007acc;
+  text-decoration: none;
 }
-
-main ul li a:hover {
+.blog-list ul li a:hover {
   text-decoration: underline;
 }
 
-/* Responsive for mobile */
+/* About box section */
+.about-box {
+  flex: 1;
+  background-color: #fff;
+  padding: 20px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+.about-box h2 {
+  margin-top: 10px;
+}
+.profile-pic {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #007acc;
+  margin-bottom: 10px;
+}
+.about-box p {
+  font-size: 15px;
+  line-height: 1.6;
+}
+.about-box a {
+  color: #007acc;
+  text-decoration: none;
+}
+.about-box a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive: Stack on small screens */
 @media (max-width: 768px) {
-  main ul li {
-    flex: 1 1 100%;
+  .main-flex {
+    flex-direction: column;
   }
 }
