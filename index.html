@@ -21,7 +21,18 @@
   </main>
 
   <footer>
-    <p>© 2025 Shivam Gupta</p>
+    <p>© 2025 Akash Das</p>
   </footer>
+
+  <!-- 🔽 JS to load navbar.html -->
+  <script>
+    fetch("navbar.html")
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById("navbar-placeholder").innerHTML = data;
+      });
+  </script>
+
+  
 </body>
 </html>
