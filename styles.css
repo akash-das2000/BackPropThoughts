@@ -1,3 +1,29 @@
+/* Global body styles */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
+  color: #333;
+}
+
+/* Container for centering and max-width layout */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+}
+
+/* Header and Footer */
+header, footer {
+  text-align: center;
+  padding: 20px 0;
+  background-color: #fff;
+  border-bottom: 1px solid #eee;
+}
+
+/* Navigation Bar */
 nav {
   background-color: #fff;
   padding: 10px 20px;
@@ -7,7 +33,7 @@ nav {
   align-items: center;
 }
 nav .brand {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: bold;
   color: #007acc;
 }
@@ -27,23 +53,43 @@ nav ul li a:hover {
   color: #007acc;
 }
 
-body {
-  font-family: Arial, sans-serif;
-  margin: auto;
-  max-width: 700px;
-  padding: 20px;
-  line-height: 1.6;
-  background-color: #f9f9f9;
-  color: #333;
-}
-header, footer {
-  text-align: center;
+/* Blog post list layout */
+main ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  list-style: none;
+  padding: 0;
   margin: 20px 0;
 }
-a {
+
+main ul li {
+  flex: 1 1 calc(50% - 20px);
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease;
+}
+main ul li:hover {
+  transform: scale(1.02);
+}
+
+main ul li a {
   color: #007acc;
   text-decoration: none;
+  font-size: 18px;
+  font-weight: bold;
 }
-a:hover {
+
+main ul li a:hover {
   text-decoration: underline;
+}
+
+/* Responsive for mobile */
+@media (max-width: 768px) {
+  main ul li {
+    flex: 1 1 100%;
+  }
 }
