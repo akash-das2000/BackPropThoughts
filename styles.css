@@ -1,11 +1,18 @@
-/* Flex container for main content */
+/* Ensure full-width layout */
+.container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+}
+
+/* Main layout flex row */
 .main-flex {
   display: flex;
   gap: 40px;
   margin-top: 30px;
 }
 
-/* Blog list section */
+/* Blog post list styles */
 .blog-list {
   flex: 2;
 }
@@ -33,17 +40,14 @@
   text-decoration: underline;
 }
 
-/* About box section */
+/* About section */
 .about-box {
   flex: 1;
   background-color: #fff;
   padding: 20px;
-  border: 1px solid #eee;
   border-radius: 8px;
+  border: 1px solid #eee;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-}
-.about-box h2 {
-  margin-top: 10px;
 }
 .profile-pic {
   width: 100px;
@@ -53,19 +57,8 @@
   border: 3px solid #007acc;
   margin-bottom: 10px;
 }
-.about-box p {
-  font-size: 15px;
-  line-height: 1.6;
-}
-.about-box a {
-  color: #007acc;
-  text-decoration: none;
-}
-.about-box a:hover {
-  text-decoration: underline;
-}
 
-/* Responsive: Stack on small screens */
+/* Responsive fallback */
 @media (max-width: 768px) {
   .main-flex {
     flex-direction: column;
