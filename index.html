@@ -2,18 +2,28 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>My Blog</title>
+  <title>BackPropThoughts</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div id="navbar-placeholder"></div>
-  <header>
-    <h1>Welcome to My Blog</h1>
-    <p>Thoughts on AI, LLMs, Digital Twins, and More</p>
-  </header>
 
-  <main>
+  <!-- Navbar Placeholder -->
+  <div id="navbar-placeholder"></div>
+
+  <!-- About Section with Image -->
+  <section class="about-section">
+    <div class="about-content">
+      <img src="images/akash.jpg" alt="Akash's Photo" class="profile-pic">
+      <div>
+        <h2>About Me</h2>
+        <p>I work at the intersection of language models, intelligent systems, and digital twin technologies. My focus is on building efficient AI pipelines, researching LLM fine-tuning strategies, and exploring agent-based workflows for real-world tasks.</p>
+        <p><a href="https://www.linkedin.com/in/akashd2000/?originalSubdomain=in" target="_blank">Connect on LinkedIn →</a></p>
+      </div>
+    </div>
+  </section>
+
+  <main class="container">
     <ul>
       <li><a href="post1.html">How I Fine-Tuned an LLM</a></li>
       <li><a href="post2.html">From Time-Series Data to Digital Twin</a></li>
@@ -21,10 +31,10 @@
   </main>
 
   <footer>
-    <p>© 2025 Akash Das</p>
+    <p>© 2025 Akash D</p>
   </footer>
 
-  <!-- 🔽 JS to load navbar.html -->
+  <!-- Load the reusable navbar -->
   <script>
     fetch("navbar.html")
       .then(response => response.text())
@@ -32,7 +42,5 @@
         document.getElementById("navbar-placeholder").innerHTML = data;
       });
   </script>
-
-  
 </body>
 </html>
