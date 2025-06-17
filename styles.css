@@ -1,3 +1,48 @@
+/* Navigation Bar */
+nav {
+  background-color: #fff;
+  padding: 10px 20px;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+nav .brand-group {
+  display: flex;
+  flex-direction: column;
+}
+
+nav .brand {
+  font-size: 22px;
+  font-weight: bold;
+  color: #007acc;
+}
+
+nav .tagline {
+  font-size: 14px;
+  color: #666;
+  margin-top: 4px;
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+  margin: 0;
+  padding: 0;
+}
+
+nav ul li a {
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+}
+
+nav ul li a:hover {
+  color: #007acc;
+}
+
 /* Ensure full-width layout */
 .container {
   max-width: 1200px;
