@@ -86,37 +86,10 @@ nav ul li a:hover {
   text-decoration: underline;
 }
 
-/* AV External Card */
-.external-card {
-  background-color: #fefefe;
-  border: 1px solid #ccc;
-  padding: 20px;
-  border-radius: 8px;
-  margin-bottom: 30px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+/* Blog List Section */
+.blog-list {
+  flex: 2;
 }
-.external-card h3 {
-  font-size: 18px;
-  color: #333;
-  margin-bottom: 6px;
-}
-.external-link {
-  display: inline-block;
-  margin-top: 8px;
-  font-weight: 600;
-  color: #007acc;
-  text-decoration: none;
-}
-.external-link:hover {
-  text-decoration: underline;
-}
-.ownership-note {
-  font-size: 11px;
-  color: #777;
-  margin-top: 10px;
-}
-
-/* Blog List */
 .blog-listing {
   list-style: none;
   padding: 0;
@@ -139,6 +112,13 @@ nav ul li a:hover {
 }
 .blog-listing li a:hover {
   text-decoration: underline;
+}
+
+/* Small disclaimer under AV post */
+.ownership-note {
+  font-size: 11px;
+  color: #777;
+  margin-top: 5px;
 }
 
 /* About Me */
