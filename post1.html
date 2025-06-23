@@ -17,8 +17,11 @@
   <header>
     <h1>How I Fine-Tuned an LLM</h1>
   </header>
+
   <main>
     <p>In this post, I describe how I used LoRA and GRPO to fine-tune a transformer model with minimal resources...</p>
+
+    <!-- Ad block -->
     <ins class="adsbygoogle"
          style="display:block"
          data-ad-client="ca-pub-xxxxxxxxxxxxxx"
@@ -27,9 +30,68 @@
     <script>
       (adsbygoogle = window.adsbygoogle || []).push({});
     </script>
+
+    <!-- Comment Section -->
+    <section id="comments-area">
+      <h2>Leave a Comment</h2>
+      <form id="comment-form">
+        <input type="text" id="name" placeholder="Your name" required><br><br>
+        <textarea id="comment" placeholder="Your comment" rows="5" required></textarea><br><br>
+        <button type="submit">Post Comment</button>
+      </form>
+
+      <h2>Comments</h2>
+      <div id="comments-section">Loading comments...</div>
+    </section>
   </main>
+
   <footer>
     <p><a href="index.html">← Back to Home</a></p>
   </footer>
+
+  <script>
+    const postId = 'post1'; // Unique identifier for this post
+    const scriptURL = 'YOUR_DEPLOYED_SCRIPT_URL'; // Replace with your actual Apps Script URL
+
+    // Submit new comment
+    document.getElementById('comment-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('name').value.trim();
+      const comment = document.getElementById('comment').value.trim();
+      if (!name || !comment) return;
+
+      await fetch(scriptURL, {
+        method: 'POST',
+        body: JSON.stringify({ name, comment, postId }),
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      document.getElementById('comment-form').reset();
+      loadComments();
+    });
+
+    // Load existing comments
+    async function loadComments() {
+      try {
+        const res = await fetch(`${scriptURL}?postId=${postId}`);
+        const comments = await res.json();
+        const section = document.getElementById('comments-section');
+        if (comments.length === 0) {
+          section.innerHTML = '<p>No comments yet. Be the first to comment!</p>';
+        } else {
+          section.innerHTML = comments.map(c =>
+            `<div class="comment">
+              <strong>${c.name}</strong> <em>${new Date(c.timestamp).toLocaleString()}</em>
+              <p>${c.comment}</p>
+            </div>`
+          ).join('<hr>');
+        }
+      } catch (err) {
+        document.getElementById('comments-section').innerHTML = '<p>Failed to load comments.</p>';
+      }
+    }
+
+    loadComments();
+  </script>
 </body>
 </html>
