@@ -5,15 +5,6 @@
   <title>How I Fine-Tuned an LLM</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="styles.css">
-
-  <!-- Google AdSense -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-  <script>
-    (adsbygoogle = window.adsbygoogle || []).push({
-      google_ad_client: "ca-pub-xxxxxxxxxxxxxx",
-      enable_page_level_ads: true
-    });
-  </script>
 </head>
 <body>
   <header>
@@ -23,18 +14,14 @@
   <main>
     <p>In this post, I describe how I used LoRA and GRPO to fine-tune a transformer model with minimal resources...</p>
 
-    <!-- Google Ad Block -->
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-client="ca-pub-xxxxxxxxxxxxxx"
-         data-ad-slot="yyyyyyyyyyyy"
-         data-ad-format="auto"></ins>
-    <script>
-      (adsbygoogle = window.adsbygoogle || []).push({});
-    </script>
+    <!-- 👏 Claps and 💬 Comments Toggle -->
+    <section id="social-actions">
+      <button id="clap-btn">👏 <span id="clap-count">0</span></button>
+      <button id="toggle-comments-btn">💬 Comments</button>
+    </section>
 
-    <!-- 🟩 COMMENTS SECTION STARTS HERE -->
-    <section id="comments-area">
+    <!-- 💬 Comments Section (Initially Hidden) -->
+    <section id="comments-area" style="display: none;">
       <h2>Leave a Comment</h2>
       <form id="comment-form">
         <input type="text" id="name" placeholder="Your name" required><br><br>
@@ -45,24 +32,37 @@
       <h2>Comments</h2>
       <div id="comments-section">Loading comments...</div>
     </section>
-    <!-- 🟥 COMMENTS SECTION ENDS HERE -->
   </main>
 
   <footer>
     <p><a href="index.html">← Back to Home</a></p>
   </footer>
 
-  <!-- ✅ FIREBASE SDK + COMMENTS SCRIPT -->
+  <!-- ✅ Firebase SDK + Logic -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, query, where, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import {
+      getFirestore,
+      collection,
+      doc,
+      addDoc,
+      getDoc,
+      setDoc,
+      updateDoc,
+      increment,
+      query,
+      where,
+      orderBy,
+      onSnapshot,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    // 🟡 Replace with your own Firebase config below:
+    // 🔧 Your Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyA3AkLphGPQy35cLP1rEt0g3hp4SQpt4XE",
       authDomain: "backpropthoughtscomments.firebaseapp.com",
       projectId: "backpropthoughtscomments",
-      storageBucket: "backpropthoughtscomments.firebasestorage.app",
+      storageBucket: "backpropthoughtscomments.appspot.com",
       messagingSenderId: "903589800417",
       appId: "1:903589800417:web:d605b4eadde34a4dd78aa0"
     };
@@ -71,13 +71,37 @@
     const db = getFirestore(app);
     const postId = "post1";
 
-    // Submit new comment
+    // 👏 Handle Claps
+    const clapBtn = document.getElementById("clap-btn");
+    const clapCount = document.getElementById("clap-count");
+    const likesRef = doc(db, "likes", postId);
+
+    getDoc(likesRef).then((docSnap) => {
+      if (docSnap.exists()) {
+        clapCount.textContent = docSnap.data().claps || 0;
+      } else {
+        setDoc(likesRef, { claps: 0 });
+      }
+    });
+
+    clapBtn.addEventListener("click", async () => {
+      await updateDoc(likesRef, { claps: increment(1) });
+      const current = parseInt(clapCount.textContent);
+      clapCount.textContent = current + 1;
+    });
+
+    // 💬 Toggle Comments
+    const commentsArea = document.getElementById("comments-area");
+    document.getElementById("toggle-comments-btn").addEventListener("click", () => {
+      commentsArea.style.display = commentsArea.style.display === "none" ? "block" : "none";
+    });
+
+    // 💬 Submit Comment
     const form = document.getElementById("comment-form");
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       const name = document.getElementById("name").value.trim();
       const comment = document.getElementById("comment").value.trim();
-
       if (name && comment) {
         await addDoc(collection(db, "comments"), {
           name,
@@ -89,39 +113,33 @@
       }
     });
 
-    // Load comments in real-time
+    // 💬 Load Comments
     const commentBox = document.getElementById("comments-section");
-    const q = query(collection(db, "comments"), where("postId", "==", postId), orderBy("timestamp", "desc"));
+    const q = query(
+      collection(db, "comments"),
+      where("postId", "==", postId),
+      orderBy("timestamp", "desc")
+    );
 
     onSnapshot(q, (snapshot) => {
-    console.log("Snapshot size:", snapshot.size);  // ✅ Check how many comments were returned
-  
-    commentBox.innerHTML = "";
-    if (snapshot.empty) {
-      console.log("No comments found.");           // ✅ If empty, confirm in console
-      commentBox.innerHTML = "<p>No comments yet. Be the first!</p>";
-      return;
-    }
-  
-    snapshot.forEach((doc) => {
-      const data = doc.data();
-      console.log("Rendering comment:", data);     // ✅ See what data is being looped
-  
-      let time = "Just now";
-      try {
-        if (data.timestamp && data.timestamp.toDate) {
-          time = data.timestamp.toDate().toLocaleString();
-        }
-      } catch (e) {
-        console.warn("Invalid timestamp:", e);
+      commentBox.innerHTML = "";
+      if (snapshot.empty) {
+        commentBox.innerHTML = "<p>No comments yet. Be the first!</p>";
       }
-  
-      const div = document.createElement("div");
-      div.classList.add("comment");
-      div.innerHTML = `<strong>${data.name}</strong> <em>${time}</em><p>${data.comment}</p><hr>`;
-      commentBox.appendChild(div);
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        let time = "Just now";
+        try {
+          if (data.timestamp && data.timestamp.toDate) {
+            time = data.timestamp.toDate().toLocaleString();
+          }
+        } catch (e) {}
+        const div = document.createElement("div");
+        div.classList.add("comment");
+        div.innerHTML = `<strong>${data.name}</strong> <em>${time}</em><p>${data.comment}</p><hr>`;
+        commentBox.appendChild(div);
+      });
     });
-  });
   </script>
 </body>
 </html>
