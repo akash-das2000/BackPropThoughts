@@ -71,10 +71,11 @@
     const db = getFirestore(app);
     const postId = "post1";
 
-    // 👏 Handle Claps
+    // 👏 Handle Claps with LocalStorage Restriction
     const clapBtn = document.getElementById("clap-btn");
     const clapCount = document.getElementById("clap-count");
     const likesRef = doc(db, "likes", postId);
+    const localKey = `clapped-${postId}`;
 
     getDoc(likesRef).then((docSnap) => {
       if (docSnap.exists()) {
@@ -85,9 +86,15 @@
     });
 
     clapBtn.addEventListener("click", async () => {
+      if (localStorage.getItem(localKey)) {
+        alert("You've already clapped for this post!");
+        return;
+      }
+
       await updateDoc(likesRef, { claps: increment(1) });
       const current = parseInt(clapCount.textContent);
       clapCount.textContent = current + 1;
+      localStorage.setItem(localKey, "true");
     });
 
     // 💬 Toggle Comments
