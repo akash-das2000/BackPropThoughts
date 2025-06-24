@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title id="post-title">Loading...</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1 id="post-title-header">Loading...</h1>
+  </header>
+
+  <main>
+    <div id="post-content">Loading content...</div>
+
+    <section id="interactions">
+      <button id="clap-button">👏 Clap (<span id="clap-count">0</span>)</button>
+      <button id="toggle-comments">💬 Comments</button>
+    </section>
+
+    <section id="comments-section" style="display: none;">
+      <h2>Leave a Comment</h2>
+      <form id="comment-form">
+        <input type="text" id="name" placeholder="Your name" required />
+        <textarea id="comment" placeholder="Your comment" rows="5" required></textarea>
+        <button type="submit">Post Comment</button>
+      </form>
+
+      <h2>Comments</h2>
+      <div id="comments-list">Loading comments...</div>
+    </section>
+  </main>
+
+  <footer>
+    <p><a href="index.html">← Back to Home</a></p>
+  </footer>
+
+  <script type="module" src="postLoader.js"></script>
+  <script type="module" src="firebaseLogic.js"></script>
+</body>
+</html>
