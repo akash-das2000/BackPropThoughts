@@ -1,0 +1,22 @@
+[
+  {
+    "slug": "llm-finetuning",
+    "date": "2025-07-01"
+  },
+  {
+    "slug": "vision-transformers",
+    "date": "2025-06-28"
+  },
+  {
+    "slug": "self-supervised-learning",
+    "date": "2025-06-20"
+  },
+  {
+    "slug": "agents-in-production",
+    "date": "2025-06-10"
+  },
+  {
+    "slug": "llm-evaluation-metrics",
+    "date": "2025-06-01"
+  }
+]
