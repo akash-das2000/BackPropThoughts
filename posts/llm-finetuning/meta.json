@@ -1,0 +1,4 @@
+{
+  "title": "How I Fine-Tuned an LLM",
+  "summary": "Exploring LoRA and GRPO methods to fine-tune large models on limited hardware."
+}
