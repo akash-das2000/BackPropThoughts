@@ -23,17 +23,6 @@
         <div class="carousel" id="blog-carousel"></div>
       </section>
 
-      <!-- Blog List Below -->
-      <ul class="blog-listing">
-        <li><a href="post.html?postId=post2">From Time-Series Data to Digital Twin</a></li>
-        <li><a href="#">(Future Post)</a></li>
-        <li>
-          <a href="https://www.analyticsvidhya.com/blog/author/akashdas/" target="_blank">
-            My Past Blogs for Analytics Vidhya
-          </a>
-          <p class="ownership-note">(Articles owned and published by AV)</p>
-        </li>
-      </ul>
     </section>
 
     <!-- About Me (right) -->
@@ -78,6 +67,17 @@
 
   <!-- Carousel JS -->
   <script>
+    async function findFeaturedImage(slug) {
+      const exts = ['jpg', 'jpeg', 'png', 'webp'];
+      for (const ext of exts) {
+        try {
+          const res = await fetch(`posts/${slug}/featured.${ext}`, { method: 'HEAD' });
+          if (res.ok) return `posts/${slug}/featured.${ext}`;
+        } catch (_) {}
+      }
+      return 'images/featured_blog.jpg'; // fallback
+    }
+
     async function loadCarousel() {
       const carousel = document.getElementById("blog-carousel");
       try {
@@ -88,12 +88,13 @@
           const slug = blog.slug;
           const metaRes = await fetch(`posts/${slug}/meta.json`);
           const meta = await metaRes.json();
+          const imgSrc = await findFeaturedImage(slug);
 
           const slide = document.createElement("div");
           slide.classList.add("carousel-slide");
 
           slide.innerHTML = `
-            <img src="posts/${slug}/featured.jpg" alt="${meta.title}" class="carousel-image" />
+            <img src="${imgSrc}" alt="${meta.title}" class="carousel-image" />
             <h3 class="carousel-title">${meta.title}</h3>
             <p class="carousel-summary">${meta.summary}</p>
             <a href="posts/${slug}/index.html" class="read-more-btn">Read More →</a>
