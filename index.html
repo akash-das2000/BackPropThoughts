@@ -5,9 +5,6 @@
   <title>BackPropThoughts</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="styles.css">
-
-  <!-- Swiper CSS -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css" />
 </head>
 <body>
 
@@ -20,44 +17,13 @@
     <!-- Blog list (left) -->
     <section class="blog-list">
 
-      <!-- Featured Blog Carousel -->
-      <div class="swiper featured-blog-carousel">
-        <div class="swiper-wrapper">
-          <!-- Slide 1 -->
-          <div class="swiper-slide">
-            <section class="featured-blog">
-              <img src="images/featured_blog.jpg" alt="LLM Fine-Tuning" class="featured-image">
-              <h2 class="featured-title">How I Fine-Tuned an LLM</h2>
-              <p class="featured-summary">An in-depth walkthrough on LoRA and GRPO with limited resources.</p>
-              <a href="post.html?postId=post1" class="read-more-btn">Read More →</a>
-            </section>
-          </div>
-
-          <!-- Slide 2 -->
-          <div class="swiper-slide">
-            <section class="featured-blog">
-              <img src="images/blog2.jpg" alt="Digital Twin" class="featured-image">
-              <h2 class="featured-title">From Time-Series Data to Digital Twin</h2>
-              <p class="featured-summary">Building simulations from raw data using modern ML techniques.</p>
-              <a href="post.html?postId=post2" class="read-more-btn">Read More →</a>
-            </section>
-          </div>
-
-          <!-- Slide 3 -->
-          <div class="swiper-slide">
-            <section class="featured-blog">
-              <img src="images/comingsoon.jpg" alt="Future Posts" class="featured-image">
-              <h2 class="featured-title">(Future Post)</h2>
-              <p class="featured-summary">More explorations in LLMs and digital agents are on the way!</p>
-              <a href="#" class="read-more-btn">Coming Soon</a>
-            </section>
-          </div>
-        </div>
-
-        <!-- Navigation buttons -->
-        <div class="swiper-button-next"></div>
-        <div class="swiper-button-prev"></div>
-      </div>
+      <!-- Featured Blog Card -->
+      <section class="featured-blog">
+        <img src="images/featured_blog.jpg" alt="Featured Blog Image" class="featured-image">
+        <h2 class="featured-title">Latest: How I Fine-Tuned an LLM</h2>
+        <p class="featured-summary">An in-depth walkthrough on fine-tuning large language models using LoRA and GRPO on constrained resources.</p>
+        <a href="post.html?postId=post1" class="read-more-btn">Read More →</a>
+      </section>
 
       <!-- Blog List Below -->
       <ul class="blog-listing">
@@ -91,25 +57,6 @@
     <p>© 2025 Akash D</p>
   </footer>
 
-  <!-- Swiper JS -->
-  <script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
-
-  <!-- Initialize Swiper -->
-  <script>
-    const swiper = new Swiper('.featured-blog-carousel', {
-      slidesPerView: 1,
-      loop: true,
-      navigation: {
-        nextEl: '.swiper-button-next',
-        prevEl: '.swiper-button-prev'
-      },
-      autoplay: {
-        delay: 5000,
-        disableOnInteraction: false
-      }
-    });
-  </script>
-
   <!-- JS to load navbar and enable hamburger dropdown -->
   <script>
     fetch("navbar.html")
@@ -117,7 +64,6 @@
       .then(data => {
         document.getElementById("navbar-placeholder").innerHTML = data;
 
-        // Attach hamburger event listeners after navbar loads
         const hamburger = document.querySelector(".hamburger");
         const dropdown = document.getElementById("menuDropdown");
 
