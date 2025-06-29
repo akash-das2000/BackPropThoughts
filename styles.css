@@ -49,7 +49,7 @@ nav .tagline {
 }
 nav ul {
   list-style: none;
-  display: none; /* updated to hide default list for hamburger */
+  display: none; /* hide default nav links for hamburger */
   margin: 0;
   padding: 0;
 }
