@@ -11,16 +11,16 @@
   <!-- Nav -->
   <div id="navbar-placeholder"></div>
 
-  <!-- Two-column layout starts here -->
+  <!-- Main layout -->
   <main class="main-flex container">
 
-    <!-- Blog list (left) -->
+    <!-- Blog section (left) -->
     <section class="blog-list">
 
-      <!-- ✅ Carousel Container -->
+      <!-- Carousel Container -->
       <section class="carousel-container">
-        <h2 class="carousel-title">Latest Blogs</h2>
-        <div class="carousel" id="carousel"></div>
+        <h2 class="carousel-heading">Latest Blogs</h2>
+        <div class="carousel" id="blog-carousel"></div>
       </section>
 
       <!-- Blog List Below -->
@@ -33,7 +33,7 @@
           </a>
           <p class="ownership-note">(Articles owned and published by AV)</p>
         </li>
-      </ul>  
+      </ul>
     </section>
 
     <!-- About Me (right) -->
@@ -55,10 +55,10 @@
     <p>© 2025 Akash D</p>
   </footer>
 
-  <!-- JS to load navbar and enable hamburger dropdown -->
+  <!-- Navbar JS -->
   <script>
     fetch("navbar.html")
-      .then(response => response.text())
+      .then(res => res.text())
       .then(data => {
         document.getElementById("navbar-placeholder").innerHTML = data;
 
@@ -66,52 +66,60 @@
         const dropdown = document.getElementById("menuDropdown");
 
         if (hamburger && dropdown) {
-          hamburger.addEventListener("click", () => {
-            dropdown.classList.toggle("show");
-          });
-
-          window.addEventListener("click", function (event) {
+          hamburger.addEventListener("click", () => dropdown.classList.toggle("show"));
+          window.addEventListener("click", event => {
             if (!event.target.closest(".menu-container")) {
               dropdown.classList.remove("show");
             }
           });
         }
       });
+  </script>
 
-    // ✅ Carousel Script
+  <!-- Carousel JS -->
+  <script>
     async function loadCarousel() {
-      const response = await fetch('posts/index.json');
-      const posts = await response.json();
+      const carousel = document.getElementById("blog-carousel");
+      try {
+        const indexRes = await fetch("data/index.json");
+        const blogList = await indexRes.json();
 
-      const latest = posts
-        .sort((a, b) => new Date(b.date) - new Date(a.date))
-        .slice(0, 5);
+        for (const blog of blogList) {
+          const slug = blog.slug;
+          const metaRes = await fetch(`posts/${slug}/meta.json`);
+          const meta = await metaRes.json();
 
-      const carousel = document.getElementById('carousel');
+          const slide = document.createElement("div");
+          slide.classList.add("carousel-slide");
 
-      for (const post of latest) {
-        const metaRes = await fetch(`posts/${post.slug}/meta.json`);
-        const meta = await metaRes.json();
+          slide.innerHTML = `
+            <img src="posts/${slug}/featured.jpg" alt="${meta.title}" class="carousel-image" />
+            <h3 class="carousel-title">${meta.title}</h3>
+            <p class="carousel-summary">${meta.summary}</p>
+            <a href="posts/${slug}/index.html" class="read-more-btn">Read More →</a>
+          `;
 
-        const slide = document.createElement('div');
-        slide.className = 'carousel-slide';
-        slide.innerHTML = `
-          <img src="posts/${post.slug}/${meta.featuredImage}" alt="${meta.title}" class="carousel-img">
-          <h3><a href="posts/${post.slug}/index.html">${meta.title}</a></h3>
-          <p>${meta.summary}</p>
-        `;
-        carousel.appendChild(slide);
+          carousel.appendChild(slide);
+        }
+
+        startCarousel();
+      } catch (err) {
+        console.error("Error loading carousel:", err);
       }
-
-      startCarousel();
     }
 
     function startCarousel() {
-      const slides = document.querySelectorAll('.carousel-slide');
-      let current = 0;
+      const slides = document.querySelectorAll(".carousel-slide");
+      let index = 0;
+
+      if (slides.length === 0) return;
+
+      slides.forEach((s, i) => s.style.display = i === 0 ? "block" : "none");
+
       setInterval(() => {
-        slides.forEach((s, i) => s.style.display = i === current ? 'block' : 'none');
-        current = (current + 1) % slides.length;
+        slides[index].style.display = "none";
+        index = (index + 1) % slides.length;
+        slides[index].style.display = "block";
       }, 4000);
     }
 
