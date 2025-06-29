@@ -18,7 +18,7 @@
   <p>Over time, the model improves its self-editing ability using reinforcement learning based on downstream task performance.</p>
 
   <figure>
-    <img src="/assets/seal_overview.jpg" alt="SEAL Overview">
+    <img src="./assets/seal_overview.jpg" alt="SEAL Overview">
     <figcaption><strong>Figure 1:</strong> SEAL's reinforcement loop: the model proposes edits, applies updates, evaluates performance, and learns from the reward.</figcaption>
   </figure>
 
@@ -36,7 +36,7 @@
   <p>In this setup, SEAL reads a passage and generates useful inferences (implications or QA pairs). These are used for finetuning, helping the model remember and apply new knowledge without needing the passage in-context.</p>
 
   <figure>
-    <img src="/assets/knowledge_incorporation.jpg" alt="Knowledge Incorporation">
+    <img src="./assets/knowledge_incorporation.jpg" alt="Knowledge Incorporation">
     <figcaption><strong>Figure 2:</strong> SEAL transforms input passages into synthetic implications, which are used for model finetuning.</figcaption>
   </figure>
 
@@ -44,7 +44,7 @@
   <p>SEAL also handles abstract reasoning tasks from the ARC benchmark. It learns to choose the best data augmentations and optimization settings—like learning rate or token-wise loss computation—to adapt with minimal examples.</p>
 
   <figure>
-    <img src="/assets/few_shot_arc.jpg" alt="Few-Shot ARC Learning">
+    <img src="./assets/few_shot_arc.jpg" alt="Few-Shot ARC Learning">
     <figcaption><strong>Figure 3:</strong> SEAL outputs a JSON-style edit defining training strategy and augmentations to apply on few-shot demos.</figcaption>
   </figure>
 
@@ -56,7 +56,7 @@
   </ul>
 
   <figure>
-    <img src="/assets/forgetting_curve.jpg" alt="Catastrophic Forgetting">
+    <img src="./assets/forgetting_curve.jpg" alt="Catastrophic Forgetting">
     <figcaption><strong>Figure 4:</strong> Model accuracy on earlier tasks degrades after repeated updates—a symptom of catastrophic forgetting.</figcaption>
   </figure>
 
