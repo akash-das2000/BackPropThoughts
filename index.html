@@ -22,8 +22,7 @@
         <h2 class="carousel-heading">Latest Blogs</h2>
         <div class="carousel" id="blog-carousel">
           <div class="carousel-inner" id="carousel-inner"></div>
-          <button class="carousel-arrow left" onclick="changeSlide(-1)">&#8249;</button>
-          <button class="carousel-arrow right" onclick="changeSlide(1)">&#8250;</button>
+          <div class="carousel-dots" id="carousel-dots"></div>
         </div>
       </section>
 
@@ -81,8 +80,6 @@
 
   <!-- Carousel JS -->
   <script>
-    let currentSlide = 0;
-
     async function findFeaturedImage(slug) {
       const exts = ['jpg', 'jpeg', 'png', 'webp'];
       for (const ext of exts) {
@@ -91,11 +88,15 @@
           if (res.ok) return `posts/${slug}/featured.${ext}`;
         } catch (_) {}
       }
-      return 'images/featured_blog.jpg'; // fallback
+      return 'images/featured_blog.jpg';
     }
+
+    let currentIndex = 0;
+    let timer;
 
     async function loadCarousel() {
       const inner = document.getElementById("carousel-inner");
+      const dotsContainer = document.getElementById("carousel-dots");
       try {
         const indexRes = await fetch("data/index.json");
         const blogList = await indexRes.json();
@@ -107,7 +108,7 @@
           const imgSrc = await findFeaturedImage(slug);
 
           const slide = document.createElement("div");
-          slide.className = "carousel-slide";
+          slide.classList.add("carousel-slide");
           slide.innerHTML = `
             <img src="${imgSrc}" alt="${meta.title}" class="carousel-image" />
             <h3 class="carousel-title">${meta.title}</h3>
@@ -115,27 +116,40 @@
             <a href="posts/${slug}/index.html" class="read-more-btn">Read More →</a>
           `;
           inner.appendChild(slide);
+
+          const dot = document.createElement("button");
+          dot.addEventListener("click", () => {
+            goToSlide(Array.from(dotsContainer.children).indexOf(dot));
+          });
+          dotsContainer.appendChild(dot);
         }
 
         updateCarousel();
-        setInterval(() => changeSlide(1), 5000);
+        timer = setInterval(() => goToSlide(currentIndex + 1), 4000);
       } catch (err) {
         console.error("Error loading carousel:", err);
       }
     }
 
-    function changeSlide(direction) {
-      const inner = document.getElementById("carousel-inner");
-      const totalSlides = inner.children.length;
-      if (totalSlides === 0) return;
-
-      currentSlide = (currentSlide + direction + totalSlides) % totalSlides;
-      updateCarousel();
-    }
-
     function updateCarousel() {
       const inner = document.getElementById("carousel-inner");
-      inner.style.transform = `translateX(-${currentSlide * 100}%)`;
+      const slides = document.querySelectorAll(".carousel-slide");
+      const dots = document.querySelectorAll(".carousel-dots button");
+
+      if (!slides.length) return;
+      currentIndex = (currentIndex + slides.length) % slides.length;
+
+      inner.style.transform = `translateX(-${currentIndex * 100}%)`;
+
+      dots.forEach(dot => dot.classList.remove("active"));
+      if (dots[currentIndex]) dots[currentIndex].classList.add("active");
+    }
+
+    function goToSlide(index) {
+      currentIndex = index;
+      updateCarousel();
+      clearInterval(timer);
+      timer = setInterval(() => goToSlide(currentIndex + 1), 4000);
     }
 
     loadCarousel();
