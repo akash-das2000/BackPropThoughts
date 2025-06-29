@@ -1,7 +1,9 @@
 <nav class="navbar">
   <div class="brand-group">
     <div class="brand">BackPropThoughts</div>
-    <div class="tagline">Perspectives on evolving ML architectures, scalable automation, and intelligent systems</div>
+    <div class="tagline">
+      Perspectives on evolving ML architectures, scalable automation, and intelligent systems
+    </div>
   </div>
 
   <div class="menu-container">
@@ -14,17 +16,22 @@
   </div>
 </nav>
 
+<!-- Hamburger Dropdown Toggle Script -->
 <script>
   function toggleMenu() {
-    document.getElementById("menuDropdown").classList.toggle("show");
-  }
-
-  window.onclick = function(event) {
-    if (!event.target.matches('.hamburger')) {
-      const dropdown = document.getElementById("menuDropdown");
-      if (dropdown && dropdown.classList.contains('show')) {
-        dropdown.classList.remove('show');
-      }
+    const dropdown = document.getElementById("menuDropdown");
+    if (dropdown) {
+      dropdown.classList.toggle("show");
     }
   }
+
+  // Optional: Close menu if clicked outside
+  window.addEventListener("click", function (event) {
+    if (!event.target.closest(".menu-container")) {
+      const dropdown = document.getElementById("menuDropdown");
+      if (dropdown && dropdown.classList.contains("show")) {
+        dropdown.classList.remove("show");
+      }
+    }
+  });
 </script>
