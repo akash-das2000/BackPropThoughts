@@ -289,7 +289,7 @@ a:hover {
   margin-bottom: 0.5rem;
 }
 
-/* === Carousel === */
+/* === Carousel Styles === */
 .carousel-container {
   background-color: #fff;
   border: 1px solid #ddd;
@@ -297,16 +297,10 @@ a:hover {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   padding: 20px;
   margin-bottom: 20px;
-  position: relative;
-}
-.carousel-heading {
-  font-size: 22px;
-  font-weight: bold;
-  margin-bottom: 15px;
 }
 .carousel {
-  overflow: hidden;
   position: relative;
+  overflow: hidden;
 }
 .carousel-inner {
   display: flex;
@@ -316,6 +310,7 @@ a:hover {
   min-width: 100%;
   box-sizing: border-box;
   padding: 10px;
+  text-align: left;
 }
 .carousel-slide img {
   width: 100%;
@@ -324,46 +319,35 @@ a:hover {
   border-radius: 8px;
   margin-bottom: 10px;
 }
-.carousel-slide h3 {
+.carousel-title {
   font-size: 18px;
   margin: 5px 0;
+  color: #007acc;
 }
-.carousel-slide p {
+.carousel-summary {
   font-size: 14px;
   color: #444;
   line-height: 1.5;
 }
-.carousel-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: #007acc;
+.carousel-dots {
+  text-align: center;
+  margin-top: 10px;
 }
-
-/* Carousel Arrows */
-.carousel-arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
+.carousel-dots button {
+  width: 10px;
+  height: 10px;
+  margin: 0 6px;
+  border-radius: 50%;
   border: none;
-  font-size: 30px;
-  color: #333;
+  background-color: #bbb;
   cursor: pointer;
-  z-index: 10;
-  padding: 0 10px;
+  transition: background-color 0.3s;
 }
-.carousel-arrow.left {
-  left: 0;
-}
-.carousel-arrow.right {
-  right: 0;
-}
-.carousel-arrow:hover {
-  color: #000;
-  text-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
+.carousel-dots button.active {
+  background-color: #007acc;
 }
 
-/* Responsive Tweaks */
+/* Mobile responsive tweaks */
 @media (max-width: 768px) {
   .carousel-slide img {
     max-height: 160px;
