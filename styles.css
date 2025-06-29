@@ -271,7 +271,6 @@ a:hover {
 #comment-form button:hover {
   background-color: #005fa3;
 }
-
 .comment {
   background-color: #fdfdfd;
   border-left: 4px solid #0077cc;
@@ -289,4 +288,31 @@ a:hover {
   color: #777;
   display: block;
   margin-bottom: 0.5rem;
+}
+
+/* === Responsive Nav Fix for Desktop === */
+@media (min-width: 768px) {
+  .hamburger {
+    display: none; /* Hide hamburger on desktop */
+  }
+
+  .dropdown {
+    display: flex !important;
+    position: static;
+    flex-direction: row;
+    border: none;
+    box-shadow: none;
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+  }
+
+  .dropdown li {
+    padding: 0 15px;
+  }
+
+  .dropdown li a {
+    font-size: 16px;
+    font-weight: 500;
+  }
 }
