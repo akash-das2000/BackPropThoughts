@@ -308,16 +308,16 @@ a:hover {
 .carousel {
   position: relative;
   overflow: hidden;
-  height: 300px;
+  height: auto;
 }
 .carousel-slide {
   display: none;
   text-align: left;
-  animation: fadeIn 1s ease-in-out;
+  animation: fadeIn 0.6s ease-in-out;
 }
 .carousel-slide img {
   width: 100%;
-  max-height: 180px;
+  max-height: 220px;
   object-fit: cover;
   border-radius: 8px;
   margin-bottom: 10px;
@@ -339,16 +339,43 @@ a:hover {
   line-height: 1.5;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+/* Arrows */
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 28px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  padding: 5px 12px;
+  cursor: pointer;
+  z-index: 10;
+  user-select: none;
+  transition: background 0.2s;
+}
+.carousel-arrow:hover {
+  background-color: #f2f2f2;
+}
+.carousel-arrow.left {
+  left: 10px;
+}
+.carousel-arrow.right {
+  right: 10px;
 }
 
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Mobile tweaks */
 @media (max-width: 768px) {
-  .carousel {
-    height: auto;
-  }
   .carousel-slide img {
     max-height: 160px;
+  }
+  .carousel-arrow {
+    font-size: 22px;
+    padding: 4px 10px;
   }
 }
