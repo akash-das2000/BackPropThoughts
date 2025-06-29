@@ -21,7 +21,19 @@
       <section class="carousel-container">
         <h2 class="carousel-heading">Latest Blogs</h2>
         <div class="carousel" id="blog-carousel"></div>
+        <div class="carousel-arrow left" onclick="changeSlide(-1)">&#8249;</div>
+        <div class="carousel-arrow right" onclick="changeSlide(1)">&#8250;</div>
       </section>
+
+      <!-- AV Blog List Card -->
+      <ul class="blog-listing">
+        <li>
+          <a href="https://www.analyticsvidhya.com/blog/author/akashdas/" target="_blank">
+            My Past Blogs for Analytics Vidhya
+          </a>
+          <p class="ownership-note">(Articles owned and published by AV)</p>
+        </li>
+      </ul>
 
     </section>
 
@@ -109,19 +121,25 @@
       }
     }
 
-    function startCarousel() {
-      const slides = document.querySelectorAll(".carousel-slide");
-      let index = 0;
+    let currentSlide = 0;
+    let slides = [];
 
+    function startCarousel() {
+      slides = document.querySelectorAll(".carousel-slide");
       if (slides.length === 0) return;
 
       slides.forEach((s, i) => s.style.display = i === 0 ? "block" : "none");
 
       setInterval(() => {
-        slides[index].style.display = "none";
-        index = (index + 1) % slides.length;
-        slides[index].style.display = "block";
+        changeSlide(1);
       }, 4000);
+    }
+
+    function changeSlide(step) {
+      if (slides.length === 0) return;
+      slides[currentSlide].style.display = "none";
+      currentSlide = (currentSlide + step + slides.length) % slides.length;
+      slides[currentSlide].style.display = "block";
     }
 
     loadCarousel();
