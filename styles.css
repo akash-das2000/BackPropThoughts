@@ -331,21 +331,27 @@ a:hover {
 }
 .carousel-dots {
   text-align: center;
-  margin-top: 10px;
+  margin-top: 15px;
 }
+
 .carousel-dots button {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   margin: 0 6px;
   border-radius: 50%;
   border: none;
-  background-color: #bbb;
+  background-color: rgba(0, 0, 0, 0.2); /* subtle transparent */
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  display: inline-block;
 }
+
 .carousel-dots button.active {
-  background-color: #007acc;
+  background-color: #007acc; /* highlight active dot */
+  transform: scale(1.2); /* slight emphasis */
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.15);
 }
+
 
 /* Mobile responsive tweaks */
 @media (max-width: 768px) {
