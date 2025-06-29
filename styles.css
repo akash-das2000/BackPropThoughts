@@ -49,18 +49,47 @@ nav .tagline {
 }
 nav ul {
   list-style: none;
-  display: flex;
-  gap: 20px;
+  display: none; /* updated to hide default list for hamburger */
   margin: 0;
   padding: 0;
 }
-nav ul li a {
+
+/* === Hamburger Menu Additions === */
+.menu-container {
+  position: relative;
+}
+.hamburger {
+  font-size: 24px;
+  cursor: pointer;
+  padding: 10px;
+  user-select: none;
+}
+.dropdown {
+  display: none;
+  position: absolute;
+  top: 40px;
+  right: 0;
+  background-color: #ffffff;
+  border: 1px solid #ccc;
+  list-style: none;
+  padding: 10px 0;
+  margin: 0;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+  z-index: 1000;
+}
+.dropdown li {
+  padding: 8px 20px;
+}
+.dropdown li a {
   text-decoration: none;
   color: #333;
-  font-weight: 500;
+  display: block;
 }
-nav ul li a:hover {
-  color: #007acc;
+.dropdown li:hover {
+  background-color: #f0f0f0;
+}
+.dropdown.show {
+  display: block;
 }
 
 /* === Layout === */
