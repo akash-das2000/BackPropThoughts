@@ -1,9 +1,30 @@
-<nav>
+<nav class="navbar">
   <div class="brand-group">
     <div class="brand">BackPropThoughts</div>
     <div class="tagline">Perspectives on evolving ML architectures, scalable automation, and intelligent systems</div>
   </div>
-  <ul>
-    <li><a href="index.html">Home</a></li>
-  </ul>
+
+  <div class="menu-container">
+    <div class="hamburger" onclick="toggleMenu()">☰</div>
+    <ul class="dropdown" id="menuDropdown">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="#">Blog</a></li>
+      <li><a href="#">Interview Prep</a></li>
+    </ul>
+  </div>
 </nav>
+
+<script>
+  function toggleMenu() {
+    document.getElementById("menuDropdown").classList.toggle("show");
+  }
+
+  window.onclick = function(event) {
+    if (!event.target.matches('.hamburger')) {
+      const dropdown = document.getElementById("menuDropdown");
+      if (dropdown && dropdown.classList.contains('show')) {
+        dropdown.classList.remove('show');
+      }
+    }
+  }
+</script>
