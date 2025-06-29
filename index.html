@@ -57,12 +57,28 @@
     <p>© 2025 Akash D</p>
   </footer>
 
-  <!-- JS to load navbar -->
+  <!-- JS to load navbar and enable hamburger dropdown -->
   <script>
     fetch("navbar.html")
       .then(response => response.text())
       .then(data => {
         document.getElementById("navbar-placeholder").innerHTML = data;
+
+        // Attach hamburger event listeners after navbar loads
+        const hamburger = document.querySelector(".hamburger");
+        const dropdown = document.getElementById("menuDropdown");
+
+        if (hamburger && dropdown) {
+          hamburger.addEventListener("click", () => {
+            dropdown.classList.toggle("show");
+          });
+
+          window.addEventListener("click", function (event) {
+            if (!event.target.closest(".menu-container")) {
+              dropdown.classList.remove("show");
+            }
+          });
+        }
       });
   </script>
 
