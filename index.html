@@ -17,12 +17,10 @@
     <!-- Blog list (left) -->
     <section class="blog-list">
 
-      <!-- Featured Blog Card -->
-      <section class="featured-blog">
-        <img src="images/featured_blog.jpg" alt="Featured Blog Image" class="featured-image">
-        <h2 class="featured-title">Latest: How I Fine-Tuned an LLM</h2>
-        <p class="featured-summary">An in-depth walkthrough on fine-tuning large language models using LoRA and GRPO on constrained resources.</p>
-        <a href="post.html?postId=post1" class="read-more-btn">Read More →</a>
+      <!-- ✅ Carousel Container -->
+      <section class="carousel-container">
+        <h2 class="carousel-title">Latest Blogs</h2>
+        <div class="carousel" id="carousel"></div>
       </section>
 
       <!-- Blog List Below -->
@@ -79,6 +77,45 @@
           });
         }
       });
+
+    // ✅ Carousel Script
+    async function loadCarousel() {
+      const response = await fetch('posts/index.json');
+      const posts = await response.json();
+
+      const latest = posts
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .slice(0, 5);
+
+      const carousel = document.getElementById('carousel');
+
+      for (const post of latest) {
+        const metaRes = await fetch(`posts/${post.slug}/meta.json`);
+        const meta = await metaRes.json();
+
+        const slide = document.createElement('div');
+        slide.className = 'carousel-slide';
+        slide.innerHTML = `
+          <img src="posts/${post.slug}/${meta.featuredImage}" alt="${meta.title}" class="carousel-img">
+          <h3><a href="posts/${post.slug}/index.html">${meta.title}</a></h3>
+          <p>${meta.summary}</p>
+        `;
+        carousel.appendChild(slide);
+      }
+
+      startCarousel();
+    }
+
+    function startCarousel() {
+      const slides = document.querySelectorAll('.carousel-slide');
+      let current = 0;
+      setInterval(() => {
+        slides.forEach((s, i) => s.style.display = i === current ? 'block' : 'none');
+        current = (current + 1) % slides.length;
+      }, 4000);
+    }
+
+    loadCarousel();
   </script>
 
 </body>
