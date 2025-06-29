@@ -1,7 +1,0 @@
-{
-  "slug": "llm-finetuning",
-  "title": "How I Fine-Tuned an LLM",
-  "date": "2025-07-01",
-  "summary": "An in-depth guide to LoRA and GRPO fine-tuning on limited compute.",
-  "featuredImage": "featured.jpg"
-}
