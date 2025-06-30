@@ -1,65 +1,110 @@
 <section>
-  <h1 id="random-forest-algorithm">Rooted in Wisdom: Understanding the Random Forest Algorithm</h1>
-  <p><em>A comprehensive breakdown of the Random Forest algorithm—how it works, its mathematical foundation, strengths, and real-world nuances.</em></p>
+  <h1 id="random-forest-algorithm">Rooted in Wisdom: A Deep Dive into the Random Forest Algorithm</h1>
+  <p><em>An advanced technical breakdown of Random Forests, complete with mathematical rigor, splitting criteria, hyperparameters, and theoretical guarantees.</em></p>
 
   <h2 id="introduction">1. Introduction</h2>
-  <p>Among the most celebrated algorithms in classical machine learning, <strong>Random Forest</strong> sits at the intersection of accuracy, interpretability, and versatility. Built atop decision trees, it corrects their tendency to overfit by combining the predictions of many “weak” learners into a powerful “ensemble” predictor. But how exactly does it work, and why is it so effective?</p>
+  <p>
+    Random Forest is a powerful ensemble method built upon the humble decision tree. It combines bagging (bootstrap aggregation) and randomized feature selection to create a robust model that reduces variance without increasing bias. In this blog, we delve deep into the technical underpinnings of Random Forest, exploring its mathematical formalism, splitting heuristics, hyperparameter interactions, and limitations.
+  </p>
 
   <h2 id="why-random-forest">2. Why Random Forest?</h2>
-  <p>Single decision trees are easy to understand but can be unstable—small variations in data can lead to very different tree structures. Random Forest reduces this variance by averaging the predictions of multiple trees trained on different parts of the data. This process creates a strong learner from many weak ones.</p>
-
-  <h2 id="how-it-works">3. How It Works</h2>
-  <p>Random Forest builds a multitude of decision trees and merges their outputs. Here's how:</p>
+  <p>
+    Consider a dataset \( D = \{(x_i, y_i)\}_{i=1}^n \) with \( x_i \in \mathbb{R}^d \) and labels \( y_i \in \mathcal{Y} \). A decision tree fits this data greedily and deterministically—making it prone to high variance. Random Forest counters this by constructing an ensemble of \( B \) trees \( \{T_b\}_{b=1}^B \), each trained on a bootstrap sample and random feature subsets.
+  </p>
+  <p>
+    The final prediction is:
+  </p>
   <ul>
-    <li><strong>Bootstrap Sampling:</strong> Each tree is trained on a random sample (with replacement) from the dataset—called a bootstrap sample.</li>
-    <li><strong>Feature Randomness:</strong> At each split in the tree, a random subset of features is selected from which the best split is chosen. This introduces further de-correlation among the trees.</li>
-    <li><strong>Ensemble Voting/Averaging:</strong> For classification tasks, the mode (majority vote) of all tree predictions is used. For regression, the average prediction is returned.</li>
+    <li><strong>Classification:</strong> \( \hat{y} = \mathrm{mode}\left(T_1(x), T_2(x), \dots, T_B(x)\right) \)</li>
+    <li><strong>Regression:</strong> \( \hat{y} = \frac{1}{B} \sum_{b=1}^B T_b(x) \)</li>
   </ul>
 
-  <h2 id="math-behind-random-forest">4. Mathematical Foundation</h2>
-  <p>Let’s formalize the key ideas:</p>
+  <h2 id="tree-growth">3. Decision Tree Construction</h2>
+  <p>Each decision tree in the forest is constructed using the CART algorithm. At every split, it chooses the feature and threshold that minimize an impurity function over the chosen subset of features \( m \ll d \).</p>
+
+  <h3 id="splitting-criteria">3.1 Splitting Criteria</h3>
   <ul>
-    <li>Suppose we have a training dataset \( D = \{(x_1, y_1), ..., (x_n, y_n)\} \), where \( x_i \in \mathbb{R}^d \) and \( y_i \in \mathbb{R} \) or \( \{0, 1, ..., K\} \).</li>
-    <li>For each tree \( T_b \) (where \( b = 1, ..., B \)), draw a bootstrap sample \( D_b \) from \( D \).</li>
-    <li>Grow the tree by splitting on a random subset of features \( m \ll d \) at each node.</li>
-    <li>For classification, the final prediction is:</li>
+    <li><strong>Gini Impurity (Classification):</strong></li>
   </ul>
-  <pre><code>
-    \hat{y} = \text{mode}(T_1(x), T_2(x), ..., T_B(x))
-  </code></pre>
+  <p>
+    For a node with class probabilities \( p_k \), the Gini index is:
+    \[
+    G = 1 - \sum_{k=1}^K p_k^2
+    \]
+  </p>
+
   <ul>
-    <li>For regression:</li>
+    <li><strong>Entropy (Information Gain):</strong></li>
   </ul>
-  <pre><code>
-    \hat{y} = \frac{1}{B} \sum_{b=1}^{B} T_b(x)
-  </code></pre>
-  <p>This averaging lowers variance and makes the model less prone to overfitting compared to a single decision tree.</p>
+  <p>
+    \[
+    H = -\sum_{k=1}^K p_k \log_2 p_k
+    \]
+    The Information Gain for a split \( s \) is:
+    \[
+    IG(s) = H(P) - \sum_{j \in \text{children}} \frac{|P_j|}{|P|} H(P_j)
+    \]
+  </p>
+
+  <ul>
+    <li><strong>Mean Squared Error (Regression):</strong></li>
+  </ul>
+  <p>
+    \[
+    \mathrm{MSE} = \frac{1}{|P|} \sum_{i \in P} (y_i - \bar{y})^2
+    \]
+  </p>
+
+  <h3 id="stopping-criteria">3.2 Stopping Criteria</h3>
+  <ul>
+    <li>Minimum samples to split: \( \min_{\text{samples\_split}} \)</li>
+    <li>Maximum depth: \( \max_{\text{depth}} \)</li>
+    <li>Minimum leaf size: \( \min_{\text{samples\_leaf}} \)</li>
+    <li>Impurity threshold: stop if decrease < \( \epsilon \)</li>
+  </ul>
+
+  <h2 id="randomization">4. Randomization Mechanisms</h2>
+  <p>
+    Random Forest introduces two levels of randomness:
+  </p>
+  <ul>
+    <li><strong>Bootstrap Sampling:</strong> From dataset \( D \), sample \( D_b \sim D \) with replacement.</li>
+    <li><strong>Feature Subspacing:</strong> At each split, draw a random subset of features \( F_b \subset \{1, ..., d\} \) with \( |F_b| = m \).</li>
+  </ul>
+  <p>This induces decorrelation between trees, increasing ensemble diversity and reducing overfitting.</p>
+
+  <h2 id="hyperparameters">5. Key Hyperparameters</h2>
+  <ul>
+    <li><strong>\( B \): Number of trees.</strong> Higher \( B \) lowers variance but increases compute cost.</li>
+    <li><strong>\( m \): Number of features to consider at each split.</strong> Common defaults: \( \sqrt{d} \) for classification, \( d/3 \) for regression.</li>
+    <li><strong>\( \text{max\_depth} \):</strong> Controls model complexity.</li>
+    <li><strong>\( \text{min\_samples\_split}, \text{min\_samples\_leaf} \):</strong> Avoid overfitting to noise.</li>
+  </ul>
+
+  <h2 id="generalization-error">6. Generalization Error and Theoretical Insights</h2>
+  <p>
+    Let the margin function for an input \( x \) and correct class \( y \) be:
+    \[
+    \text{margin}(x, y) = \frac{1}{B} \sum_{b=1}^B \mathbf{1}(T_b(x) = y) - \max_{k \neq y} \frac{1}{B} \sum_{b=1}^B \mathbf{1}(T_b(x) = k)
+    \]
+  </p>
+  <p>
+    The generalization error is bounded by:
+    \[
+    \mathbb{P}(\text{margin}(x, y) < 0)
+    \]
+    As shown in Breiman's original paper (2001), ensemble diversity and tree strength are crucial for low error.
+  </p>
 
   <figure>
     <img src="posts/random-forest/assets/random_forest_diagram.JPG" alt="Random Forest Diagram">
     <figcaption><strong>Figure 1:</strong> A forest of uncorrelated decision trees voting collectively. Feature and data randomness injects diversity.</figcaption>
   </figure>
 
-  <h2 id="strengths">5. Strengths of Random Forest</h2>
+  <h2 id="feature-importance">7. Feature Importance</h2>
   <ul>
-    <li><strong>High Accuracy:</strong> Particularly robust to overfitting on training data.</li>
-    <li><strong>Handles Non-Linearity:</strong> Naturally captures complex interactions between features.</li>
-    <li><strong>Feature Importance:</strong> Can rank features by importance using metrics like Gini decrease or permutation importance.</li>
-    <li><strong>Works on Mixed Data:</strong> Handles categorical and continuous variables natively.</li>
-  </ul>
-
-  <h2 id="limitations">6. Limitations</h2>
-  <ul>
-    <li><strong>Interpretability:</strong> While individual trees are interpretable, the ensemble is more opaque.</li>
-    <li><strong>Computationally Intensive:</strong> Training and predicting with hundreds of trees can be resource-heavy.</li>
-    <li><strong>Memory Usage:</strong> Storing multiple trees consumes more memory than a single model.</li>
-  </ul>
-
-  <h2 id="feature-importance">7. Feature Importance & Interpretability</h2>
-  <p>Random Forest provides a measure of how important each feature is to the model’s decisions. Two common metrics:</p>
-  <ul>
-    <li><strong>Mean Decrease in Gini Impurity:</strong> Tracks how much each feature reduces the Gini impurity across all trees.</li>
-    <li><strong>Permutation Importance:</strong> Measures drop in model performance when a feature’s values are randomly shuffled.</li>
+    <li><strong>Mean Decrease in Impurity (MDI):</strong> Average reduction in Gini or entropy when splitting on a feature.</li>
+    <li><strong>Permutation Importance:</strong> Performance drop when feature values are randomly shuffled.</li>
   </ul>
 
   <figure>
@@ -67,16 +112,24 @@
     <figcaption><strong>Figure 2:</strong> Features ranked by their average importance across the ensemble.</figcaption>
   </figure>
 
-  <h2 id="real-world-applications">8. Real-World Applications</h2>
+  <h2 id="limitations">8. Limitations</h2>
   <ul>
-    <li><strong>Healthcare:</strong> Diagnosing diseases using patient data.</li>
-    <li><strong>Finance:</strong> Fraud detection and credit scoring.</li>
-    <li><strong>Marketing:</strong> Customer segmentation and churn prediction.</li>
-    <li><strong>Ecology:</strong> Modeling species distributions and environmental impacts.</li>
+    <li>Harder to interpret than single trees.</li>
+    <li>May not extrapolate well outside training data range (esp. regression).</li>
+    <li>Can be slow on very large datasets with many trees.</li>
   </ul>
 
-  <h2 id="final-thoughts">9. Final Thoughts</h2>
-  <p>Random Forest is one of the most powerful tools in the machine learning toolkit. It combines the simplicity of decision trees with the power of ensemble learning. Though newer deep learning models now dominate many domains, Random Forest remains a go-to choice when interpretability, quick deployment, and tabular data are involved.</p>
+  <h2 id="applications">9. Real-World Applications</h2>
+  <ul>
+    <li>Fraud detection, medical diagnosis, genomics.</li>
+    <li>Credit scoring, customer segmentation.</li>
+    <li>Environmental modeling and remote sensing.</li>
+  </ul>
 
-  <p><em>Explore the algorithm hands-on using scikit-learn's RandomForestClassifier at <a href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html" target="_blank">scikit-learn documentation</a>.</em></p>
+  <h2 id="final-thoughts">10. Final Thoughts</h2>
+  <p>
+    Random Forest is not just a convenient default—it is a deeply grounded, theoretically robust model that balances predictive power with resistance to overfitting. Its foundation in ensemble theory and statistical learning makes it ideal for tabular, structured data where neural nets often struggle.
+  </p>
+
+  <p><em>Explore the implementation via <a href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html" target="_blank">scikit-learn's RandomForestClassifier</a>.</em></p>
 </section>
