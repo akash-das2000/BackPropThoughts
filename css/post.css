@@ -110,7 +110,7 @@ main img {
   color: #000;
 }
 .reading-time-display i.fa-clock + span {
-  margin-left: 4px;
+  margin-left: 1px;
 }
 
 /* === TOC Sidebar === */
