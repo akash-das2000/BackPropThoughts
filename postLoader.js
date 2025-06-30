@@ -85,12 +85,11 @@ if (!postId) {
         toggleIcon.textContent = tocBox.classList.contains("collapsed") ? "▼" : "▲";
       });
 
-      // === Mobile: Move TOC after full Introduction section ===
+      // === Mobile TOC Positioning After Introduction ===
       try {
         if (window.innerWidth <= 768) {
           const rightTocSlot = document.querySelector(".right-toc-slot");
           const h2s = Array.from(contentDiv.querySelectorAll("h2"));
-
           const introHeading = h2s.find(h =>
             h.textContent.trim().toLowerCase().includes("introduction")
           );
@@ -115,6 +114,37 @@ if (!postId) {
       } catch (e) {
         console.warn("Mobile TOC logic failed:", e);
       }
+
+      // === Scroll to Top Button ===
+      const scrollBtn = document.createElement("button");
+      scrollBtn.id = "scrollToTopBtn";
+      scrollBtn.textContent = "↑ Top";
+      document.body.appendChild(scrollBtn);
+
+      scrollBtn.addEventListener("click", () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+
+      window.addEventListener("scroll", () => {
+        if (window.scrollY > 500) {
+          scrollBtn.classList.add("show");
+        } else {
+          scrollBtn.classList.remove("show");
+        }
+      });
+
+      // === Smooth Scroll on TOC click (override default anchor jump) ===
+      tocList.addEventListener("click", e => {
+        const link = e.target.closest("a[href^='#']");
+        if (link) {
+          e.preventDefault();
+          const target = document.querySelector(link.getAttribute("href"));
+          if (target) {
+            target.scrollIntoView({ behavior: "smooth" });
+            history.pushState(null, null, link.getAttribute("href"));
+          }
+        }
+      });
     })
     .catch(err => {
       document.getElementById("post-content").innerHTML = "<p>Post not found.</p>";
@@ -133,16 +163,4 @@ if (!postId) {
     .catch(err => {
       console.warn("Could not load blog metadata:", err);
     });
-
-  // === Scroll To Top Button Logic ===
-  const scrollBtn = document.getElementById("scrollToTopBtn");
-  if (scrollBtn) {
-    window.addEventListener("scroll", () => {
-      scrollBtn.style.display = window.scrollY > 500 ? "block" : "none";
-    });
-
-    scrollBtn.addEventListener("click", () => {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    });
-  }
 }
