@@ -7,35 +7,46 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <main>
 
-    <!-- 📌 Top Ad Slot -->
-    <div class="ad-slot ad-top"></div>
+  <div class="blog-layout">
 
-    <!-- 📌 Post Content -->
-    <div id="post-content">Loading content...</div>
+    <!-- 📌 Left Sidebar Ad Slot -->
+    <aside class="left-ad-slot">
+      <div class="ad-slot sidebar">Ad Placeholder</div>
+    </aside>
 
-    <!-- 📌 Bottom Ad Slot -->
-    <div class="ad-slot ad-bottom"></div>
+    <!-- 📌 Main Blog Area -->
+    <main>
 
-    <!-- 👏 Interactions -->
-    <section id="interactions">
-      <button id="clap-button">👏 Clap (<span id="clap-count">0</span>)</button>
-      <button id="toggle-comments">💬 Comments</button>
-    </section>
+      <!-- 📌 Top Ad Slot -->
+      <div class="ad-slot ad-top"></div>
 
-    <section id="comments-section" style="display: none;">
-      <h2>Leave a Comment</h2>
-      <form id="comment-form">
-        <input type="text" id="name" placeholder="Your name" required />
-        <textarea id="comment" placeholder="Your comment" rows="5" required></textarea>
-        <button type="submit">Post Comment</button>
-      </form>
+      <!-- 📌 Post Content -->
+      <div id="post-content">Loading content...</div>
 
-      <h2>Comments</h2>
-      <div id="comments-list">Loading comments...</div>
-    </section>
-  </main>
+      <!-- 📌 Bottom Ad Slot -->
+      <div class="ad-slot ad-bottom"></div>
+
+      <!-- 👏 Interactions -->
+      <section id="interactions">
+        <button id="clap-button">👏 Clap (<span id="clap-count">0</span>)</button>
+        <button id="toggle-comments">💬 Comments</button>
+      </section>
+
+      <section id="comments-section" style="display: none;">
+        <h2>Leave a Comment</h2>
+        <form id="comment-form">
+          <input type="text" id="name" placeholder="Your name" required />
+          <textarea id="comment" placeholder="Your comment" rows="5" required></textarea>
+          <button type="submit">Post Comment</button>
+        </form>
+
+        <h2>Comments</h2>
+        <div id="comments-list">Loading comments...</div>
+      </section>
+
+    </main>
+  </div>
 
   <footer>
     <p><a href="index.html">← Back to Home</a></p>
