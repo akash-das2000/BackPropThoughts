@@ -19,7 +19,7 @@ if (!postId) {
       console.error(err);
     });
 
-  // Load blog metadata
+  // Load blog metadata for browser tab only (not visible heading)
   fetch(`posts/${postId}/meta.json`)
     .then(res => {
       if (!res.ok) throw new Error("Meta not found");
@@ -27,9 +27,7 @@ if (!postId) {
     })
     .then(meta => {
       const title = meta.title || postId;
-      document.getElementById("post-title").textContent = title;
-      document.getElementById("post-title-header").textContent = title;
-      document.title = title;
+      document.title = title; // only set browser tab title
     })
     .catch(err => {
       console.warn("Could not load blog metadata:", err);
