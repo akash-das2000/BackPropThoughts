@@ -34,15 +34,7 @@ if (!postId) {
       readingTimeDiv.title = "Read Time";
 
       const firstH1 = contentDiv.querySelector("h1");
-      const subtitle = firstH1?.nextElementSibling?.tagName === "P" ? firstH1.nextElementSibling : null;
-
-      if (firstH1 && subtitle) {
-        const wrapper = document.createElement("div");
-        wrapper.className = "heading-meta-wrapper";
-        wrapper.appendChild(subtitle);
-        wrapper.appendChild(readingTimeDiv);
-        firstH1.insertAdjacentElement("afterend", wrapper);
-      } else if (firstH1) {
+      if (firstH1) {
         firstH1.insertAdjacentElement("afterend", readingTimeDiv);
       } else {
         contentDiv.prepend(readingTimeDiv);
@@ -95,7 +87,7 @@ if (!postId) {
         toggleIcon.textContent = tocBox.classList.contains("collapsed") ? "▼" : "▲";
       });
 
-      // === Mobile: Move TOC after full Introduction section ===
+      // === Mobile: Move TOC after Introduction section content ===
       if (window.innerWidth <= 768) {
         const rightTocSlot = document.querySelector(".right-toc-slot");
 
