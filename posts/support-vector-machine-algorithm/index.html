@@ -1,0 +1,142 @@
+<section>
+  <h1 id="support-vector-machines">Maximal Margins: A Deep Dive into Support Vector Machines</h1>
+  <p><em>A rigorous exploration of Support Vector Machines, covering primal &amp; dual formulations, KKT conditions, the kernel trick, optimization algorithms, and theoretical guarantees.</em></p>
+
+  <h2 id="introduction">1. Introduction</h2>
+  <p>
+    Support Vector Machines (SVMs) are powerful margin-based classifiers that seek the hyperplane maximizing the distance to the nearest training points (the support vectors). By framing classification as a convex quadratic optimization problem, SVMs deliver robust generalization with strong theoretical underpinnings in VC theory.
+  </p>
+
+  <h2 id="hard-margin-svm">2. Hard-Margin SVM</h2>
+  <p>
+    For linearly separable data \(\{(x_i, y_i)\}_{i=1}^n\), \(x_i\in\mathbb R^d\), \(y_i\in\{\pm1\}\), we seek
+  </p>
+  <h3 id="primal-formulation">2.1 Primal Formulation</h3>
+  <p>
+    \[
+      \min_{w,b}
+      \;\frac{1}{2}\|w\|^2
+      \quad\text{s.t.}\quad
+      y_i\bigl(w^\top x_i + b\bigr) \ge 1,\;\;i=1,\dots,n.
+    \]
+  </p>
+
+  <h3 id="dual-formulation">2.2 Dual Formulation</h3>
+  <p>
+    Introducing Lagrange multipliers \(\alpha_i\ge0\), the Lagrangian is
+  </p>
+  \[
+    \mathcal L(w,b,\alpha)
+    = \tfrac12\|w\|^2 - \sum_{i=1}^n \alpha_i\bigl[y_i(w^\top x_i + b)-1\bigr].
+  \]
+  <p>
+    Setting \(\nabla_w\mathcal L=0\), \(\nabla_b\mathcal L=0\) gives \(w=\sum_i\alpha_i y_i x_i\), \(\sum_i\alpha_i y_i=0\). Substituting yields the dual:
+  </p>
+  \[
+    \max_{\alpha}\;\sum_{i=1}^n \alpha_i
+    - \tfrac{1}{2}\sum_{i,j=1}^n \alpha_i\alpha_j y_i y_j\,x_i^\top x_j
+    \quad\text{s.t.}\quad
+    \alpha_i\ge0,\;\sum_i\alpha_i y_i=0.
+  \]
+
+  <h2 id="soft-margin-svm">3. Soft-Margin SVM</h2>
+  <p>
+    To handle non-separable data, introduce slack variables \(\xi_i\ge0\):
+  </p>
+  <h3 id="primal-soft">3.1 Primal with Slack</h3>
+  <p>
+    \[
+      \min_{w,b,\xi}\;
+      \tfrac12\|w\|^2 + C\sum_{i=1}^n \xi_i
+      \quad\text{s.t.}\quad
+      y_i(w^\top x_i + b)\ge1-\xi_i,\;\xi_i\ge0.
+    \]
+  </p>
+  <h3 id="dual-soft">3.2 Dual with Slack</h3>
+  <p>
+    The dual becomes
+  </p>
+  \[
+    \max_{\alpha}\;
+    \sum_i\alpha_i - \tfrac12\sum_{i,j}\alpha_i\alpha_j y_i y_j\,x_i^\top x_j
+    \quad\text{s.t.}\quad
+    0\le\alpha_i\le C,\;\sum_i\alpha_i y_i=0.
+  \]
+  </p>
+
+  <h2 id="kkt-conditions">4. KKT Conditions</h2>
+  <ul>
+    <li><strong>Stationarity:</strong> \(w = \sum_i \alpha_i y_i x_i\), \(\sum_i \alpha_i y_i=0\)</li>
+    <li><strong>Primal feasibility:</strong> \(y_i(w^\top x_i + b)\ge1-\xi_i\), \(\xi_i\ge0\)</li>
+    <li><strong>Dual feasibility:</strong> \(0\le\alpha_i\le C\)</li>
+    <li><strong>Complementary slackness:</strong> 
+      \(\alpha_i\bigl[y_i(w^\top x_i + b)-1+\xi_i\bigr]=0,\;
+       (C-\alpha_i)\xi_i=0\)
+    </li>
+  </ul>
+
+  <h2 id="kernel-trick">5. Kernel Trick &amp; Mercer’s Theorem</h2>
+  <p>
+    Replace inner products \(x_i^\top x_j\) with kernel functions \(K(x_i,x_j)=\phi(x_i)^\top\phi(x_j)\). Mercer’s theorem guarantees that for a positive-semidefinite \(K\), there exists a feature map \(\phi\).
+  </p>
+  <h3 id="common-kernels">5.1 Common Kernels</h3>
+  <ul>
+    <li><strong>Linear:</strong> \(K(x,z)=x^\top z\)</li>
+    <li><strong>Polynomial:</strong> \(K(x,z)=(\gamma\,x^\top z + r)^d\)</li>
+    <li><strong>RBF (Gaussian):</strong> \(K(x,z)=\exp\bigl(-\|x-z\|^2/(2\sigma^2)\bigr)\)</li>
+    <li><strong>Sigmoid:</strong> \(K(x,z)=\tanh(\gamma\,x^\top z + r)\)</li>
+  </ul>
+
+  <h2 id="optimization-algorithms">6. Optimization Algorithms</h2>
+  <ul>
+    <li><strong>SMO (Sequential Minimal Optimization):</strong> Breaks QP into 2-variable subproblems</li>
+    <li><strong>Interior-Point Methods:</strong> Primal-dual path-following for large QPs</li>
+    <li><strong>Gradient-based Solvers:</strong> Pegasos, stochastic subgradient descent</li>
+    <li><strong>Complexity:</strong> Training scales between \(O(n^2)\) and \(O(n^3)\) in the number of samples</li>
+  </ul>
+
+  <h2 id="hyperparameters">7. Key Hyperparameters</h2>
+  <ul>
+    <li><strong>Penalty \(C\):</strong> Trade-off between margin width and training error</li>
+    <li><strong>Kernel parameters:</strong> \(\sigma\) in RBF, degree \(d\), coefficient \(r\)</li>
+    <li><strong>Tolerance \(\varepsilon\):</strong> Convergence threshold for KKT violations</li>
+  </ul>
+
+  <h2 id="generalization-bounds">8. Generalization Bounds</h2>
+  <p>
+    For margin classifier with radius \(R\) (max \(\|x_i\|\)) and margin \(\gamma\), the VC dimension satisfies
+  </p>
+  \[
+    \mathrm{VCdim}\le\min\Bigl\{\frac{R^2}{\gamma^2},\,d\Bigr\}.
+  \]
+  <p>
+    With high probability over \(n\) samples, the generalization error is bounded by
+  </p>
+  \[
+    O\!\Bigl(\frac{R^2}{\gamma^2}\,\frac{\ln n}{n}\Bigr).
+  \]
+
+  <figure>
+    <img src="posts/svm/assets/svm_margin_diagram.png" alt="SVM Margin Diagram">
+    <figcaption><strong>Figure 1:</strong> Maximum-margin hyperplane with support vectors highlighted.</figcaption>
+  </figure>
+
+  <figure>
+    <img src="posts/svm/assets/kernel_mapping.png" alt="Kernel Feature Mapping">
+    <figcaption><strong>Figure 2:</strong> Nonlinear mapping into feature space via kernel trick.</figcaption>
+  </figure>
+
+  <h2 id="applications">9. Applications</h2>
+  <ul>
+    <li>Text categorization and sentiment analysis</li>
+    <li>Image recognition and object detection</li>
+    <li>Bioinformatics: protein classification, gene expression analysis</li>
+    <li>Anomaly detection in finance and cybersecurity</li>
+  </ul>
+
+  <h2 id="conclusion">10. Conclusion</h2>
+  <p>
+    SVMs marry convex optimization with statistical learning theory to deliver robust, margin-maximizing classifiers. Through kernelization, they extend naturally to nonlinear decision boundaries, making them a versatile tool in the classical ML toolbox.
+  </p>
+  <p><em>Explore the API: <a href="https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html" target="_blank">sklearn.svm.SVC</a></em></p>
+</section>
