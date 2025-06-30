@@ -3,15 +3,15 @@
   display: flex;
   justify-content: center;
   margin: 0 auto;
-  max-width: 1600px; /* widened from 1400px */
-  padding: 2rem 2rem; /* added more horizontal room */
+  max-width: 1600px;
+  padding: 2rem 2rem;
 }
 
 /* === Left Ad Sidebar === */
 .left-ad-slot {
-  flex: 0 0 160px;
+  flex: 0 0 200px;  /* increased width */
   padding: 2rem 1rem;
-  margin-right: 3rem;
+  margin-right: 2rem;  /* reduced gap */
   border-right: 1px solid #eee;
 }
 .ad-slot.sidebar {
@@ -29,7 +29,7 @@
 
 /* === Blog Main Content Area === */
 .blog-layout {
-  flex: 1 1 800px; /* increased from 700px */
+  flex: 1 1 800px;
   padding: 0 2rem;
 }
 main {
@@ -42,9 +42,10 @@ main h1, main h2, main h3 {
 main p {
   font-size: 1.125rem;
   margin-bottom: 1.25rem;
-  white-space: normal;
-  overflow: visible;
-  text-overflow: initial;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: initial !important;
+  display: block !important;
 }
 main a {
   color: #0077cc;
@@ -79,36 +80,38 @@ main a:hover {
 
 /* === Table of Contents Sidebar === */
 .right-toc-slot {
-  flex: 0 0 260px; /* widened from 220px */
-  padding: 2rem 1rem 2rem 2.5rem; /* more left spacing */
+  flex: 0 0 260px;
+  padding: 2rem 1.5rem 2rem 2.5rem;
 }
-.right-toc-slot .toc-box {
+.toc-box {
   position: sticky;
   top: 2rem;
-  background: none;
-  border: none;
-  padding: 0;
-  box-shadow: none;
+  padding-left: 1rem;
+  border-left: 3px solid #007acc;
 }
 .toc-box h3 {
   font-size: 1.1rem;
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
   font-weight: 600;
-  color: #333;
+  color: #222;
 }
 .toc-box ul {
   list-style: none;
   padding-left: 0;
+  margin: 0;
 }
 .toc-box li {
   font-size: 15px;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.6rem;
+  padding-left: 0.3rem;
 }
 .toc-box a {
   color: #007acc;
   text-decoration: none;
+  transition: color 0.3s ease;
 }
 .toc-box a:hover {
+  color: #005f99;
   text-decoration: underline;
 }
 
