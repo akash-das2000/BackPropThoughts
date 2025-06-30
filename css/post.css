@@ -11,6 +11,7 @@
 .left-ad-slot {
   flex: 0 0 160px;
   padding: 2rem 1rem;
+  margin-right: 3rem; /* Added spacing between ad and content */
   border-right: 1px solid #eee;
 }
 .ad-slot.sidebar {
@@ -42,6 +43,9 @@ main h1, main h2, main h3 {
 main p {
   font-size: 1.125rem;
   margin-bottom: 1.25rem;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: initial;
 }
 main a {
   color: #0077cc;
@@ -83,15 +87,16 @@ main a:hover {
 .right-toc-slot .toc-box {
   position: sticky;
   top: 2rem;
-  background: #fff;
-  border: 1px solid #ddd;
-  padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  background: none;
+  border: none;
+  padding: 0;
+  box-shadow: none;
 }
 .toc-box h3 {
-  font-size: 1rem;
-  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  color: #333;
 }
 .toc-box ul {
   list-style: none;
@@ -99,7 +104,7 @@ main a:hover {
 }
 .toc-box li {
   font-size: 14px;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.35rem;
 }
 .toc-box a {
   color: #007acc;
