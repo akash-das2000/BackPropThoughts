@@ -219,12 +219,12 @@ main img {
   margin: 0.25rem 0 0.75rem;
 }
 
-/* Smooth scrolling for anchor links */
+/* === Smooth Scroll === */
 html {
   scroll-behavior: smooth;
 }
 
-/* Scroll to Top Button */
+/* === Scroll to Top Button === */
 #scrollToTopBtn {
   position: fixed;
   bottom: 40px;
@@ -244,6 +244,19 @@ html {
   background-color: #111;
 }
 
+/* === Footer Link === */
+.footer-link {
+  text-align: center;
+  font-size: 1rem;
+  padding: 2rem 0;
+}
+.footer-link a {
+  color: #333;
+  text-decoration: none;
+}
+.footer-link a:hover {
+  text-decoration: underline;
+}
 
 /* === Responsive === */
 @media (max-width: 768px) {
