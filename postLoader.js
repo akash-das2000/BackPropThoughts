@@ -41,6 +41,23 @@ if (!postId) {
           .catch(() => alert("Failed to copy link"));
       });
 
+      // === PDF Download Icon ===
+      const pdfIcon = document.createElement("i");
+      pdfIcon.className = "fa-solid fa-file-pdf";
+      pdfIcon.title = "Download as PDF";
+      pdfIcon.style.cursor = "pointer";
+      pdfIcon.addEventListener("click", () => {
+        const element = document.getElementById("post-content");
+        const opt = {
+          margin: 0.5,
+          filename: `${document.title || "post"}.pdf`,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2 },
+          jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+        html2pdf().from(element).set(opt).save();
+      });
+
       // Email share
       const emailIcon = document.createElement("i");
       emailIcon.className = "fa-solid fa-envelope";
