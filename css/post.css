@@ -5,6 +5,7 @@
   margin: 0 auto;
   max-width: 1600px;
   padding: 2rem 2rem;
+  flex-wrap: wrap; /* for better mobile stacking */
 }
 
 /* === Left Ad Sidebar === */
@@ -54,6 +55,12 @@ main a {
 main a:hover {
   text-decoration: underline;
 }
+#post-content img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1rem auto;
+}
 
 /* === Ad Slots (Top/Bottom) === */
 .ad-slot {
@@ -86,7 +93,7 @@ main a:hover {
 .toc-box {
   position: sticky;
   top: 2rem;
-  padding: 1rem 1rem 1rem 1.5rem;
+  padding-left: 1rem;
   border-left: 3px solid #007acc;
   background: #fafafa;
   border-radius: 8px;
@@ -104,18 +111,14 @@ main a:hover {
   align-items: center;
   cursor: pointer;
 }
-.toc-box h3::after {
-  content: "▼";
-  font-size: 0.8rem;
-  transition: transform 0.3s ease;
-}
-.toc-box.expanded h3::after {
-  transform: rotate(180deg);
-}
 .toc-box ul {
   list-style: none;
   padding-left: 0;
   margin: 0;
+  display: none;
+}
+.toc-box.expanded ul {
+  display: block;
 }
 .toc-box li {
   font-size: 15px;
@@ -139,28 +142,37 @@ main a:hover {
   display: inline-block;
 }
 
-/* === Responsive for Blog Post === */
+/* === Responsive for All Devices === */
 @media (max-width: 768px) {
   .blog-wrapper {
     flex-direction: column;
     padding: 1rem;
   }
+
   .left-ad-slot {
     display: none;
   }
+
   .right-toc-slot {
+    order: 0;
     width: 100%;
-    margin-top: 2rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
   }
+
   .toc-box {
     border-left: none;
     border-top: 3px solid #007acc;
+    padding: 1rem;
   }
-  .toc-box ul {
-    display: none;
-    margin-top: 1rem;
+
+  .toc-box h3 {
+    border-bottom: none;
   }
-  .toc-box.expanded ul {
-    display: block;
+
+  .blog-layout {
+    order: 1;
+    padding: 0;
+    max-width: 100%;
   }
 }
