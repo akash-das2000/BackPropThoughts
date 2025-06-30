@@ -7,18 +7,20 @@
   <link rel="stylesheet" href="css/post.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
-  <!-- MathJax for LaTeX-style math rendering -->
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script id="MathJax-script" async
-    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
-  </script>
+  <!-- MathJax configuration FIRST -->
   <script>
     window.MathJax = {
       tex: {
         inlineMath: [['\\(', '\\)']],
         displayMath: [['\\[', '\\]']]
+      },
+      startup: {
+        typeset: false  // we'll trigger this manually after injection
       }
     };
+  </script>
+  <script defer id="MathJax-script"
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
   </script>
 </head>
 <body>
@@ -82,6 +84,7 @@
     <p><a href="index.html">← Back to Home</a></p>
   </footer>
 
+  <!-- Scripts -->
   <script type="module" src="postLoader.js"></script>
   <script type="module" src="firebaseLogic.js"></script>
 </body>
