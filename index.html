@@ -1,146 +1,178 @@
-<section>
-  <h1 id="support-vector-machines">Maximal Margins: A Deep Dive into Support Vector Machines</h1>
-  <p><em>A rigorous exploration of Support Vector Machines, covering primal &amp; dual formulations, KKT conditions, the kernel trick, optimization algorithms, representer theorem, hinge loss, multi-class extensions, and theoretical generalization bounds.</em></p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>BackPropThoughts</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="css/main.css" />
+</head>
+<body>
 
-  <h2 id="introduction">1. Introduction</h2>
-  <p>
-    Support Vector Machines (SVMs) are margin-based classifiers that solve a convex quadratic program to find the optimal separating hyperplane. SVMs achieve strong generalization via structural risk minimization, balancing empirical risk (hinge loss) with regularization. Through kernelization, SVMs extend to non-linear decision boundaries in high-dimensional feature spaces without explicit mapping.
-  </p>
+  <!-- Nav -->
+  <div id="navbar-placeholder"></div>
 
-  <h2 id="primal-formulation">2. Primal Formulation and Hinge Loss</h2>
-  <p>
-    Given labeled training data \(\{(x_i,y_i)\}_{i=1}^n\), \(x_i\in\mathbb R^d\), \(y_i\in\{\pm1\}\), the soft-margin SVM solves:
-  </p>
-  <pre><code>
-min_{w,b,\xi}\quad \frac12\|w\|^2 + C \sum_{i=1}^n \xi_i \\
-subject\;to\quad y_i(w^T x_i + b) \ge 1 - \xi_i, \quad \xi_i \ge 0.
-  </code></pre>
-  <p>
-    Equivalently, using hinge loss \(\ell(u)=\max(0,1-u)\):
-  </p>
-  <pre><code>
-min_{w,b}\quad \frac12\|w\|^2 + C \sum_{i=1}^n \ell\bigl(y_i(w^T x_i + b)\bigr).
-  </code></pre>
-  <p>
-    The subgradient w.r.t. \(w\) is:
-  </p>
-  <pre><code>
-\partial_w = w - C \sum_{i=1}^n y_i x_i \; \mathbf{1}_{y_i(w^T x_i + b) < 1}.
-  </code></pre>
+  <!-- Main layout -->
+  <main class="container main-flex">
 
-  <h2 id="dual-formulation-kkt">3. Dual Formulation &amp; KKT Conditions</h2>
-  <p>
-    Introducing Lagrange multipliers \(\alpha_i \ge 0\) and slack \(\mu_i \ge 0\) for \(\xi_i\), the Lagrangian:
-  </p>
-  <pre><code>
-L(w,b,\xi,\alpha,\mu) = \tfrac12\|w\|^2 + C\sum_i\xi_i
-  - \sum_i \alpha_i[y_i(w^T x_i + b) -1 + \xi_i]
-  - \sum_i \mu_i \xi_i.
-  </code></pre>
-  <p>
-    Stationarity gives:
-  </p>
-  <ul>
-    <li>\(w = \sum_i \alpha_i y_i x_i\)</li>
-    <li>\(\sum_i \alpha_i y_i = 0\)</li>
-    <li>\(C - \alpha_i - \mu_i = 0\) \(\Rightarrow 0 \le \alpha_i \le C\)</li>
-  </ul>
-  <p>
-    The dual QP is:
-  </p>
-  <pre><code>
-max_{0 \le \alpha_i \le C}\quad \sum_i \alpha_i
- - \frac12 \sum_{i,j=1}^n \alpha_i \alpha_j y_i y_j x_i^T x_j
-subject\;to\quad \sum_i \alpha_i y_i = 0.
-  </code></pre>
-  <h3 id="kkt">3.1 KKT Conditions</h3>
-  <ul>
-    <li>Primal feasibility: \(y_i(w^T x_i + b) \ge 1 - \xi_i,\; \xi_i \ge 0\)</li>
-    <li>Dual feasibility: \(0 \le \alpha_i \le C\)</li>
-    <li>Complementary slackness:
-      \(\alpha_i[y_i(w^T x_i + b)-1+\xi_i]=0,\;(C-\alpha_i)\xi_i=0.\)
-    </li>
-    <li>Support vectors satisfy \(0<\alpha_i<C\) and lie on margin \(y_i(w^T x_i + b)=1\).</li>
-  </ul>
+    <!-- Blog section (left) -->
+    <section class="blog-list">
 
-  <h2 id="representer-theorem">4. Representer Theorem &amp; Kernel Trick</h2>
-  <p>
-    By the Representer Theorem, \(w\) lies in span\(\{x_i\}\), enabling kernelization. Replace dot products with kernel functions \(K(x_i,x_j)=\phi(x_i)^T\phi(x_j)\). The dual becomes:
-  </p>
-  <pre><code>
-max_{\alpha}\quad \sum_i \alpha_i - \tfrac12 \sum_{i,j} \alpha_i \alpha_j y_i y_j K(x_i,x_j)
-subject\;to\quad 0\le\alpha_i\le C,\;\sum_i\alpha_i y_i=0.
-  </code></pre>
-  <h3 id="common-kernels">4.1 Common Kernels</h3>
-  <ul>
-    <li>Linear: \(K(x,z)=x^T z\)</li>
-    <li>Polynomial: \(K(x,z)=(\gamma\,x^T z + r)^d\)</li>
-    <li>RBF: \(\exp(-\|x-z\|^2/(2\sigma^2))\)</li>
-    <li>Sigmoid: \(\tanh(\gamma\,x^T z + r)\)</li>
-  </ul>
+      <!-- Carousel -->
+      <section class="carousel-container">
+        <h2 class="carousel-heading">Latest Blogs</h2>
+        <div class="carousel" id="blog-carousel">
+          <div class="carousel-inner" id="carousel-inner"></div>
+          <div class="carousel-dots" id="carousel-dots"></div>
+        </div>
+      </section>
 
-  <h2 id="optimization-methods">5. Optimization Methods &amp; Complexity</h2>
-  <p>
-    Efficient solvers leverage problem structure:
-  </p>
-  <ul>
-    <li><strong>SMO:</strong> Iteratively solves 2-variable subproblems in closed form, \(O(n^2 d)\) time.</li>
-    <li><strong>Interior-Point:</strong> Primal-dual methods for large QPs, scales roughly \(O(n^3)\).</li>
-    <li><strong>Stochastic Gradient:</strong> Pegasos solves primal hinge via SGD: 
-      \(w_{t+1}=(1-\eta_t)w_t + \eta_t C y_i x_i \mathbf{1}_{\ell<0}\).
-    </li>
-  </ul>
+      <!-- AV Blog Card -->
+      <section class="featured-blog">
+        <h3>
+          <a href="https://www.analyticsvidhya.com/blog/author/akashdas/" target="_blank">
+            My Past Blogs for Analytics Vidhya →
+          </a>
+        </h3>
+        <p class="ownership-note">(Articles owned and published by AV)</p>
+      </section>
 
-  <h2 id="multi-class-extensions">6. Multi-Class &amp; Structured SVMs</h2>
-  <ul>
-    <li><strong>One-vs-Rest:</strong> Fit \(K\) binary SVMs; predict by highest decision value.</li>
-    <li><strong>Crammer–Singer:</strong> Joint formulation: maximize margin between correct class and all others:
-      \(\min_W \tfrac12\sum_k\|w_k\|^2 + C\sum_i \max_{j\neq y_i}[1 + w_j^T x_i - w_{y_i}^T x_i]_+\).
-    </li>
-    <li><strong>Structured Outputs:</strong> Loss-augmented inference via Joint Feature Maps and cutting-plane algorithms.</li>
-  </ul>
+    </section>
 
-  <h2 id="generalization-bounds">7. Theoretical Generalization Bounds</h2>
-  <p>
-    Let \(R=\max_i\|x_i\|\), margin \(\gamma=\min_i y_i(w^T x_i+b)/\|w\|\). Then the VC dimension satisfies:
-  </p>
-  <pre><code>
-VCdim \le \min\{R^2/\gamma^2, d\}.
-  </code></pre>
-  <p>
-    With probability \(1-\delta\), the expected error \(\mathrm{Err}(f)\) is bounded by:
-  </p>
-  <pre><code>
-O\bigl(\tfrac{R^2}{\gamma^2}\tfrac{\log(1/\delta)}{n}\bigr).
-  </code></pre>
-  <p>
-    Leave-one-out bound relates number of support vectors \(\#SV\):
-  </p>
-  <pre><code>
-LOO\;error \le \frac{\#SV}{n}.
-  </code></pre>
+    <!-- About Me (right) -->
+    <aside class="about-box">
+      <img src="images/akash.png" alt="Akash's Photo" class="profile-pic" />
+      <h2>About Me</h2>
+      <p>
+        I'm a machine learning researcher specializing in building foundational models and agentic AI systems, with works published at AAAI, ICLR, KDD, and EAAI. My focus lies in advancing LLM fine-tuning strategies, designing efficient AI pipelines, and developing intelligent workflows for real-world automation and digital twin applications.
+      </p>
+      <p>
+        <a href="https://www.linkedin.com/in/akashd2000/?originalSubdomain=in" target="_blank">Connect on LinkedIn →</a><br />
+        <a href="https://scholar.google.com/citations?user=wikJ0m8AAAAJ&hl=en" target="_blank">View Google Scholar →</a>
+      </p>
+    </aside>
 
-  <figure>
-    <img src="posts/svm/assets/svm_margin.png" alt="SVM Margin Diagram">
-    <figcaption><strong>Figure 1:</strong> Maximum-margin hyperplane and support vectors.</figcaption>
-  </figure>
+  </main>
 
-  <figure>
-    <img src="posts/svm/assets/kernel_space.png" alt="Kernel Feature Space">
-    <figcaption><strong>Figure 2:</strong> Non-linear embedding via kernel trick.</figcaption>
-  </figure>
+  <footer>
+    <p>© 2025 Akash D</p>
+  </footer>
 
-  <h2 id="application-cases">8. Applications &amp; Practical Tips</h2>
-  <ul>
-    <li>Text Classification: high-dimensional sparse input; use linear SVM with SGD solver.</li>
-    <li>Image Recognition: RBF kernel on small datasets; deep kernel learning for large-scale.</li>
-    <li>Bioinformatics: careful kernel choice (string kernels, graph kernels).</li>
-    <li>Anomaly Detection: one-class SVM; \(\nu\)-SVM variant controls number of support vectors.</li>
-  </ul>
+  <!-- Navbar Script -->
+  <script>
+    fetch("navbar.html")
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById("navbar-placeholder").innerHTML = data;
+        const hamburger = document.querySelector(".hamburger");
+        const dropdown = document.getElementById("menuDropdown");
+        if (hamburger && dropdown) {
+          hamburger.addEventListener("click", () => dropdown.classList.toggle("show"));
+          window.addEventListener("click", e => {
+            if (!e.target.closest(".menu-container")) dropdown.classList.remove("show");
+          });
+        }
+      });
+  </script>
 
-  <h2 id="conclusion">9. Conclusion</h2>
-  <p>
-    SVMs offer a mathematically elegant framework grounded in convex optimization and statistical learning theory. Through hinge loss, kernelization, and robust solvers, they remain a cornerstone of classical machine learning with guaranteed generalization and flexible extensions to structured outputs.
-  </p>
-  <p><em>Explore the API: <a href="https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html" target="_blank">sklearn.svm.SVC</a></em></p>
-</section>
+  <!-- Carousel Script -->
+  <script>
+    async function findFeaturedImage(slug) {
+      const exts = ['jpg','jpeg','png','webp'];
+      for (const ext of exts) {
+        try {
+          const res = await fetch(`posts/${slug}/featured.${ext}`, { method: 'HEAD' });
+          if (res.ok) return `posts/${slug}/featured.${ext}`;
+        } catch (_) {}
+      }
+      return 'images/featured_blog.jpg';
+    }
+
+    let currentIndex = 0, timer;
+
+    async function loadCarousel() {
+      const inner = document.getElementById("carousel-inner");
+      const dots  = document.getElementById("carousel-dots");
+
+      try {
+        // 1) fetch full list of slugs + dates
+        const res      = await fetch("data/index.json");
+        if (!res.ok) throw new Error(`Failed to fetch index.json (${res.status})`);
+        const blogList = await res.json();
+
+        // 2) sort newest→oldest by date
+        blogList.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        // 3) take the top 5 most recent
+        const latestFive = blogList.slice(0, 5);
+
+        // 4) clear any existing slides/dots
+        inner.innerHTML = "";
+        dots.innerHTML  = "";
+
+        // 5) build slides for these five
+        for (const { slug } of latestFive) {
+          try {
+            const metaRes = await fetch(`posts/${slug}/meta.json`);
+            if (!metaRes.ok) throw new Error(`meta.json not found (${metaRes.status})`);
+            const meta = await metaRes.json();
+            const imgSrc = await findFeaturedImage(slug);
+
+            // slide element
+            const slide = document.createElement("div");
+            slide.className = "carousel-slide";
+            slide.innerHTML = `
+              <img src="${imgSrc}" alt="${meta.title}" class="carousel-image" />
+              <h3 class="carousel-title">${meta.title}</h3>
+              <p class="carousel-summary">${meta.summary}</p>
+              <a href="post?postId=${slug}" class="read-more-btn">Read More →</a>
+            `;
+            inner.appendChild(slide);
+
+            // dot element
+            const dot = document.createElement("button");
+            dot.addEventListener("click", () => goToSlide(
+              Array.from(dots.children).indexOf(dot)
+            ));
+            dots.appendChild(dot);
+
+          } catch (slideErr) {
+            console.warn(`Skipping “${slug}”:`, slideErr);
+          }
+        }
+
+        // 6) start auto-advance if any slides exist
+        if (inner.children.length) {
+          updateCarousel();
+          timer = setInterval(() => goToSlide(currentIndex + 1), 4000);
+        }
+      } catch (err) {
+        console.error("Carousel load failed:", err);
+      }
+    }
+
+    function updateCarousel() {
+      const slides = document.querySelectorAll(".carousel-slide");
+      const dots    = document.querySelectorAll(".carousel-dots button");
+      if (!slides.length) return;
+
+      currentIndex = (currentIndex + slides.length) % slides.length;
+      document.getElementById("carousel-inner")
+              .style.transform = `translateX(-${currentIndex * 100}%)`;
+
+      dots.forEach(d => d.classList.remove("active"));
+      if (dots[currentIndex]) dots[currentIndex].classList.add("active");
+    }
+
+    function goToSlide(i) {
+      currentIndex = i;
+      updateCarousel();
+      clearInterval(timer);
+      timer = setInterval(() => goToSlide(currentIndex + 1), 4000);
+    }
+
+    // initialize on page load
+    loadCarousel();
+  </script>
+
+</body>
+</html>
