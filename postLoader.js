@@ -22,7 +22,7 @@ if (!postId) {
         }
       });
 
-      // === Reading Time Calculation and Placement ===
+      // === Reading Time Calculation ===
       const wordsPerMinute = 200;
       const text = contentDiv.innerText || contentDiv.textContent || "";
       const wordCount = text.trim().split(/\s+/).length;
@@ -87,7 +87,7 @@ if (!postId) {
         toggleIcon.textContent = tocBox.classList.contains("collapsed") ? "▼" : "▲";
       });
 
-      // === Mobile: Move TOC after Introduction section content ===
+      // === Mobile TOC after full "Introduction" section ===
       if (window.innerWidth <= 768) {
         const rightTocSlot = document.querySelector(".right-toc-slot");
 
@@ -95,15 +95,21 @@ if (!postId) {
           h.textContent.trim().toLowerCase().includes("introduction")
         );
 
-        const nextSection = Array.from(contentDiv.querySelectorAll("h2")).find(h =>
-          h !== introHeading && h.compareDocumentPosition(introHeading) & Node.DOCUMENT_POSITION_FOLLOWING
-        );
+        if (introHeading && rightTocSlot) {
+          let endOfIntro = introHeading.nextElementSibling;
+          while (endOfIntro && endOfIntro.tagName.toLowerCase() !== "h2") {
+            endOfIntro = endOfIntro.nextElementSibling;
+          }
 
-        if (rightTocSlot && nextSection) {
           const wrapper = document.createElement("div");
           wrapper.className = "mobile-toc-wrapper";
           wrapper.appendChild(rightTocSlot);
-          nextSection.insertAdjacentElement("beforebegin", wrapper);
+
+          if (endOfIntro) {
+            endOfIntro.insertAdjacentElement("beforebegin", wrapper);
+          } else {
+            contentDiv.appendChild(wrapper);
+          }
         }
       }
     })
@@ -112,7 +118,7 @@ if (!postId) {
       console.error(err);
     });
 
-  // Load metadata
+  // Load metadata (e.g., title)
   fetch(`posts/${postId}/meta.json`)
     .then(res => {
       if (!res.ok) throw new Error("Meta not found");
@@ -124,4 +130,3 @@ if (!postId) {
     .catch(err => {
       console.warn("Could not load blog metadata:", err);
     });
-}
