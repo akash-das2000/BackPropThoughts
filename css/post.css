@@ -1,18 +1,18 @@
-/* === Blog Post Page Specific Layout === */
+/* === Blog Post Layout Wrapper === */
 .blog-wrapper {
   display: flex;
   justify-content: center;
   margin: 0 auto;
   max-width: 1600px;
-  padding: 2rem 2rem;
-  flex-wrap: wrap; /* for better mobile stacking */
+  padding: 2rem;
+  gap: 2rem;
+  flex-wrap: nowrap;
 }
 
 /* === Left Ad Sidebar === */
 .left-ad-slot {
   flex: 0 0 200px;
   padding: 2rem 1rem;
-  margin-right: 2rem;
   border-right: 1px solid #eee;
 }
 .ad-slot.sidebar {
@@ -28,13 +28,10 @@
   color: #777;
 }
 
-/* === Blog Main Content Area === */
+/* === Blog Main Content === */
 .blog-layout {
   flex: 1 1 800px;
   padding: 0 2rem;
-}
-main {
-  flex: 1;
 }
 main h1, main h2, main h3 {
   font-weight: 600;
@@ -43,10 +40,6 @@ main h1, main h2, main h3 {
 main p {
   font-size: 1.125rem;
   margin-bottom: 1.25rem;
-  white-space: normal !important;
-  overflow: visible !important;
-  text-overflow: initial !important;
-  display: block !important;
 }
 main a {
   color: #0077cc;
@@ -55,6 +48,8 @@ main a {
 main a:hover {
   text-decoration: underline;
 }
+
+/* === Ensure Images Are Responsive === */
 #post-content img {
   max-width: 100%;
   height: auto;
@@ -62,7 +57,7 @@ main a:hover {
   margin: 1rem auto;
 }
 
-/* === Ad Slots (Top/Bottom) === */
+/* === Top & Bottom Ad Slots === */
 .ad-slot {
   margin: 2rem 0;
   min-height: 100px;
@@ -78,47 +73,38 @@ main a:hover {
 .ad-slot::before {
   content: "Ad Placeholder";
 }
-.ad-top {
-  min-height: 90px;
-}
+.ad-top,
 .ad-bottom {
   min-height: 90px;
 }
 
-/* === Table of Contents Sidebar === */
+/* === TOC Sidebar === */
 .right-toc-slot {
   flex: 0 0 260px;
-  padding: 2rem 1.5rem 2rem 2.5rem;
+  padding: 2rem 1.5rem 2rem 0;
 }
 .toc-box {
   position: sticky;
   top: 2rem;
-  padding-left: 1rem;
-  border-left: 3px solid #007acc;
   background: #fafafa;
+  border-left: 3px solid #007acc;
+  padding: 1rem 1rem 1rem 1.5rem;
   border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 .toc-box h3 {
   font-size: 1.1rem;
-  margin-bottom: 1rem;
   font-weight: 600;
-  color: #222;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 0.5rem;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
 }
 .toc-box ul {
   list-style: none;
   padding-left: 0;
   margin: 0;
-  display: none;
-}
-.toc-box.expanded ul {
-  display: block;
+  transition: max-height 0.3s ease;
 }
 .toc-box li {
   font-size: 15px;
@@ -140,39 +126,41 @@ main a:hover {
   padding-left: 0.5rem;
   background-color: #eaf6ff;
   display: inline-block;
+  border-radius: 4px;
 }
 
-/* === Responsive for All Devices === */
+/* === TOC Collapsibility for All Devices === */
+.toc-box.collapsed ul {
+  display: none;
+}
+.toc-box.collapsed::after {
+  content: "▼";
+  font-size: 0.9rem;
+  margin-left: 0.5rem;
+}
+.toc-box:not(.collapsed)::after {
+  content: "▲";
+  font-size: 0.9rem;
+  margin-left: 0.5rem;
+}
+
+/* === Responsive Fixes for Mobile === */
 @media (max-width: 768px) {
   .blog-wrapper {
     flex-direction: column;
     padding: 1rem;
   }
-
   .left-ad-slot {
     display: none;
   }
-
   .right-toc-slot {
-    order: 0;
     width: 100%;
+    order: -1; /* TOC on top for mobile */
     margin-bottom: 1rem;
-    padding: 1rem;
   }
-
   .toc-box {
     border-left: none;
     border-top: 3px solid #007acc;
     padding: 1rem;
-  }
-
-  .toc-box h3 {
-    border-bottom: none;
-  }
-
-  .blog-layout {
-    order: 1;
-    padding: 0;
-    max-width: 100%;
   }
 }
