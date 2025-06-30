@@ -109,6 +109,9 @@ main img {
 .reading-time-display i:hover {
   color: #000;
 }
+.reading-time-display i.fa-clock + span {
+  margin-left: 4px;
+}
 
 /* === TOC Sidebar === */
 .right-toc-slot {
