@@ -133,4 +133,16 @@ if (!postId) {
     .catch(err => {
       console.warn("Could not load blog metadata:", err);
     });
+
+  // === Scroll To Top Button Logic ===
+  const scrollBtn = document.getElementById("scrollToTopBtn");
+  if (scrollBtn) {
+    window.addEventListener("scroll", () => {
+      scrollBtn.style.display = window.scrollY > 500 ? "block" : "none";
+    });
+
+    scrollBtn.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
 }
