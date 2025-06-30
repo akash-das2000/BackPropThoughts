@@ -47,13 +47,8 @@ nav .tagline {
   color: #666;
   margin-top: 4px;
 }
-nav ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
 
-/* === Always-Visible Hamburger & Dropdown === */
+/* === Hamburger Menu === */
 .menu-container {
   position: relative;
   display: flex;
@@ -67,11 +62,9 @@ nav ul {
   background-color: #fff;
   box-shadow: 0 1px 5px rgba(0,0,0,0.05);
   cursor: pointer;
-  transition: background-color 0.3s, box-shadow 0.3s;
 }
 .hamburger:hover {
   background-color: #f2f9ff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 .dropdown {
   display: none;
@@ -99,96 +92,145 @@ nav ul {
 }
 .dropdown li {
   padding: 10px 20px;
-  transition: background-color 0.2s;
 }
 .dropdown li a {
   color: #333;
   text-decoration: none;
   font-weight: 500;
   font-size: 15px;
-  display: block;
 }
 .dropdown li:hover {
   background-color: #f5faff;
 }
 
-/* === Interaction Buttons === */
-#interactions {
-  margin-top: 2rem;
+/* === Main Layout for Index === */
+.main-flex {
   display: flex;
-  gap: 1rem;
+  justify-content: space-between;
+  gap: 40px;
+  margin-top: 30px;
 }
-#interactions button {
-  background: #f0f8ff;
-  border: 1px solid #0077cc;
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.2s;
+.blog-list {
+  flex: 2;
 }
-#interactions button:hover {
-  background: #e1f2ff;
+.about-box {
+  flex: 1;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #eee;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  align-self: flex-start;
+}
+.profile-pic {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #007acc;
+  margin-bottom: 10px;
 }
 
-/* === Comments Section === */
-#comments-section {
-  margin-top: 3rem;
-  padding-top: 2rem;
-  border-top: 1px solid #eee;
+/* === Carousel === */
+.carousel-container {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+  margin-bottom: 20px;
 }
-#comment-form input,
-#comment-form textarea {
+.carousel {
+  position: relative;
+  overflow: hidden;
+}
+.carousel-inner {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+}
+.carousel-slide {
+  min-width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  text-align: left;
+}
+.carousel-slide img {
   width: 100%;
-  font-size: 1rem;
-  padding: 0.75rem;
-  margin-bottom: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 10px;
 }
-#comment-form button {
-  background-color: #0077cc;
-  color: white;
+.carousel-title {
+  font-size: 18px;
+  margin: 5px 0;
+  color: #007acc;
+}
+.carousel-summary {
+  font-size: 14px;
+  color: #444;
+  line-height: 1.5;
+}
+.carousel-dots {
+  text-align: center;
+  margin-top: 15px;
+}
+.carousel-dots button {
+  width: 12px;
+  height: 12px;
+  margin: 0 6px;
+  border-radius: 50%;
   border: none;
-  padding: 0.75rem 1.25rem;
-  border-radius: 5px;
+  background-color: rgba(0, 0, 0, 0.2);
   cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+.carousel-dots button.active {
+  background-color: #007acc;
+  transform: scale(1.2);
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.15);
+}
+
+/* === Blog Links === */
+.blog-listing {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.blog-listing li a {
+  font-size: 18px;
   font-weight: bold;
-  transition: background-color 0.2s;
+  color: #007acc;
+  text-decoration: none;
 }
-#comment-form button:hover {
-  background-color: #005fa3;
+.blog-listing li a:hover {
+  text-decoration: underline;
 }
-.comment {
-  background-color: #fdfdfd;
-  border-left: 4px solid #0077cc;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  border-radius: 6px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-}
-.comment strong {
-  font-size: 1rem;
-  color: #333;
-}
-.comment em {
-  font-size: 0.875rem;
+.ownership-note {
+  font-size: 11px;
   color: #777;
-  display: block;
-  margin-bottom: 0.5rem;
+  margin-top: 5px;
+}
+.read-more-btn {
+  font-weight: bold;
+  color: #007acc;
+  text-decoration: none;
+}
+.read-more-btn:hover {
+  text-decoration: underline;
 }
 
-/* === Responsive Adjustments === */
+/* === Responsive Mobile === */
 @media (max-width: 768px) {
-  nav {
+  .main-flex {
     flex-direction: column;
-    align-items: flex-start;
   }
-
-  .menu-container {
-    margin-top: 10px;
-    width: 100%;
-    justify-content: flex-end;
+  .about-box {
+    margin-top: 30px;
+  }
+  .carousel-slide img {
+    max-height: 160px;
   }
 }
