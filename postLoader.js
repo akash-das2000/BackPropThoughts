@@ -78,6 +78,7 @@ if (!postId) {
 
       const timeText = document.createElement("span");
       timeText.textContent = `${minutes} min`;
+      timeText.style.marginLeft = "2px"; 
 
       // Append in desired order
       readingTimeDiv.appendChild(pdfIcon);
