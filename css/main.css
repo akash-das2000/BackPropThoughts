@@ -1,0 +1,194 @@
+/* === Global Reset === */
+* {
+  box-sizing: border-box;
+}
+body {
+  font-family: 'Segoe UI', Roboto, Helvetica, sans-serif;
+  background-color: #f9f9f9;
+  color: #222;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+}
+
+/* === Header & Footer === */
+header, footer {
+  background-color: #fff;
+  padding: 1.5rem 0;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+footer p {
+  font-size: 0.95rem;
+  color: #555;
+}
+
+/* === Navigation Bar === */
+nav {
+  background-color: #fff;
+  padding: 10px 20px;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+nav .brand-group {
+  display: flex;
+  flex-direction: column;
+}
+nav .brand {
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #005f99;
+}
+nav .tagline {
+  font-size: 14px;
+  color: #666;
+  margin-top: 4px;
+}
+nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* === Always-Visible Hamburger & Dropdown === */
+.menu-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.hamburger {
+  font-size: 26px;
+  padding: 10px 14px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background-color: #fff;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+  cursor: pointer;
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+.hamburger:hover {
+  background-color: #f2f9ff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.dropdown {
+  display: none;
+  position: absolute;
+  top: 55px;
+  right: 0;
+  min-width: 180px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 10px 0;
+  list-style: none;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+.dropdown.show {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.dropdown li {
+  padding: 10px 20px;
+  transition: background-color 0.2s;
+}
+.dropdown li a {
+  color: #333;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 15px;
+  display: block;
+}
+.dropdown li:hover {
+  background-color: #f5faff;
+}
+
+/* === Interaction Buttons === */
+#interactions {
+  margin-top: 2rem;
+  display: flex;
+  gap: 1rem;
+}
+#interactions button {
+  background: #f0f8ff;
+  border: 1px solid #0077cc;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+#interactions button:hover {
+  background: #e1f2ff;
+}
+
+/* === Comments Section === */
+#comments-section {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid #eee;
+}
+#comment-form input,
+#comment-form textarea {
+  width: 100%;
+  font-size: 1rem;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+#comment-form button {
+  background-color: #0077cc;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.25rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+#comment-form button:hover {
+  background-color: #005fa3;
+}
+.comment {
+  background-color: #fdfdfd;
+  border-left: 4px solid #0077cc;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 6px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+.comment strong {
+  font-size: 1rem;
+  color: #333;
+}
+.comment em {
+  font-size: 0.875rem;
+  color: #777;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+/* === Responsive Adjustments === */
+@media (max-width: 768px) {
+  nav {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .menu-container {
+    margin-top: 10px;
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
