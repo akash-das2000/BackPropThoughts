@@ -1,29 +1,35 @@
-// postLoader.js
 const params = new URLSearchParams(window.location.search);
 const postId = params.get("postId");
 
-const postContainer = document.getElementById("post-content");
-
-if (!postId || !postContainer) {
-  if (postContainer) {
-    postContainer.innerHTML = "<p>Post not found.</p>";
-  }
+if (!postId) {
+  document.getElementById("post-content").innerHTML = "<p>Post not found.</p>";
 } else {
-  // Load blog content from posts/{postId}/index.html
+  // Load blog content
   fetch(`posts/${postId}/index.html`)
     .then(res => {
       if (!res.ok) throw new Error("Post not found");
       return res.text();
     })
     .then(html => {
-      postContainer.innerHTML = html;
+      const contentDiv = document.getElementById("post-content");
+      contentDiv.innerHTML = html;
+
+      // === Dynamic TOC Generation ===
+      const tocList = document.getElementById("toc-list");
+      tocList.innerHTML = ""; // Clear placeholder
+      const headings = contentDiv.querySelectorAll("h2[id], h3[id]");
+      headings.forEach(h => {
+        const li = document.createElement("li");
+        li.innerHTML = `<a href="#${h.id}">${h.textContent}</a>`;
+        tocList.appendChild(li);
+      });
     })
     .catch(err => {
-      postContainer.innerHTML = "<p>Post not found.</p>";
+      document.getElementById("post-content").innerHTML = "<p>Post not found.</p>";
       console.error(err);
     });
 
-  // Load blog metadata from posts/{postId}/meta.json
+  // Set browser tab title
   fetch(`posts/${postId}/meta.json`)
     .then(res => {
       if (!res.ok) throw new Error("Meta not found");
