@@ -60,11 +60,9 @@ if (!postId) {
         entries.forEach(entry => {
           const id = entry.target.id;
           const link = tocList.querySelector(`a[href="#${id}"]`);
-          if (link) {
-            if (entry.isIntersecting) {
-              tocLinks.forEach(a => a.classList.remove("active"));
-              link.classList.add("active");
-            }
+          if (link && entry.isIntersecting) {
+            tocLinks.forEach(a => a.classList.remove("active"));
+            link.classList.add("active");
           }
         });
       }, { rootMargin: "-40% 0px -50% 0px", threshold: 0 });
@@ -87,7 +85,7 @@ if (!postId) {
         toggleIcon.textContent = tocBox.classList.contains("collapsed") ? "▼" : "▲";
       });
 
-      // === Mobile TOC after full "Introduction" section ===
+      // === Mobile: Move TOC after full "Introduction" content ===
       if (window.innerWidth <= 768) {
         const rightTocSlot = document.querySelector(".right-toc-slot");
 
@@ -118,7 +116,7 @@ if (!postId) {
       console.error(err);
     });
 
-  // Load metadata (e.g., title)
+  // === Load Metadata (Title) ===
   fetch(`posts/${postId}/meta.json`)
     .then(res => {
       if (!res.ok) throw new Error("Meta not found");
