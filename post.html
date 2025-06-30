@@ -9,25 +9,16 @@
 
   <!-- MathJax for LaTeX-style math rendering -->
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
   <script>
     window.MathJax = {
       tex: {
         inlineMath: [['\\(', '\\)']],
         displayMath: [['\\[', '\\]']]
-      },
-      options: {
-        renderActions: {
-          find: [10, function (doc) {
-            for (const node of document.querySelectorAll('p, li, div')) {
-              doc.compile(node);
-            }
-          }, '']
-        }
       }
     };
-  </script>
-  <script id="MathJax-script" async
-    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
   </script>
 </head>
 <body>
@@ -80,8 +71,7 @@
     <!-- Right TOC -->
     <aside class="right-toc-slot">
       <div class="toc-box">
-        <div class="toc-header">
-        </div>
+        <div class="toc-header"></div>
         <ul id="toc-list"></ul>
       </div>
     </aside>
