@@ -23,6 +23,26 @@ if (!postId) {
         }
       });
 
+      // === Reading Time Calculation ===
+      const wordsPerMinute = 200;
+      const text = contentDiv.innerText || contentDiv.textContent || "";
+      const wordCount = text.trim().split(/\s+/).length;
+      const minutes = Math.max(1, Math.ceil(wordCount / wordsPerMinute));
+
+      const readingTimeDiv = document.createElement("div");
+      readingTimeDiv.className = "reading-time-display";
+      readingTimeDiv.innerHTML = `
+        <i class="fa-solid fa-clock"></i> ${minutes} min
+      `;
+      readingTimeDiv.title = "Read Time";
+
+      const firstH1 = contentDiv.querySelector("h1");
+      if (firstH1) {
+        firstH1.insertAdjacentElement("afterend", readingTimeDiv);
+      } else {
+        contentDiv.prepend(readingTimeDiv);
+      }
+
       // === TOC Generation ===
       const tocList = document.getElementById("toc-list");
       tocList.innerHTML = "";
@@ -31,6 +51,9 @@ if (!postId) {
       headings.forEach(h => {
         const li = document.createElement("li");
         li.innerHTML = `<a href="#${h.id}">${h.textContent}</a>`;
+        if (h.tagName.toLowerCase() === "h3") {
+          li.classList.add("subsection");
+        }
         tocList.appendChild(li);
       });
 
