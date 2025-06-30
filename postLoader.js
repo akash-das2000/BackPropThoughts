@@ -4,7 +4,6 @@ const postId = params.get("postId");
 if (!postId) {
   document.getElementById("post-content").innerHTML = "<p>Post not found.</p>";
 } else {
-  // Load blog content
   fetch(`posts/${postId}/index.html`)
     .then(res => {
       if (!res.ok) throw new Error("Post not found");
@@ -14,35 +13,31 @@ if (!postId) {
       const contentDiv = document.getElementById("post-content");
       contentDiv.innerHTML = html;
 
-      // === TOC Generation ===
+      // === Table of Contents ===
       const tocList = document.getElementById("toc-list");
       tocList.innerHTML = "";
       const headings = contentDiv.querySelectorAll("h2[id], h3[id]");
-
       headings.forEach(h => {
         const li = document.createElement("li");
         li.innerHTML = `<a href="#${h.id}">${h.textContent}</a>`;
         tocList.appendChild(li);
       });
 
-      // === Highlight Active TOC Link on Scroll ===
+      // === Highlight TOC on Scroll ===
       const tocLinks = tocList.querySelectorAll("a");
       const observer = new IntersectionObserver(entries => {
         entries.forEach(entry => {
           const id = entry.target.id;
           const link = tocList.querySelector(`a[href="#${id}"]`);
-          if (link) {
-            if (entry.isIntersecting) {
-              tocLinks.forEach(a => a.classList.remove("active"));
-              link.classList.add("active");
-            }
+          if (link && entry.isIntersecting) {
+            tocLinks.forEach(a => a.classList.remove("active"));
+            link.classList.add("active");
           }
         });
       }, { rootMargin: "-40% 0px -50% 0px", threshold: 0 });
-
       headings.forEach(h => observer.observe(h));
 
-      // === TOC Collapse Toggle (All Devices) ===
+      // === TOC Toggle ===
       const tocBox = document.querySelector(".toc-box");
       const tocHeader = document.createElement("div");
       tocHeader.className = "toc-header";
@@ -50,7 +45,6 @@ if (!postId) {
         <span>Table of Contents</span>
         <span class="toggle-icon" id="toc-toggle-icon">▲</span>
       `;
-
       const existingTitle = tocBox.querySelector("h3");
       if (existingTitle) existingTitle.remove();
       tocBox.prepend(tocHeader);
@@ -61,19 +55,13 @@ if (!postId) {
         toggleIcon.textContent = tocBox.classList.contains("collapsed") ? "▼" : "▲";
       });
 
-      // === Mobile: Move TOC after Introduction section ===
+      // === Mobile TOC Repositioning ===
       if (window.innerWidth <= 768) {
         const rightTocSlot = document.querySelector(".right-toc-slot");
-
-        // Try by ID
-        let introHeading = contentDiv.querySelector("h2#introduction");
-
-        // Fallback: search for h2 whose textContent includes "introduction"
-        if (!introHeading) {
-          introHeading = Array.from(contentDiv.querySelectorAll("h2")).find(h =>
+        let introHeading = contentDiv.querySelector("h2#introduction") ||
+          Array.from(contentDiv.querySelectorAll("h2")).find(h =>
             h.textContent.trim().toLowerCase().includes("introduction")
           );
-        }
 
         if (rightTocSlot && introHeading) {
           const wrapper = document.createElement("div");
@@ -83,11 +71,9 @@ if (!postId) {
         }
       }
 
-      // === Trigger MathJax rendering after content injection ===
-      if (window.MathJax && window.MathJax.typesetPromise) {
-        MathJax.typesetPromise([contentDiv]).catch(err =>
-          console.warn("MathJax render failed:", err)
-        );
+      // === MathJax: Re-typeset the injected content ===
+      if (window.MathJax && MathJax.typeset) {
+        MathJax.typeset([contentDiv]);
       }
     })
     .catch(err => {
@@ -95,7 +81,7 @@ if (!postId) {
       console.error(err);
     });
 
-  // Load metadata for browser tab title
+  // === Page Title from meta.json ===
   fetch(`posts/${postId}/meta.json`)
     .then(res => {
       if (!res.ok) throw new Error("Meta not found");
