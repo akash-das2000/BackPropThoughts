@@ -14,47 +14,58 @@ if (!postId) {
       const contentDiv = document.getElementById("post-content");
       contentDiv.innerHTML = html;
 
-      // === Dynamic TOC Generation ===
+      // === TOC Generation ===
       const tocList = document.getElementById("toc-list");
-      tocList.innerHTML = ""; // Clear placeholder
+      tocList.innerHTML = "";
       const headings = contentDiv.querySelectorAll("h2[id], h3[id]");
-      const tocLinks = [];
 
       headings.forEach(h => {
         const li = document.createElement("li");
-        const link = document.createElement("a");
-        link.href = `#${h.id}`;
-        link.textContent = h.textContent;
-        li.appendChild(link);
+        li.innerHTML = `<a href="#${h.id}">${h.textContent}</a>`;
         tocList.appendChild(li);
-        tocLinks.push({ link, id: h.id });
       });
 
       // === Active Section Highlight on Scroll ===
-      const observerOptions = {
-        root: null,
-        rootMargin: '0px 0px -60% 0px',
-        threshold: 0
-      };
-
+      const tocLinks = tocList.querySelectorAll("a");
       const observer = new IntersectionObserver(entries => {
         entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            tocLinks.forEach(({ link }) => link.classList.remove('active'));
-            const active = tocLinks.find(t => t.id === entry.target.id);
-            if (active) active.link.classList.add('active');
+          const id = entry.target.id;
+          const link = tocList.querySelector(`a[href="#${id}"]`);
+          if (link) {
+            if (entry.isIntersecting) {
+              tocLinks.forEach(a => a.classList.remove("active"));
+              link.classList.add("active");
+            }
           }
         });
-      }, observerOptions);
+      }, { rootMargin: "-40% 0px -50% 0px", threshold: 0 });
 
       headings.forEach(h => observer.observe(h));
+
+      // === TOC Collapse Toggle ===
+      const tocBox = document.querySelector(".toc-box");
+      const tocHeader = document.createElement("div");
+      tocHeader.className = "toc-header";
+      tocHeader.innerHTML = `
+        <span>Table of Contents</span>
+        <span class="toggle-icon" id="toc-toggle-icon">▲</span>
+      `;
+      const existingTitle = tocBox.querySelector("h3");
+      if (existingTitle) existingTitle.remove();
+      tocBox.prepend(tocHeader);
+
+      const toggleIcon = tocHeader.querySelector("#toc-toggle-icon");
+      tocHeader.addEventListener("click", () => {
+        tocBox.classList.toggle("collapsed");
+        toggleIcon.textContent = tocBox.classList.contains("collapsed") ? "▼" : "▲";
+      });
     })
     .catch(err => {
       document.getElementById("post-content").innerHTML = "<p>Post not found.</p>";
       console.error(err);
     });
 
-  // Set browser tab title
+  // Load blog meta title
   fetch(`posts/${postId}/meta.json`)
     .then(res => {
       if (!res.ok) throw new Error("Meta not found");
@@ -68,17 +79,3 @@ if (!postId) {
       console.warn("Could not load blog metadata:", err);
     });
 }
-
-// === TOC Toggle on All Devices ===
-document.addEventListener("DOMContentLoaded", () => {
-  const tocBox = document.querySelector(".toc-box");
-  const tocHeader = tocBox?.querySelector("h3");
-
-  if (tocBox && tocHeader) {
-    tocBox.classList.add("expanded"); // Default to open
-
-    tocHeader.addEventListener("click", () => {
-      tocBox.classList.toggle("expanded");
-    });
-  }
-});
