@@ -53,7 +53,7 @@ nav ul {
   padding: 0;
 }
 
-/* === Always-Visible Hamburger & Dropdown === */
+/* === Hamburger & Dropdown === */
 .menu-container {
   position: relative;
   display: flex;
@@ -67,11 +67,9 @@ nav ul {
   background-color: #fff;
   box-shadow: 0 1px 5px rgba(0,0,0,0.05);
   cursor: pointer;
-  transition: background-color 0.3s, box-shadow 0.3s;
 }
 .hamburger:hover {
   background-color: #f2f9ff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 .dropdown {
   display: none;
@@ -99,40 +97,86 @@ nav ul {
 }
 .dropdown li {
   padding: 10px 20px;
-  transition: background-color 0.2s;
 }
 .dropdown li a {
   color: #333;
   text-decoration: none;
   font-weight: 500;
   font-size: 15px;
-  display: block;
 }
 .dropdown li:hover {
   background-color: #f5faff;
 }
 
-/* === Layout === */
-.container {
-  max-width: 1200px;
-  margin: auto;
-  padding: 20px;
-}
-.main-flex {
+/* === Main Layout === */
+.blog-wrapper {
   display: flex;
-  gap: 40px;
-  margin-top: 30px;
-}
-@media (max-width: 768px) {
-  .main-flex {
-    flex-direction: column;
-  }
+  justify-content: space-between;
+  gap: 2rem;
+  margin: 0 auto;
+  max-width: 1400px;
+  padding: 2rem;
 }
 
-/* === Blog Post Template Styles === */
+/* === Left Sidebar (Ads) === */
+.left-ad-slot {
+  flex: 0 0 160px;
+}
+.ad-slot.sidebar {
+  position: sticky;
+  top: 2rem;
+  min-height: 600px;
+  background: #f5f5f5;
+  border: 1px dashed #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-style: italic;
+  color: #777;
+}
+
+/* === Blog Content Center === */
+.blog-layout {
+  flex: 1;
+  max-width: 720px;
+}
+
+/* === TOC Right Sidebar === */
+.right-toc-slot {
+  flex: 0 0 220px;
+}
+.toc-box {
+  position: sticky;
+  top: 2rem;
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+.toc-box h3 {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+.toc-box ul {
+  list-style: none;
+  padding-left: 0;
+}
+.toc-box li {
+  font-size: 14px;
+  margin-bottom: 0.5rem;
+}
+.toc-box a {
+  color: #007acc;
+  text-decoration: none;
+}
+.toc-box a:hover {
+  text-decoration: underline;
+}
+
+/* === Blog Post Content === */
 main {
   flex: 1;
-  max-width: 700px;
 }
 h1, h2, h3 {
   font-weight: 600;
@@ -164,7 +208,6 @@ a:hover {
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.2s;
 }
 #interactions button:hover {
   background: #e1f2ff;
@@ -193,7 +236,6 @@ a:hover {
   border-radius: 5px;
   cursor: pointer;
   font-weight: bold;
-  transition: background-color 0.2s;
 }
 #comment-form button:hover {
   background-color: #005fa3;
@@ -217,7 +259,7 @@ a:hover {
   margin-bottom: 0.5rem;
 }
 
-/* === Ad Slots === */
+/* === Ads (Top/Bottom) === */
 .ad-slot {
   margin: 2rem 0;
   min-height: 100px;
@@ -233,86 +275,16 @@ a:hover {
 .ad-slot::before {
   content: "Ad Placeholder";
 }
-.ad-top {
-  min-height: 90px;
-}
+.ad-top,
 .ad-bottom {
   min-height: 90px;
-}
-.ad-slot.sidebar {
-  position: sticky;
-  top: 2rem;
-  min-height: 600px;
-  background: #f5f5f5;
-  border: 1px dashed #ccc;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-style: italic;
-  color: #777;
-}
-
-/* === Blog Wrapper Layout === */
-.blog-wrapper {
-  display: flex;
-  justify-content: center;
-  margin: 0 auto;
-  max-width: 1400px;
-}
-
-/* === Left Ad === */
-.left-ad-slot {
-  flex: 0 0 160px;
-  padding: 2rem 1rem;
-  border-right: 1px solid #eee;
-}
-
-/* === Blog Content Center === */
-.blog-layout {
-  flex: 1;
-  max-width: 700px;
-  padding: 2rem;
-}
-
-/* === TOC Right Sidebar === */
-.right-toc-slot {
-  flex: 0 0 220px;
-  padding: 2rem 1rem;
-  border-left: 1px solid #eee;
-}
-.right-toc-slot .toc-box {
-  position: sticky;
-  top: 2rem;
-  background: #fff;
-  border: 1px solid #ddd;
-  padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-.toc-box h3 {
-  font-size: 1rem;
-  margin-bottom: 1rem;
-}
-.toc-box ul {
-  list-style: none;
-  padding-left: 0;
-}
-.toc-box li {
-  font-size: 14px;
-  margin-bottom: 0.5rem;
-}
-.toc-box a {
-  color: #007acc;
-  text-decoration: none;
-}
-.toc-box a:hover {
-  text-decoration: underline;
 }
 
 /* === Responsive === */
 @media (max-width: 768px) {
   .blog-wrapper {
     flex-direction: column;
+    padding: 1rem;
   }
   .left-ad-slot,
   .right-toc-slot {
@@ -320,7 +292,6 @@ a:hover {
   }
   .blog-layout {
     padding: 1rem;
-    margin: 0;
     max-width: 100%;
   }
 }
