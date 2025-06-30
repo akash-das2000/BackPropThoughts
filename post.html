@@ -7,9 +7,7 @@
   <link rel="stylesheet" href="css/post.css" />
 </head>
 <body>
-
   <div class="blog-wrapper">
-
     <!-- Left Ad Slot -->
     <aside class="left-ad-slot">
       <div class="ad-slot sidebar">Ad Placeholder</div>
@@ -20,26 +18,19 @@
       <div class="ad-slot ad-top"></div>
 
       <main>
-        <div id="post-content">
-          <!-- Blog content will be injected here by postLoader.js -->
-        </div>
+        <div id="post-content"></div>
 
         <!-- Interactions -->
         <section id="interactions">
           <div class="icon-button" id="clap-button" title="Clap">
-            <svg viewBox="0 0 24 24" class="icon" fill="currentColor">
-              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5
-                2 6.5 3.5 5 5.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46
-                5.99 14.96 5 16.5 5 18.5 5 20 6.5 20 8.5c0 3.78-3.4
-                6.86-8.55 11.54L12 21.35z" />
+            <svg class="icon" viewBox="0 0 24 24">
+              <path d="M18.364 3.636a2 2 0 0 1 0 2.828l-2.12 2.12 2.12 2.12a2 2 0 1 1-2.828 2.828L12 11.656l-2.12 2.12a2 2 0 1 1-2.828-2.828l2.12-2.12-2.12-2.12a2 2 0 1 1 2.828-2.828L12 6.343l2.12-2.12a2 2 0 0 1 2.828 0z"/>
             </svg>
             <span id="clap-count">0</span>
           </div>
-
-          <div class="icon-button" id="toggle-comments" title="Toggle Comments">
-            <svg viewBox="0 0 24 24" class="icon" fill="currentColor">
-              <path d="M20 2H4c-1.1 0-2 .9-2 2v14l4-4h14c1.1 0 2-.9
-                2-2V4c0-1.1-.9-2-2-2z" />
+          <div class="icon-button" id="toggle-comments" title="Comments">
+            <svg class="icon" viewBox="0 0 24 24">
+              <path d="M21 6h-2v9H5v2a1 1 0 0 0 1 1h11l4 4V7a1 1 0 0 0-1-1z"/>
             </svg>
           </div>
         </section>
@@ -47,7 +38,7 @@
         <!-- Comments -->
         <section id="comments-section" style="display: none;">
           <h2>Leave a Comment</h2>
-          <form id="comment-form">
+          <form id="comment-form" class="comment-form">
             <input type="text" id="name" placeholder="Your name" required />
             <textarea id="comment" placeholder="Your comment" rows="5" required></textarea>
             <button type="submit">Post Comment</button>
@@ -64,11 +55,13 @@
     <!-- Right TOC -->
     <aside class="right-toc-slot">
       <div class="toc-box">
-        <h3>Table of Contents</h3>
-        <ul id="toc-list"></ul> <!-- TOC is dynamically generated -->
+        <div class="toc-header">
+          <span>Table of Contents</span>
+          <span class="toggle-icon" id="toc-toggle">▲</span>
+        </div>
+        <ul id="toc-list"></ul>
       </div>
     </aside>
-
   </div>
 
   <footer>
