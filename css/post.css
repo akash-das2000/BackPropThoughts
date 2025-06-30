@@ -35,9 +35,20 @@
 main {
   flex: 1;
 }
-main h1, main h2, main h3 {
+main h1 {
   font-weight: 600;
   line-height: 1.3;
+  color: #1a1a1a;
+}
+main h2 {
+  font-weight: 600;
+  line-height: 1.3;
+  color: #1f3a93;
+}
+main h3 {
+  font-weight: 600;
+  line-height: 1.3;
+  color: #555;
 }
 main p {
   font-size: 1.125rem;
@@ -226,10 +237,9 @@ main img {
   margin: 0.25rem 0 0.75rem;
 }
 
-/* Reading time box - right aligned */
+/* Reading time box - after heading, before first paragraph */
 .reading-time-display {
-  display: flex;
-  justify-content: flex-end;
+  display: inline-flex;
   align-items: center;
   gap: 0.4em;
   font-size: 0.9rem;
@@ -237,11 +247,9 @@ main img {
   background: #f7f7f7;
   padding: 4px 10px;
   border-radius: 6px;
-  margin: 0.5rem 0 1.5rem 0;
+  margin: 0.75rem 0 1.25rem 0;
   cursor: help;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  float: right;
-  clear: both;
 }
 .reading-time-display i {
   color: #444;
