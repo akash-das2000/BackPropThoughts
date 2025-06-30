@@ -100,7 +100,7 @@ main img {
   top: 2rem;
   padding: 1rem;
   background: #fafafa;
-  border-left: 3px solid #007acc;
+  border-left: 3px solid #444;
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
@@ -135,19 +135,20 @@ main img {
   color: #444;
 }
 .toc-box a {
-  color: #007acc;
+  color: #444;
   text-decoration: none;
   transition: all 0.2s ease;
 }
 .toc-box a:hover {
-  color: #005f99;
+  color: #111;
   text-decoration: underline;
 }
 .toc-box a.active {
   font-weight: 600;
-  border-left: 3px solid #007acc;
+  border-left: 3px solid #222;
   padding-left: 0.5rem;
-  background-color: #eaf6ff;
+  background-color: #efefef;
+  color: #111;
   display: inline-block;
 }
 .toc-box.collapsed ul {
