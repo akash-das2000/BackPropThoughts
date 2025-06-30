@@ -25,7 +25,7 @@ if (!postId) {
         tocList.appendChild(li);
       });
 
-      // === Active Section Highlight on Scroll ===
+      // === Highlight Active TOC Link on Scroll ===
       const tocLinks = tocList.querySelectorAll("a");
       const observer = new IntersectionObserver(entries => {
         entries.forEach(entry => {
@@ -42,7 +42,7 @@ if (!postId) {
 
       headings.forEach(h => observer.observe(h));
 
-      // === TOC Collapse Toggle ===
+      // === TOC Collapse Toggle (All Devices) ===
       const tocBox = document.querySelector(".toc-box");
       const tocHeader = document.createElement("div");
       tocHeader.className = "toc-header";
@@ -50,6 +50,7 @@ if (!postId) {
         <span>Table of Contents</span>
         <span class="toggle-icon" id="toc-toggle-icon">▲</span>
       `;
+
       const existingTitle = tocBox.querySelector("h3");
       if (existingTitle) existingTitle.remove();
       tocBox.prepend(tocHeader);
@@ -59,13 +60,35 @@ if (!postId) {
         tocBox.classList.toggle("collapsed");
         toggleIcon.textContent = tocBox.classList.contains("collapsed") ? "▼" : "▲";
       });
+
+      // === Mobile: Move TOC after Introduction section ===
+      if (window.innerWidth <= 768) {
+        const rightTocSlot = document.querySelector(".right-toc-slot");
+
+        // Try by ID
+        let introHeading = contentDiv.querySelector("h2#introduction");
+
+        // Fallback: search for h2 whose textContent includes "introduction"
+        if (!introHeading) {
+          introHeading = Array.from(contentDiv.querySelectorAll("h2")).find(h =>
+            h.textContent.trim().toLowerCase().includes("introduction")
+          );
+        }
+
+        if (rightTocSlot && introHeading) {
+          const wrapper = document.createElement("div");
+          wrapper.className = "mobile-toc-wrapper";
+          wrapper.appendChild(rightTocSlot);
+          introHeading.insertAdjacentElement("afterend", wrapper);
+        }
+      }
     })
     .catch(err => {
       document.getElementById("post-content").innerHTML = "<p>Post not found.</p>";
       console.error(err);
     });
 
-  // Load blog meta title
+  // Load metadata for browser tab title
   fetch(`posts/${postId}/meta.json`)
     .then(res => {
       if (!res.ok) throw new Error("Meta not found");
