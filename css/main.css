@@ -139,6 +139,13 @@ nav .tagline {
 }
 
 /* === Carousel === */
+
+/* === Latest Blogs section title === */
+.carousel-container > h2,
+.carousel-container > h3 {
+  color: #007acc;  /* match your link/clap-icon blue */
+}
+
 .carousel-container {
   background-color: #fff;
   border: 1px solid #ddd;
