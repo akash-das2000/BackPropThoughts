@@ -14,10 +14,14 @@ if (!postId) {
       const contentDiv = document.getElementById("post-content");
       contentDiv.innerHTML = html;
 
-      // ✅ Trigger MathJax rendering on dynamically injected content
-      if (window.MathJax) {
-        MathJax.typeset([contentDiv]);
-      }
+      // === Wait for DOM to update and then trigger MathJax ===
+      requestAnimationFrame(() => {
+        if (window.MathJax && window.MathJax.typesetPromise) {
+          MathJax.typesetPromise([contentDiv]).catch((err) =>
+            console.error("MathJax typeset failed:", err)
+          );
+        }
+      });
 
       // === TOC Generation ===
       const tocList = document.getElementById("toc-list");
@@ -70,10 +74,8 @@ if (!postId) {
       if (window.innerWidth <= 768) {
         const rightTocSlot = document.querySelector(".right-toc-slot");
 
-        // Try by ID
         let introHeading = contentDiv.querySelector("h2#introduction");
 
-        // Fallback: search for h2 whose textContent includes "introduction"
         if (!introHeading) {
           introHeading = Array.from(contentDiv.querySelectorAll("h2")).find(h =>
             h.textContent.trim().toLowerCase().includes("introduction")
