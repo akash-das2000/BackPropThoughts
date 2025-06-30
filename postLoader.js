@@ -33,7 +33,7 @@ if (!postId) {
 
       // PDF Download Icon
       const pdfIcon = document.createElement("i");
-      pdfIcon.className = "fa-solid fa-file-pdf";
+      pdfIcon.className = "fa-solid fa-download";
       pdfIcon.title = "Download as PDF";
       pdfIcon.style.cursor = "pointer";
       pdfIcon.addEventListener("click", () => {
