@@ -22,7 +22,7 @@ if (!postId) {
         }
       });
 
-      // === Reading Time + Share Icons ===
+      // === Reading Time + Icons (PDF, Share, Email, Clock) ===
       const wordsPerMinute = 200;
       const text = contentDiv.innerText || contentDiv.textContent || "";
       const wordCount = text.trim().split(/\s+/).length;
@@ -31,17 +31,7 @@ if (!postId) {
       const readingTimeDiv = document.createElement("div");
       readingTimeDiv.className = "reading-time-display";
 
-      // Link share
-      const linkIcon = document.createElement("i");
-      linkIcon.className = "fa-solid fa-link";
-      linkIcon.title = "Copy Link";
-      linkIcon.addEventListener("click", () => {
-        navigator.clipboard.writeText(window.location.href)
-          .then(() => alert("Link copied to clipboard"))
-          .catch(() => alert("Failed to copy link"));
-      });
-
-      // === PDF Download Icon ===
+      // PDF Download Icon
       const pdfIcon = document.createElement("i");
       pdfIcon.className = "fa-solid fa-file-pdf";
       pdfIcon.title = "Download as PDF";
@@ -58,24 +48,39 @@ if (!postId) {
         html2pdf().from(element).set(opt).save();
       });
 
-      // Email share
+      // Link Share Icon
+      const linkIcon = document.createElement("i");
+      linkIcon.className = "fa-solid fa-link";
+      linkIcon.title = "Copy Link";
+      linkIcon.style.cursor = "pointer";
+      linkIcon.addEventListener("click", () => {
+        navigator.clipboard.writeText(window.location.href)
+          .then(() => alert("Link copied to clipboard"))
+          .catch(() => alert("Failed to copy link"));
+      });
+
+      // Email Share Icon
       const emailIcon = document.createElement("i");
       emailIcon.className = "fa-solid fa-envelope";
       emailIcon.title = "Share via Email";
+      emailIcon.style.cursor = "pointer";
       emailIcon.addEventListener("click", () => {
         const subject = encodeURIComponent(document.title);
         const body = encodeURIComponent(`Check out this post: ${window.location.href}`);
         window.location.href = `mailto:?subject=${subject}&body=${body}`;
       });
 
-      // Clock and text
+      // Clock + Reading time
       const clockIcon = document.createElement("i");
       clockIcon.className = "fa-solid fa-clock";
       clockIcon.title = "Estimated reading time";
+      clockIcon.style.marginLeft = "4px";
 
       const timeText = document.createElement("span");
       timeText.textContent = ` ${minutes} min`;
 
+      // Append in desired order
+      readingTimeDiv.appendChild(pdfIcon);
       readingTimeDiv.appendChild(linkIcon);
       readingTimeDiv.appendChild(emailIcon);
       readingTimeDiv.appendChild(clockIcon);
@@ -133,7 +138,7 @@ if (!postId) {
         toggleIcon.textContent = tocBox.classList.contains("collapsed") ? "▼" : "▲";
       });
 
-      // === Mobile TOC Positioning After Introduction ===
+      // === Mobile TOC Placement After Introduction
       try {
         if (window.innerWidth <= 768) {
           const rightTocSlot = document.querySelector(".right-toc-slot");
@@ -181,7 +186,7 @@ if (!postId) {
         }
       });
 
-      // === Smooth Scroll on TOC click (override default anchor jump) ===
+      // === Smooth Scroll for TOC links ===
       tocList.addEventListener("click", e => {
         const link = e.target.closest("a[href^='#']");
         if (link) {
