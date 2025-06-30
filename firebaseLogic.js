@@ -1,4 +1,3 @@
-// firebaseLogic.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
   getFirestore,
@@ -16,7 +15,6 @@ import {
   serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// Replace with your Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyA3AkLphGPQy35cLP1rEt0g3hp4SQpt4XE",
   authDomain: "backpropthoughtscomments.firebaseapp.com",
@@ -32,7 +30,7 @@ const db = getFirestore(app);
 const params = new URLSearchParams(window.location.search);
 const postId = params.get("postId");
 
-// === Clap Functionality ===
+// Clap functionality
 const clapButton = document.getElementById("clap-button");
 const clapCountSpan = document.getElementById("clap-count");
 const clapDocRef = doc(db, "likes", postId);
@@ -44,31 +42,33 @@ getDoc(clapDocRef).then((docSnap) => {
     setDoc(clapDocRef, { claps: 0 });
     clapCountSpan.textContent = 0;
   }
+
+  const hasClapped = localStorage.getItem(`clapped_${postId}`);
+  if (hasClapped) {
+    clapButton.classList.add("active");
+  }
 });
 
 clapButton.addEventListener("click", () => {
   const hasClapped = localStorage.getItem(`clapped_${postId}`);
-  if (hasClapped) return; // Prevent duplicate claps
+  if (hasClapped) return;
 
   updateDoc(clapDocRef, { claps: increment(1) });
   localStorage.setItem(`clapped_${postId}`, "true");
-
-  // UI update
-  clapButton.classList.add("clicked");
   clapCountSpan.textContent = parseInt(clapCountSpan.textContent) + 1;
+  clapButton.classList.add("active");
 });
 
-// === Toggle Comments Section ===
+// Comments toggle
 const toggleCommentsButton = document.getElementById("toggle-comments");
 const commentsSection = document.getElementById("comments-section");
 
 toggleCommentsButton.addEventListener("click", () => {
-  const isOpen = commentsSection.style.display !== "none";
-  commentsSection.style.display = isOpen ? "none" : "block";
-  toggleCommentsButton.classList.toggle("clicked", !isOpen);
+  commentsSection.style.display =
+    commentsSection.style.display === "none" ? "block" : "none";
 });
 
-// === Submit New Comment ===
+// Submit comment
 const commentForm = document.getElementById("comment-form");
 commentForm.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -86,7 +86,7 @@ commentForm.addEventListener("submit", async (e) => {
   }
 });
 
-// === Load Comments in Real Time ===
+// Load comments in real-time
 const commentsList = document.getElementById("comments-list");
 const q = query(
   collection(db, "comments"),
@@ -98,6 +98,7 @@ onSnapshot(q, (snapshot) => {
   commentsList.innerHTML = "";
   if (snapshot.empty) {
     commentsList.innerHTML = "<p>No comments yet. Be the first!</p>";
+    return;
   }
   snapshot.forEach((doc) => {
     const data = doc.data();
@@ -109,7 +110,6 @@ onSnapshot(q, (snapshot) => {
     } catch (e) {
       console.warn("Invalid timestamp:", e);
     }
-
     const div = document.createElement("div");
     div.classList.add("comment");
     div.innerHTML = `<strong>${data.name}</strong> <em>${time}</em><p>${data.comment}</p><hr>`;
