@@ -2,24 +2,28 @@
 const params = new URLSearchParams(window.location.search);
 const postId = params.get("postId");
 
-if (!postId) {
-  document.getElementById("post-content").innerHTML = "<p>Post not found.</p>";
+const postContainer = document.getElementById("post-content");
+
+if (!postId || !postContainer) {
+  if (postContainer) {
+    postContainer.innerHTML = "<p>Post not found.</p>";
+  }
 } else {
-  // Load blog content
+  // Load blog content from posts/{postId}/index.html
   fetch(`posts/${postId}/index.html`)
     .then(res => {
       if (!res.ok) throw new Error("Post not found");
       return res.text();
     })
     .then(html => {
-      document.getElementById("post-content").innerHTML = html;
+      postContainer.innerHTML = html;
     })
     .catch(err => {
-      document.getElementById("post-content").innerHTML = "<p>Post not found.</p>";
+      postContainer.innerHTML = "<p>Post not found.</p>";
       console.error(err);
     });
 
-  // Load blog metadata for browser tab only (not visible heading)
+  // Load blog metadata from posts/{postId}/meta.json
   fetch(`posts/${postId}/meta.json`)
     .then(res => {
       if (!res.ok) throw new Error("Meta not found");
@@ -27,7 +31,7 @@ if (!postId) {
     })
     .then(meta => {
       const title = meta.title || postId;
-      document.title = title; // only set browser tab title
+      document.title = title;
     })
     .catch(err => {
       console.warn("Could not load blog metadata:", err);
