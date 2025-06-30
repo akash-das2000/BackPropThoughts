@@ -14,11 +14,6 @@ if (!postId) {
       const contentDiv = document.getElementById("post-content");
       contentDiv.innerHTML = html;
 
-      // ✅ Trigger MathJax rendering for dynamically loaded content
-      if (window.MathJax && MathJax.typesetPromise) {
-        MathJax.typesetPromise([contentDiv]).catch(err => console.error("MathJax rendering error:", err));
-      }
-
       // === TOC Generation ===
       const tocList = document.getElementById("toc-list");
       tocList.innerHTML = "";
@@ -86,6 +81,13 @@ if (!postId) {
           wrapper.appendChild(rightTocSlot);
           introHeading.insertAdjacentElement("afterend", wrapper);
         }
+      }
+
+      // === Trigger MathJax rendering after content injection ===
+      if (window.MathJax && window.MathJax.typesetPromise) {
+        MathJax.typesetPromise([contentDiv]).catch(err =>
+          console.warn("MathJax render failed:", err)
+        );
       }
     })
     .catch(err => {
