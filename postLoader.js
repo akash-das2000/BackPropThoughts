@@ -118,7 +118,7 @@ if (!postId) {
       // === Scroll to Top Button ===
       const scrollBtn = document.createElement("button");
       scrollBtn.id = "scrollToTopBtn";
-      scrollBtn.textContent = "↑ Top";
+      scrollBtn.textContent = "▴";
       document.body.appendChild(scrollBtn);
 
       scrollBtn.addEventListener("click", () => {
