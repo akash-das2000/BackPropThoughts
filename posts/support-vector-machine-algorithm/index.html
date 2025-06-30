@@ -17,7 +17,10 @@
   \]
   </div>
   <p>
-    The primal soft-margin SVM solves:
+    This means every data point lies on the correct side of the margin, allowing slack \(\xi_i\) for those that violate it. The term \( \xi_i \) measures how far a point lies from its margin boundary.
+  </p>
+  <p>
+    The optimization problem becomes:
   </p>
   <div>
   \[
@@ -25,20 +28,23 @@
   \]
   </div>
   <p>
-    This balances maximizing the margin (minimizing \( \|w\| \)) and penalizing misclassified or margin-violating points (via slack variables \( \xi_i \)).
+    The first term encourages a small norm \( \|w\| \), equivalent to maximizing the margin. The second term penalizes total margin violations, scaled by hyperparameter \( C \).
   </p>
   <p>
-    Using the hinge loss \( \ell(u) = \max(0, 1 - u) \), this is equivalent to:
+    Using hinge loss simplifies it as:
   </p>
   <div>
   \[
-    \min_{w,b} \quad \frac{1}{2} \|w\|^2 + C \sum_{i=1}^n \ell(y_i(w^T x_i + b))
+    \min_{w,b} \quad \frac{1}{2} \|w\|^2 + C \sum_{i=1}^n \max(0, 1 - y_i(w^T x_i + b))
   \]
   </div>
+  <p>
+    Intuitively, this objective encourages the model to predict with large margins and only penalizes samples violating the margin constraint.
+  </p>
 
   <h2 id="dual-derivation">3. Dual QP Derivation &amp; KKT Conditions</h2>
   <p>
-    The Lagrangian for the primal is:
+    The dual formulation expresses the problem in terms of the data points and their interactions. It reveals the dependence of the model solely on dot products between input vectors.
   </p>
   <div>
   \[
@@ -46,140 +52,126 @@
   \]
   </div>
   <p>
-    Optimality conditions (setting gradients to zero):
-  </p>
-  <ul>
-    <li>\( \nabla_w \mathcal{L} = 0 \Rightarrow w = \sum_i \alpha_i y_i x_i \)</li>
-    <li>\( \nabla_b \mathcal{L} = 0 \Rightarrow \sum_i \alpha_i y_i = 0 \)</li>
-    <li>\( \nabla_{\xi_i} \mathcal{L} = 0 \Rightarrow \alpha_i + \mu_i = C \Rightarrow 0 \le \alpha_i \le C \)</li>
-  </ul>
-  <p>
-    Plugging into \( \mathcal{L} \), we derive the dual QP:
+    Taking derivatives and solving the saddle point conditions, we get:
   </p>
   <div>
   \[
-    \max_{\alpha} \sum_i \alpha_i - \frac{1}{2} \sum_{i,j} \alpha_i \alpha_j y_i y_j x_i^T x_j \\
-    \text{s.t.} \quad 0 \le \alpha_i \le C, \quad \sum_i \alpha_i y_i = 0
+    w = \sum_i \alpha_i y_i x_i, \quad \sum_i \alpha_i y_i = 0, \quad 0 \le \alpha_i \le C
   \]
   </div>
   <p>
-    The KKT conditions ensure optimality and determine support vectors (points for which \( \alpha_i > 0 \)).
+    The dual objective becomes:
+  </p>
+  <div>
+  \[
+    \max_{\alpha} \sum_i \alpha_i - \frac{1}{2} \sum_{i,j} \alpha_i \alpha_j y_i y_j x_i^T x_j
+  \]
+  <p>
+    Here, \(\alpha_i\) reflects how important each point is. Only support vectors have non-zero \(\alpha_i\); they lie exactly on or within the margin.
   </p>
 
   <h2 id="representer-theorem">4. Representer Theorem &amp; Kernelization</h2>
   <p>
-    The optimal hyperplane lies in the span of training examples:
+    The Representer Theorem guarantees that the solution to the optimization problem lies in the span of the training data. Therefore, we can express the decision function as:
   </p>
   <div>
   \[
-    w = \sum_{i=1}^n \alpha_i y_i x_i \Rightarrow f(x) = \sum_i \alpha_i y_i \langle x_i, x \rangle + b
+    f(x) = \sum_i \alpha_i y_i \langle x_i, x \rangle + b
   \]
   </div>
   <p>
-    Replacing \( \langle x_i, x_j \rangle \) with a kernel \( K(x_i, x_j) \), we work implicitly in feature space \( \phi(x) \) without computing it directly.
+    Kernel functions \( K(x_i, x_j) \) replace inner products, allowing computation in high-dimensional feature spaces without ever mapping explicitly to \( \phi(x) \).
   </p>
-  <p>
-    Common kernels:
-  </p>
-  <ul>
-    <li>Linear: \( K(x,z) = x^T z \)</li>
-    <li>Polynomial: \( K(x,z) = (\gamma x^T z + r)^d \)</li>
-    <li>Gaussian RBF: \( K(x,z) = \exp(-\|x-z\|^2 / (2\sigma^2)) \)</li>
-  </ul>
 
   <h2 id="optimization-algorithms">5. Optimization Algorithms &amp; Complexity</h2>
   <p>
-    The dual form is a convex QP. SMO solves it by iteratively optimizing two \(\alpha_i\) variables at a time. Pegasos minimizes the primal using stochastic subgradient descent:
+    Sequential Minimal Optimization (SMO) updates pairs of \(\alpha\)s while satisfying the constraints. Pegasos uses stochastic updates to directly minimize the primal using subgradients:
   </p>
   <div>
   \[
-    w_{t+1} = (1 - \eta_t \lambda)w_t + \eta_t y_i x_i \mathbf{1}[y_i w_t^T x_i < 1]
+    w_{t+1} = (1 - \eta_t \lambda)w_t + \eta_t y_i x_i \mathbf{1}_{y_i w_t^T x_i < 1}
   \]
   </div>
   <p>
-    The choice depends on problem size, kernel use, and batch vs. online setting.
+    This balances the pull towards regularization and gradient descent on hinge loss violations.
   </p>
 
   <h2 id="advanced-extensions">6. Advanced Extensions</h2>
   <p>
-    In multi-class SVMs, we learn \(K\) classifiers \( w_k \) and assign:
+    Multi-class SVMs generalize binary SVMs. The Crammer–Singer formulation creates one weight vector per class and enforces that the correct class scores higher than others:
   </p>
   <div>
   \[
-    \hat{y} = \arg\max_k w_k^T x
+    \min_W \frac{1}{2} \sum_k \|w_k\|^2 + C \sum_i \max_{j \neq y_i} [1 + w_j^T x_i - w_{y_i}^T x_i]_+
   \]
   </div>
   <p>
-    The Crammer–Singer model jointly enforces margins across all class pairs. Structured SVMs generalize this further using joint feature maps \( \Psi(x, y) \) and solve for structured output prediction.
+    Structured SVMs go further by defining margins over structured outputs using joint feature maps \(\Psi(x,y)\).
   </p>
 
   <h2 id="theoretical-bounds">7. Theoretical Generalization &amp; Stability Bounds</h2>
 
   <h3>7.1 VC-Dimension Bound</h3>
-  <p>If inputs lie in a ball of radius \( R \), and margin is \( \gamma \), then:</p>
+  <p>
+    The number of samples an SVM can shatter is limited by the margin \(\gamma\) and the radius \(R\) of the input space:
+  </p>
   <div>
   \[
     \mathrm{VCdim} \le \min\left\{d, \frac{R^2}{\gamma^2}\right\}
-  \]
-  </div>
+  \]</div>
+  <p>
+    This quantifies the effective capacity of the SVM. A large margin (larger \(\gamma\)) reduces VCdim, improving generalization.
+  </p>
 
   <h3>7.2 Margin-Based Bound</h3>
-  <p>With probability \( 1 - \delta \):</p>
   <div>
   \[
     \mathrm{Err}(f) \le O\left( \frac{R^2}{\gamma^2} \cdot \frac{\log(1/\delta)}{n} \right)
   \]
-  </div>
+  <p>
+    This probabilistic bound shows that if we maintain a large margin, we can control the generalization error with high probability.
+  </p>
 
-  <h3>7.3 Leave-One-Out (LOO) Bound</h3>
+  <h3>7.3 Leave-One-Out Bound</h3>
   <div>
   \[
     \mathrm{Err}_{\mathrm{LOO}} \le \frac{\#\mathrm{SV}}{n}
-  \]
-  </div>
+  \]</div>
+  <p>
+    Only support vectors can affect the classifier if removed. Hence the LOO error is bounded by the fraction of support vectors.
+  </p>
 
   <h3>7.4 PAC-Bayes Bound</h3>
   <div>
   \[
     \mathbb{E}_{w \sim Q}[\mathrm{Err}(w)] \le \mathbb{E}_{w \sim Q}[\widehat{\mathrm{Err}}(w)] + \sqrt{\frac{\mathrm{KL}(Q\|P) + \ln(2\sqrt{n}/\delta)}{2(n-1)}}
-  \]
-  </div>
+  \]</div>
+  <p>
+    This bound bridges Bayesian inference and margin-based learning. It offers a way to understand generalization from a probabilistic lens, where \(Q\) is a posterior over models and \(P\) a prior.
+  </p>
 
   <h2 id="svr">8. Support Vector Regression (SVR)</h2>
   <p>
-    SVR aims to predict continuous outputs with a tolerance \( \epsilon \). Optimization:
+    SVR seeks a function \(f(x) = w^T x + b\) that deviates from true values \(y_i\) by no more than \(\epsilon\). Slack variables capture deviations beyond \(\epsilon\), and the optimization balances flatness (\(\|w\|^2\)) with loss:
   </p>
   <div>
   \[
     \min_{w,b,\xi,\xi^*} \tfrac12 \|w\|^2 + C \sum_i (\xi_i + \xi_i^*)
-  \]
-  <div>
-    Subject to:
-  </div>
-  \[
-    \begin{aligned}
-    &y_i - (w^T x_i + b) \le \epsilon + \xi_i \\
-    &(w^T x_i + b) - y_i \le \epsilon + \xi_i^* \\
-    &\xi_i, \xi_i^* \ge 0
-    \end{aligned}
-  \]
+  \]</div>
 
   <h2 id="incremental-svm">9. Incremental &amp; Online SVM Learning</h2>
   <p>
-    Algorithms like LASVM update \( \alpha_i \) online with low memory. Budgeted SVMs limit the number of support vectors to fixed-size pools.
+    Incremental algorithms update solutions as new data arrives. Budgeted approaches restrict the number of support vectors, approximating the full SVM to preserve efficiency.
   </p>
 
   <h2 id="applications">10. Applications &amp; Practical Tips</h2>
-  <ul>
-    <li>Text classification: linear SVMs on TF-IDF vectors</li>
-    <li>Image recognition: RBF or deep-kernel SVMs</li>
-    <li>Bioinformatics: domain-specific kernels (e.g. string kernels)</li>
-    <li>Outlier detection: one-class SVM for novelty detection</li>
-  </ul>
+  <p>
+    Select linear SVMs for sparse high-dimensional data (e.g. text), RBF kernels for low-dimensional non-linear data, and use proper hyperparameter tuning via cross-validation.
+  </p>
 
   <h2 id="conclusion">11. Conclusion</h2>
   <p>
-    SVMs blend geometry, optimization, and statistical theory. Their performance and elegance lie in margin maximization and the use of duality for kernelization. Through this deep dive, we’ve uncovered their theoretical underpinnings and broad extensions.
+    SVMs offer a robust, mathematically grounded approach to classification and regression. Their dual formulation, margin theory, and support vector mechanism remain central to modern machine learning.
   </p>
   <p><em>Reference API: <a href="https://scikit-learn.org/stable/modules/svm.html" target="_blank">scikit-learn SVM</a></em></p>
 </section>
