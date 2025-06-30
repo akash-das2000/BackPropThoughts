@@ -229,20 +229,23 @@ html {
   position: fixed;
   bottom: 40px;
   right: 40px;
-  opacity: 0;
-  visibility: hidden;
+  display: none;
   background-color: #222;
   color: #f1f1f1;
-  padding: 10px 14px;
-  border-radius: 6px;
-  font-size: 14px;
+  padding: 10px;
+  border-radius: 50%;
+  font-size: 18px;
+  font-weight: bold;
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
   transition: opacity 0.4s ease, visibility 0.4s ease;
 }
 
 #scrollToTopBtn.show {
+  display: block;
   opacity: 1;
   visibility: visible;
 }
@@ -250,6 +253,7 @@ html {
 #scrollToTopBtn:hover {
   background-color: #111;
 }
+
 
 
 /* === Footer Link === */
