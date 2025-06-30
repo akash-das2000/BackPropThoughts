@@ -1,146 +1,154 @@
 <section>
-  <h1 id="support-vector-machines">Maximal Margins: A Deep Dive into Support Vector Machines</h1>
-  <p><em>A rigorous exploration of Support Vector Machines, covering primal &amp; dual formulations, KKT conditions, the kernel trick, optimization algorithms, representer theorem, hinge loss, multi-class extensions, and theoretical generalization bounds.</em></p>
+  <h1 id="support-vector-machines">Maximal Margins: An In-Depth Mathematical Exploration of Support Vector Machines</h1>
+  <p><em>An extensive technical treatise on Support Vector Machines: primal &amp; dual QP derivations, hinge-loss geometry, KKT proof, Representer Theorem, advanced kernels, duality gap analysis, PAC-Bayes bounds, Support Vector Regression, incremental learning, and structured-output extensions.</em></p>
 
   <h2 id="introduction">1. Introduction</h2>
   <p>
-    Support Vector Machines (SVMs) are margin-based classifiers that solve a convex quadratic program to find the optimal separating hyperplane. SVMs achieve strong generalization via structural risk minimization, balancing empirical risk (hinge loss) with regularization. Through kernelization, SVMs extend to non-linear decision boundaries in high-dimensional feature spaces without explicit mapping.
+    Support Vector Machines (SVMs) are margin-based classifiers derived from convex optimization principles. By solving a quadratic program (QP), SVMs maximize the margin—the smallest perpendicular distance from data points to the decision hyperplane—thereby ensuring strong generalization guarantees via structural risk minimization.
   </p>
 
-  <h2 id="primal-formulation">2. Primal Formulation and Hinge Loss</h2>
-  <p>
-    Given labeled training data \(\{(x_i,y_i)\}_{i=1}^n\), \(x_i\in\mathbb R^d\), \(y_i\in\{\pm1\}\), the soft-margin SVM solves:
-  </p>
+  <h2 id="primal-qps">2. Primal QP &amp; Hinge-Loss Formulation</h2>
+  <p>Given training data \(\{(x_i,y_i)\}_{i=1}^n\), with \(x_i\in\mathbb R^d\), \(y_i\in\{\pm1\}\), the soft-margin primal QP is:</p>
   <pre><code>
-min_{w,b,\xi}\quad \frac12\|w\|^2 + C \sum_{i=1}^n \xi_i \\
-subject\;to\quad y_i(w^T x_i + b) \ge 1 - \xi_i, \quad \xi_i \ge 0.
+min_{w,b,\xi}\quad \frac{1}{2}\|w\|^2 + C \sum_{i=1}^n \xi_i  \\
+\text{s.t.}\quad y_i\bigl(w^\top x_i + b\bigr) \ge 1 - \xi_i, \quad \xi_i \ge 0.
   </code></pre>
-  <p>
-    Equivalently, using hinge loss \(\ell(u)=\max(0,1-u)\):
-  </p>
+  <p>Equivalently, one minimizes regularized hinge loss \(\ell(u)=\max(0,1-u)\):</p>
   <pre><code>
-min_{w,b}\quad \frac12\|w\|^2 + C \sum_{i=1}^n \ell\bigl(y_i(w^T x_i + b)\bigr).
+min_{w,b}\quad \frac12\|w\|^2 + C \sum_{i=1}^n \ell\bigl(y_i(w^\top x_i + b)\bigr).
   </code></pre>
-  <p>
-    The subgradient w.r.t. \(w\) is:
-  </p>
+  <p>The subgradient w.r.t. \(w\) is:</p>
   <pre><code>
-\partial_w = w - C \sum_{i=1}^n y_i x_i \; \mathbf{1}_{y_i(w^T x_i + b) < 1}.
+\partial_w = w - C \sum_{i=1}^n y_i x_i \; \mathbf{1}_{y_i(w^\top x_i + b) < 1}.
   </code></pre>
 
-  <h2 id="dual-formulation-kkt">3. Dual Formulation &amp; KKT Conditions</h2>
-  <p>
-    Introducing Lagrange multipliers \(\alpha_i \ge 0\) and slack \(\mu_i \ge 0\) for \(\xi_i\), the Lagrangian:
-  </p>
+  <h2 id="dual-derivation">3. Dual QP Derivation &amp; KKT Conditions</h2>
+  <p>Introduce Lagrange multipliers \(\alpha_i\ge0\) for margin constraints and \(\mu_i\ge0\) for \(\xi_i\):</p>
   <pre><code>
-L(w,b,\xi,\alpha,\mu) = \tfrac12\|w\|^2 + C\sum_i\xi_i
-  - \sum_i \alpha_i[y_i(w^T x_i + b) -1 + \xi_i]
-  - \sum_i \mu_i \xi_i.
+L = \tfrac12\|w\|^2 + C\sum_i\xi_i
+    - \sum_i \alpha_i\bigl[y_i(w^\top x_i + b)-1+\xi_i\bigr]
+    - \sum_i \mu_i\xi_i.
   </code></pre>
-  <p>
-    Stationarity gives:
-  </p>
+  <p>Stationarity gives:</p>
   <ul>
-    <li>\(w = \sum_i \alpha_i y_i x_i\)</li>
-    <li>\(\sum_i \alpha_i y_i = 0\)</li>
-    <li>\(C - \alpha_i - \mu_i = 0\) \(\Rightarrow 0 \le \alpha_i \le C\)</li>
+    <li>\(\nabla_w L = 0 \implies w = \sum_{i=1}^n \alpha_i y_i x_i\)</li>
+    <li>\(\partial_b L = 0 \implies \sum_{i=1}^n \alpha_i y_i = 0\)</li>
+    <li>\(\partial_{\xi_i} L = 0 \implies C - \alpha_i - \mu_i = 0 \implies 0 \le \alpha_i \le C\)</li>
   </ul>
-  <p>
-    The dual QP is:
-  </p>
+  <p>Substituting yields the dual QP:</p>
   <pre><code>
-max_{0 \le \alpha_i \le C}\quad \sum_i \alpha_i
- - \frac12 \sum_{i,j=1}^n \alpha_i \alpha_j y_i y_j x_i^T x_j
-subject\;to\quad \sum_i \alpha_i y_i = 0.
+max_{\alpha}\quad \sum_{i=1}^n \alpha_i - \tfrac12 \sum_{i,j=1}^n \alpha_i \alpha_j y_i y_j x_i^\top x_j  \\
+\text{s.t.}\quad 0 \le \alpha_i \le C, \quad \sum_{i=1}^n \alpha_i y_i = 0.
   </code></pre>
-  <h3 id="kkt">3.1 KKT Conditions</h3>
+
+  <h3 id="kkt-conditions">3.1 KKT Conditions</h3>
   <ul>
-    <li>Primal feasibility: \(y_i(w^T x_i + b) \ge 1 - \xi_i,\; \xi_i \ge 0\)</li>
-    <li>Dual feasibility: \(0 \le \alpha_i \le C\)</li>
+    <li>Primal feasibility: \(y_i(f(x_i)) \ge 1 - \xi_i,\;\xi_i\ge0\)</li>
+    <li>Dual feasibility: \(0\le\alpha_i\le C\)</li>
     <li>Complementary slackness:
-      \(\alpha_i[y_i(w^T x_i + b)-1+\xi_i]=0,\;(C-\alpha_i)\xi_i=0.\)
+      \(\alpha_i[y_i(f(x_i))-1 + \xi_i]=0,\;(C-\alpha_i)\xi_i=0.\)
     </li>
-    <li>Support vectors satisfy \(0<\alpha_i<C\) and lie on margin \(y_i(w^T x_i + b)=1\).</li>
+    <li>Support vectors: those with \(0<\alpha_i<C\) satisfy \(y_i f(x_i)=1\).</li>
   </ul>
 
-  <h2 id="representer-theorem">4. Representer Theorem &amp; Kernel Trick</h2>
-  <p>
-    By the Representer Theorem, \(w\) lies in span\(\{x_i\}\), enabling kernelization. Replace dot products with kernel functions \(K(x_i,x_j)=\phi(x_i)^T\phi(x_j)\). The dual becomes:
-  </p>
+  <h2 id="representer-theorem">4. Representer Theorem &amp; Kernelization</h2>
+  <p>By the Representer Theorem, the solution lies in the span of \(\{x_i\}\):</p>
   <pre><code>
-max_{\alpha}\quad \sum_i \alpha_i - \tfrac12 \sum_{i,j} \alpha_i \alpha_j y_i y_j K(x_i,x_j)
-subject\;to\quad 0\le\alpha_i\le C,\;\sum_i\alpha_i y_i=0.
+w = \sum_i \alpha_i y_i x_i, \quad f(x)=\sum_i \alpha_i y_i \langle x_i, x \rangle + b.
   </code></pre>
-  <h3 id="common-kernels">4.1 Common Kernels</h3>
+  <p>For non-linear separation, replace \(\langle x_i,x \rangle\) with kernel \(K(x_i,x)=\phi(x_i)^\top\phi(x)\). The dual becomes:</p>
+  <pre><code>
+max_{\alpha}\;\sum_i\alpha_i - \tfrac12\sum_{i,j}\alpha_i\alpha_j y_i y_j K(x_i,x_j)
+\quad\text{s.t.}\quad 0\le\alpha_i\le C,\;\sum_i\alpha_i y_i=0.
+  </code></pre>
+
+  <h3 id="common-kernels">4.1 Common Kernel Functions</h3>
   <ul>
-    <li>Linear: \(K(x,z)=x^T z\)</li>
-    <li>Polynomial: \(K(x,z)=(\gamma\,x^T z + r)^d\)</li>
-    <li>RBF: \(\exp(-\|x-z\|^2/(2\sigma^2))\)</li>
-    <li>Sigmoid: \(\tanh(\gamma\,x^T z + r)\)</li>
+    <li>Linear: \(K(x,z)=x^\top z\)</li>
+    <li>Polynomial: \(K(x,z)=(\gamma\,x^\top z + r)^d\)</li>
+    <li>RBF (Gaussian): \(K(x,z)=\exp\bigl(-\|x-z\|^2/(2\sigma^2)\bigr)\)</li>
+    <li>ANOVA: \(K(x,z)=\sum_{j=1}^d \exp(-\sigma\,(x_j-z_j)^2)\)</li>
   </ul>
 
-  <h2 id="optimization-methods">5. Optimization Methods &amp; Complexity</h2>
-  <p>
-    Efficient solvers leverage problem structure:
-  </p>
+  <h2 id="optimization-algorithms">5. Optimization Algorithms &amp; Complexity</h2>
   <ul>
-    <li><strong>SMO:</strong> Iteratively solves 2-variable subproblems in closed form, \(O(n^2 d)\) time.</li>
-    <li><strong>Interior-Point:</strong> Primal-dual methods for large QPs, scales roughly \(O(n^3)\).</li>
-    <li><strong>Stochastic Gradient:</strong> Pegasos solves primal hinge via SGD: 
-      \(w_{t+1}=(1-\eta_t)w_t + \eta_t C y_i x_i \mathbf{1}_{\ell<0}\).
+    <li><strong>SMO (Sequential Minimal Optimization):</strong> solves 2-variable QP subproblems analytically; empirical complexity \(O(n^2 d)\).</li>
+    <li><strong>Interior-point methods:</strong> primal-dual path-following; worst-case \(O(n^3)\).</li>
+    <li><strong>Pegasos (SGD):</strong> optimizes primal hinge via stochastic gradient; iteration complexity \(O(1/(\lambda\epsilon))\).</li>
+    <li><strong>Dual coordinate ascent:</strong> cyclic coordinate updates of \(\alpha_i\); converges linearly under strong convexity.</li>
+  </ul>
+
+  <h2 id="advanced-extensions">6. Advanced Extensions</h2>
+  <h3 id="multi-class-svm">6.1 Multi-class SVMs</h3>
+  <ul>
+    <li>One-vs-Rest: train \(K\) binary SVMs; predict class \(\arg\max_k f_k(x)\).</li>
+    <li>Crammer–Singer formulation:
+      \(\min_{W}\tfrac12\sum_k\|w_k\|^2 + C\sum_i\max_{j\neq y_i}[1 + w_j^\top x_i - w_{y_i}^\top x_i]_+\).
     </li>
   </ul>
+  <h3 id="structured-svm">6.2 Structured Output &amp; Ranking SVM</h3>
+  <p>General joint-feature SVMs with loss-augmented inference: cutting-plane algorithm solves:</p>
+  <pre><code>
+min_W \tfrac12\|W\|^2 + C\sum_i \max_{y\neq y_i}\bigl[\Delta(y_i,y) + W^\top(\Psi(x_i,y)-\Psi(x_i,y_i))\bigr]_+.
+  </code></pre>
 
-  <h2 id="multi-class-extensions">6. Multi-Class &amp; Structured SVMs</h2>
+  <h2 id="theoretical-bounds">7. Theoretical Generalization &amp; Stability Bounds</h2>
+  <h3 id="vc-dimension-bound">7.1 VC-Dimension Bound</h3>
+  <p>With data in an \(R\)-ball and margin \(\gamma\):</p>
+  <div>
+  \[
+    \mathrm{VCdim} \le \min\Bigl\{d,\;\frac{R^2}{\gamma^2}\Bigr\}.
+  \]
+  </div>
+
+  <h3 id="margin-bound">7.2 Margin-Based Generalization Bound</h3>
+  <p>With probability \(1-\delta\):</p>
+  <div>
+  \[
+    \mathrm{Err}(f) \le O\Bigl(\frac{R^2}{\gamma^2}\frac{\ln(1/\delta)}{n}\Bigr).
+  \]
+  </div>
+
+  <h3 id="loo-bound">7.3 Leave-One-Out Bound</h3>
+  <p>Let \(\#\mathrm{SV}\) be support vectors count:</p>
+  <div>
+  \[
+    \mathrm{Err}_{\mathrm{LOO}} \le \frac{\#\mathrm{SV}}{n}.
+  \]
+  </div>
+
+  <h3 id="pac-bayes-bound">7.4 PAC-Bayes Bound</h3>
+  <p>Applying PAC-Bayes yields, for any posterior \(Q\) over weight vectors:</p>
+  <div>
+  \[
+    \mathbb{E}_{w\sim Q}[\mathrm{Err}(w)] \le \mathbb{E}_{w\sim Q}[\widehat{\mathrm{Err}}(w)] + \sqrt{\frac{\mathrm{KL}(Q\|P) + \ln(2\sqrt{n}/\delta)}{2(n-1)}}.
+  \]
+  </div>
+
+  <h2 id="svr">8. Support Vector Regression (SVR)</h2>
+  <p>SVR solves:</p>
+  <pre><code>
+min_{w,b,\xi,\xi^*} \tfrac12\|w\|^2 + C\sum_i(\xi_i + \xi_i^*)  \\
+\text{s.t.}\;
+  y_i - (w^\top x_i + b) \le \epsilon + \xi_i,  \\
+  (w^\top x_i + b) - y_i \le \epsilon + \xi_i^*,  \\
+  \xi_i,\xi_i^* \ge 0.
+  </code></pre>
+
+  <h2 id="incremental-svm">9. Incremental &amp; Online SVM Learning</h2>
+  <p>Online updates via dual coordinate ascent and budget maintenance to cap \(\#\mathrm{SV}\). Algorithms like NORMA, LASVM implement streaming updates with theoretical regret bounds \(O(\sqrt{T})\).</p>
+
+  <h2 id="applications">10. Applications &amp; Practical Tips</h2>
   <ul>
-    <li><strong>One-vs-Rest:</strong> Fit \(K\) binary SVMs; predict by highest decision value.</li>
-    <li><strong>Crammer–Singer:</strong> Joint formulation: maximize margin between correct class and all others:
-      \(\min_W \tfrac12\sum_k\|w_k\|^2 + C\sum_i \max_{j\neq y_i}[1 + w_j^T x_i - w_{y_i}^T x_i]_+\).
-    </li>
-    <li><strong>Structured Outputs:</strong> Loss-augmented inference via Joint Feature Maps and cutting-plane algorithms.</li>
+    <li>Text &amp; NLP: linear SVM on TF-IDF, use Pegasos for large corpora.</li>
+    <li>Image &amp; Vision: RBF for small datasets; approximate kernels for scalability.</li>
+    <li>Bioinformatics: string/graph kernels for sequence and network data.</li>
+    <li>Anomaly Detection: one-class SVM with \(\nu\)-parameter controlling support vectors.</li>
   </ul>
 
-  <h2 id="generalization-bounds">7. Theoretical Generalization Bounds</h2>
+  <h2 id="conclusion">11. Conclusion</h2>
   <p>
-    Let \(R=\max_i\|x_i\|\), margin \(\gamma=\min_i y_i(w^T x_i+b)/\|w\|\). Then the VC dimension satisfies:
+    This deep dive has illuminated the mathematical foundations of SVMs, from primal/dual QP formulations and KKT proofs to advanced generalization bounds and practical extensions like SVR and online learning. SVMs remain a cornerstone of classical ML, blending convex optimization with statistical rigour.
   </p>
-  <pre><code>
-VCdim \le \min\{R^2/\gamma^2, d\}.
-  </code></pre>
-  <p>
-    With probability \(1-\delta\), the expected error \(\mathrm{Err}(f)\) is bounded by:
-  </p>
-  <pre><code>
-O\bigl(\tfrac{R^2}{\gamma^2}\tfrac{\log(1/\delta)}{n}\bigr).
-  </code></pre>
-  <p>
-    Leave-one-out bound relates number of support vectors \(\#SV\):
-  </p>
-  <pre><code>
-LOO\;error \le \frac{\#SV}{n}.
-  </code></pre>
-
-  <figure>
-    <img src="posts/svm/assets/svm_margin.png" alt="SVM Margin Diagram">
-    <figcaption><strong>Figure 1:</strong> Maximum-margin hyperplane and support vectors.</figcaption>
-  </figure>
-
-  <figure>
-    <img src="posts/svm/assets/kernel_space.png" alt="Kernel Feature Space">
-    <figcaption><strong>Figure 2:</strong> Non-linear embedding via kernel trick.</figcaption>
-  </figure>
-
-  <h2 id="application-cases">8. Applications &amp; Practical Tips</h2>
-  <ul>
-    <li>Text Classification: high-dimensional sparse input; use linear SVM with SGD solver.</li>
-    <li>Image Recognition: RBF kernel on small datasets; deep kernel learning for large-scale.</li>
-    <li>Bioinformatics: careful kernel choice (string kernels, graph kernels).</li>
-    <li>Anomaly Detection: one-class SVM; \(\nu\)-SVM variant controls number of support vectors.</li>
-  </ul>
-
-  <h2 id="conclusion">9. Conclusion</h2>
-  <p>
-    SVMs offer a mathematically elegant framework grounded in convex optimization and statistical learning theory. Through hinge loss, kernelization, and robust solvers, they remain a cornerstone of classical machine learning with guaranteed generalization and flexible extensions to structured outputs.
-  </p>
-  <p><em>Explore the API: <a href="https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html" target="_blank">sklearn.svm.SVC</a></em></p>
+  <p><em>API Reference: <a href="https://scikit-learn.org/stable/modules/svm.html" target="_blank">scikit-learn SVM Modules</a></em></p>
 </section>
