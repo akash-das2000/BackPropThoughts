@@ -229,7 +229,6 @@ html {
   position: fixed;
   bottom: 40px;
   right: 40px;
-  display: none;
   background-color: #222;
   color: #f1f1f1;
   padding: 10px;
@@ -241,18 +240,20 @@ html {
   z-index: 1000;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.4s ease, visibility 0.4s ease;
+  transform: translateY(20px);
+  transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s ease;
 }
 
 #scrollToTopBtn.show {
-  display: block;
   opacity: 1;
   visibility: visible;
+  transform: translateY(0);
 }
 
 #scrollToTopBtn:hover {
   background-color: #111;
 }
+
 
 
 
