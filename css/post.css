@@ -26,6 +26,17 @@
   color: #777;
 }
 
+.ad-slot.top-ad,
+.ad-slot.bottom-ad {
+  margin: 2rem 0;
+  padding: 2rem;
+  background-color: #f9f9f9;
+  border: 1px dashed #ccc;
+  text-align: center;
+  font-style: italic;
+  color: #777;
+}
+
 .blog-layout {
   flex: 1 1 800px;
   padding: 0 2rem;
