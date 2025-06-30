@@ -11,6 +11,13 @@ body {
   padding: 0;
 }
 
+/* === Container === */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
 /* === Header & Footer === */
 header, footer {
   background-color: #fff;
@@ -219,6 +226,25 @@ nav .tagline {
   text-decoration: none;
 }
 .read-more-btn:hover {
+  text-decoration: underline;
+}
+
+/* === Featured AV Blog Section === */
+.featured-blog {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  margin-top: 20px;
+}
+.featured-blog h3 a {
+  font-size: 18px;
+  font-weight: bold;
+  color: #007acc;
+  text-decoration: none;
+}
+.featured-blog h3 a:hover {
   text-decoration: underline;
 }
 
