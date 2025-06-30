@@ -32,10 +32,9 @@ const db = getFirestore(app);
 const params = new URLSearchParams(window.location.search);
 const postId = params.get("postId");
 
-// Clap functionality
+// === Clap Functionality ===
 const clapButton = document.getElementById("clap-button");
 const clapCountSpan = document.getElementById("clap-count");
-
 const clapDocRef = doc(db, "likes", postId);
 
 getDoc(clapDocRef).then((docSnap) => {
@@ -49,26 +48,27 @@ getDoc(clapDocRef).then((docSnap) => {
 
 clapButton.addEventListener("click", () => {
   const hasClapped = localStorage.getItem(`clapped_${postId}`);
-  if (hasClapped) {
-    alert("You've already clapped for this post!");
-    return;
-  }
+  if (hasClapped) return; // Prevent duplicate claps
 
   updateDoc(clapDocRef, { claps: increment(1) });
   localStorage.setItem(`clapped_${postId}`, "true");
+
+  // UI update
+  clapButton.classList.add("clicked");
   clapCountSpan.textContent = parseInt(clapCountSpan.textContent) + 1;
 });
 
-// Comments functionality
+// === Toggle Comments Section ===
 const toggleCommentsButton = document.getElementById("toggle-comments");
 const commentsSection = document.getElementById("comments-section");
 
 toggleCommentsButton.addEventListener("click", () => {
-  commentsSection.style.display =
-    commentsSection.style.display === "none" ? "block" : "none";
+  const isOpen = commentsSection.style.display !== "none";
+  commentsSection.style.display = isOpen ? "none" : "block";
+  toggleCommentsButton.classList.toggle("clicked", !isOpen);
 });
 
-// Submit new comment
+// === Submit New Comment ===
 const commentForm = document.getElementById("comment-form");
 commentForm.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -86,7 +86,7 @@ commentForm.addEventListener("submit", async (e) => {
   }
 });
 
-// Load comments in real-time
+// === Load Comments in Real Time ===
 const commentsList = document.getElementById("comments-list");
 const q = query(
   collection(db, "comments"),
@@ -109,6 +109,7 @@ onSnapshot(q, (snapshot) => {
     } catch (e) {
       console.warn("Invalid timestamp:", e);
     }
+
     const div = document.createElement("div");
     div.classList.add("comment");
     div.innerHTML = `<strong>${data.name}</strong> <em>${time}</em><p>${data.comment}</p><hr>`;
