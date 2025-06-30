@@ -143,6 +143,35 @@ main img {
   display: none;
 }
 
+#interactions {
+  display: flex;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.icon-button {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.icon-button:hover {
+  background: #f0f0f0;
+}
+
+.icon-button.clicked .icon {
+  color: #ff9800;
+  transform: scale(1.1);
+}
+
+
 /* === Responsive === */
 @media (max-width: 768px) {
   .blog-wrapper {
