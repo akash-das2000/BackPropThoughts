@@ -1,14 +1,14 @@
 <section>
-  <h1>SEAL the Future: How Language Models Are Learning to Adapt Themselves</h1>
+  <h1 id="seal-the-future">SEAL the Future: How Language Models Are Learning to Adapt Themselves</h1>
   <p><em>A dive into the Self-Adapting LLMs (SEAL) framework and how it's redefining model adaptation and self-improvement.</em></p>
 
   <h2>1. Introduction</h2>
   <p>Large language models (LLMs) like GPT-4 and LLaMA have shown incredible performance in understanding and generating human language. But there's a catch—they’re static. Once trained, they don’t easily adapt to new information, tasks, or styles unless explicitly fine-tuned. Enter <strong>SEAL (Self-Editing for Adaptation through Learning)</strong>, a new approach from MIT that enables LLMs to not just learn—but to teach themselves.</p>
 
-  <h2>2. Why Adaptability Matters</h2>
+  <h2 id="introduction">2. Why Adaptability Matters</h2>
   <p>Imagine a student studying for a final exam. Instead of rereading textbooks verbatim, they often write notes, reorganize content, or draw diagrams. This restructuring makes learning more effective. Current LLMs don’t do this—they consume raw training data without reshaping it for easier learning. SEAL draws inspiration from human strategies, enabling models to transform and tailor their own learning process.</p>
 
-  <h2>3. What is SEAL?</h2>
+  <h2 id="what-is-seal">3. What is SEAL?</h2>
   <p>SEAL is a framework where LLMs generate their own <strong>self-edits</strong>—textual instructions or synthetic data they can fine-tune on. These self-edits include:</p>
   <ul>
     <li>Reformulations of input data</li>
@@ -22,7 +22,7 @@
     <figcaption><strong>Figure 1:</strong> SEAL's reinforcement loop: the model proposes edits, applies updates, evaluates performance, and learns from the reward.</figcaption>
   </figure>
 
-  <h2>4. How SEAL Works</h2>
+  <h2 id="how-seal-works">4. How SEAL Works</h2>
   <p>SEAL uses two interleaved loops:</p>
   <ul>
     <li><strong>Outer RL Loop:</strong> Trains the model to generate better self-edits.</li>
@@ -30,9 +30,9 @@
   </ul>
   <p>Training uses the ReSTEM strategy—supervised finetuning on only high-reward generations.</p>
 
-  <h2>5. Applications and Results</h2>
+  <h2 id="applications-and-results">5. Applications and Results</h2>
 
-  <h3>5.1 Knowledge Incorporation</h3>
+  <h3 id="knowledge-incorporation">5.1 Knowledge Incorporation</h3>
   <p>In this setup, SEAL reads a passage and generates useful inferences (implications or QA pairs). These are used for finetuning, helping the model remember and apply new knowledge without needing the passage in-context.</p>
 
   <figure>
@@ -40,7 +40,7 @@
     <figcaption><strong>Figure 2:</strong> SEAL transforms input passages into synthetic implications, which are used for model finetuning.</figcaption>
   </figure>
 
-  <h3>5.2 Few-Shot Learning</h3>
+  <h3 id="few-shot-learning">5.2 Few-Shot Learning</h3>
   <p>SEAL also handles abstract reasoning tasks from the ARC benchmark. It learns to choose the best data augmentations and optimization settings—like learning rate or token-wise loss computation—to adapt with minimal examples.</p>
 
   <figure>
@@ -48,7 +48,7 @@
     <figcaption><strong>Figure 3:</strong> SEAL outputs a JSON-style edit defining training strategy and augmentations to apply on few-shot demos.</figcaption>
   </figure>
 
-  <h2>6. Limitations</h2>
+  <h2 id="limitations">6. Limitations</h2>
   <ul>
     <li><strong>Catastrophic Forgetting:</strong> Repeated edits can degrade performance on earlier knowledge.</li>
     <li><strong>Compute Cost:</strong> Each edit involves finetuning—time-consuming for large-scale use.</li>
@@ -60,7 +60,7 @@
     <figcaption><strong>Figure 4:</strong> Model accuracy on earlier tasks degrades after repeated updates—a symptom of catastrophic forgetting.</figcaption>
   </figure>
 
-  <h2>7. Why This Matters</h2>
+  <h2 id="why-this-matters">7. Why This Matters</h2>
   <p>LLMs are nearing the limits of web-scale human data. SEAL offers a future-proof direction: letting models generate their own effective training signals. It enables:</p>
   <ul>
     <li>Autonomous adaptation</li>
@@ -68,7 +68,7 @@
     <li>Continual learning in evolving environments</li>
   </ul>
 
-  <h2>8. Final Thoughts</h2>
+  <h2 id="final-thoughts">8. Final Thoughts</h2>
   <p>SEAL flips the script—from static learners to dynamic self-improvers. It's a bold step toward models that don’t just memorize answers, but learn how to teach themselves. As research evolves, SEAL could become a cornerstone for agentic, continually learning AI systems.</p>
 
   <p><em>Check out the full paper and project at <a href="https://jyopari.github.io/posts/seal" target="_blank">https://jyopari.github.io/posts/seal</a>.</em></p>
