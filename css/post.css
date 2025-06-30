@@ -1,0 +1,126 @@
+/* === Blog Post Page Specific Layout === */
+.blog-wrapper {
+  display: flex;
+  justify-content: center;
+  margin: 0 auto;
+  max-width: 1400px;
+  padding: 2rem 1rem;
+}
+
+/* === Left Ad Sidebar === */
+.left-ad-slot {
+  flex: 0 0 160px;
+  padding: 2rem 1rem;
+  border-right: 1px solid #eee;
+}
+.ad-slot.sidebar {
+  position: sticky;
+  top: 2rem;
+  min-height: 600px;
+  background: #f5f5f5;
+  border: 1px dashed #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-style: italic;
+  color: #777;
+}
+
+/* === Blog Main Content Area === */
+.blog-layout {
+  flex: 1;
+  max-width: 700px;
+  padding: 0 2rem;
+}
+main {
+  flex: 1;
+}
+main h1, main h2, main h3 {
+  font-weight: 600;
+  line-height: 1.3;
+}
+main p {
+  font-size: 1.125rem;
+  margin-bottom: 1.25rem;
+}
+main a {
+  color: #0077cc;
+  text-decoration: none;
+}
+main a:hover {
+  text-decoration: underline;
+}
+
+/* === Ad Slots (Top/Bottom) === */
+.ad-slot {
+  margin: 2rem 0;
+  min-height: 100px;
+  background: #f5f5f5;
+  border: 2px dashed #ccc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #666;
+  font-size: 14px;
+  font-style: italic;
+}
+.ad-slot::before {
+  content: "Ad Placeholder";
+}
+.ad-top {
+  min-height: 90px;
+}
+.ad-bottom {
+  min-height: 90px;
+}
+
+/* === Table of Contents Sidebar === */
+.right-toc-slot {
+  flex: 0 0 220px;
+  padding: 2rem 1rem;
+  border-left: 1px solid #eee;
+}
+.right-toc-slot .toc-box {
+  position: sticky;
+  top: 2rem;
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+.toc-box h3 {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+.toc-box ul {
+  list-style: none;
+  padding-left: 0;
+}
+.toc-box li {
+  font-size: 14px;
+  margin-bottom: 0.5rem;
+}
+.toc-box a {
+  color: #007acc;
+  text-decoration: none;
+}
+.toc-box a:hover {
+  text-decoration: underline;
+}
+
+/* === Responsive for Blog Post === */
+@media (max-width: 768px) {
+  .blog-wrapper {
+    flex-direction: column;
+    padding: 1rem;
+  }
+  .left-ad-slot,
+  .right-toc-slot {
+    display: none;
+  }
+  .blog-layout {
+    padding: 0;
+    max-width: 100%;
+  }
+}
