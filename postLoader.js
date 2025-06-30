@@ -22,7 +22,7 @@ if (!postId) {
         }
       });
 
-      // === Reading Time Calculation ===
+      // === Reading Time + Share Icons ===
       const wordsPerMinute = 200;
       const text = contentDiv.innerText || contentDiv.textContent || "";
       const wordCount = text.trim().split(/\s+/).length;
@@ -30,8 +30,39 @@ if (!postId) {
 
       const readingTimeDiv = document.createElement("div");
       readingTimeDiv.className = "reading-time-display";
-      readingTimeDiv.innerHTML = `<i class="fa-solid fa-clock"></i> ${minutes} min`;
-      readingTimeDiv.title = "Read Time";
+
+      // Link share
+      const linkIcon = document.createElement("i");
+      linkIcon.className = "fa-solid fa-link";
+      linkIcon.title = "Copy Link";
+      linkIcon.addEventListener("click", () => {
+        navigator.clipboard.writeText(window.location.href)
+          .then(() => alert("Link copied to clipboard"))
+          .catch(() => alert("Failed to copy link"));
+      });
+
+      // Email share
+      const emailIcon = document.createElement("i");
+      emailIcon.className = "fa-solid fa-envelope";
+      emailIcon.title = "Share via Email";
+      emailIcon.addEventListener("click", () => {
+        const subject = encodeURIComponent(document.title);
+        const body = encodeURIComponent(`Check out this post: ${window.location.href}`);
+        window.location.href = `mailto:?subject=${subject}&body=${body}`;
+      });
+
+      // Clock and text
+      const clockIcon = document.createElement("i");
+      clockIcon.className = "fa-solid fa-clock";
+      clockIcon.title = "Estimated reading time";
+
+      const timeText = document.createElement("span");
+      timeText.textContent = ` ${minutes} min`;
+
+      readingTimeDiv.appendChild(linkIcon);
+      readingTimeDiv.appendChild(emailIcon);
+      readingTimeDiv.appendChild(clockIcon);
+      readingTimeDiv.appendChild(timeText);
 
       const firstH1 = contentDiv.querySelector("h1");
       if (firstH1) {
