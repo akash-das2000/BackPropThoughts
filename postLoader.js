@@ -85,30 +85,35 @@ if (!postId) {
         toggleIcon.textContent = tocBox.classList.contains("collapsed") ? "▼" : "▲";
       });
 
-      // === Mobile: Move TOC after full "Introduction" content ===
-      if (window.innerWidth <= 768) {
-        const rightTocSlot = document.querySelector(".right-toc-slot");
+      // === Mobile: Move TOC after full Introduction section ===
+      try {
+        if (window.innerWidth <= 768) {
+          const rightTocSlot = document.querySelector(".right-toc-slot");
+          const h2s = Array.from(contentDiv.querySelectorAll("h2"));
 
-        const introHeading = Array.from(contentDiv.querySelectorAll("h2")).find(h =>
-          h.textContent.trim().toLowerCase().includes("introduction")
-        );
+          const introHeading = h2s.find(h =>
+            h.textContent.trim().toLowerCase().includes("introduction")
+          );
 
-        if (introHeading && rightTocSlot) {
-          let endOfIntro = introHeading.nextElementSibling;
-          while (endOfIntro && endOfIntro.tagName.toLowerCase() !== "h2") {
-            endOfIntro = endOfIntro.nextElementSibling;
-          }
+          if (introHeading && rightTocSlot) {
+            let walker = introHeading.nextElementSibling;
+            while (walker && walker.tagName.toLowerCase() !== "h2") {
+              walker = walker.nextElementSibling;
+            }
 
-          const wrapper = document.createElement("div");
-          wrapper.className = "mobile-toc-wrapper";
-          wrapper.appendChild(rightTocSlot);
+            const wrapper = document.createElement("div");
+            wrapper.className = "mobile-toc-wrapper";
+            wrapper.appendChild(rightTocSlot);
 
-          if (endOfIntro) {
-            endOfIntro.insertAdjacentElement("beforebegin", wrapper);
-          } else {
-            contentDiv.appendChild(wrapper);
+            if (walker) {
+              walker.insertAdjacentElement("beforebegin", wrapper);
+            } else {
+              contentDiv.appendChild(wrapper);
+            }
           }
         }
+      } catch (e) {
+        console.warn("Mobile TOC logic failed:", e);
       }
     })
     .catch(err => {
@@ -116,7 +121,7 @@ if (!postId) {
       console.error(err);
     });
 
-  // === Load Metadata (Title) ===
+  // === Load blog metadata ===
   fetch(`posts/${postId}/meta.json`)
     .then(res => {
       if (!res.ok) throw new Error("Meta not found");
