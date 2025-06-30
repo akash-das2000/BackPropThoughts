@@ -228,3 +228,30 @@ main img {
     order: -1;
   }
 }
+
+/* TOC subsection indentation */
+#toc-list li.subsection {
+  margin-left: 1.2rem;
+  font-size: 0.95em;
+  color: #444;
+}
+
+/* Reading time box */
+.reading-time-display {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  font-size: 0.9rem;
+  color: #333;
+  background: #f7f7f7;
+  padding: 4px 10px;
+  border-radius: 6px;
+  margin: 0.5rem 0 1rem 0;
+  cursor: help;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  width: fit-content;
+}
+
+.reading-time-display i {
+  color: #444;
+}
