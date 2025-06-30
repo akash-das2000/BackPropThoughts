@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>BackPropThoughts</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="css/main.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="css/main.css" />
 </head>
 <body>
 
@@ -12,12 +12,12 @@
   <div id="navbar-placeholder"></div>
 
   <!-- Main layout -->
-  <main class="main-flex container">
+  <main class="container main-flex">
 
     <!-- Blog section (left) -->
     <section class="blog-list">
 
-      <!-- Carousel Container -->
+      <!-- Carousel -->
       <section class="carousel-container">
         <h2 class="carousel-heading">Latest Blogs</h2>
         <div class="carousel" id="blog-carousel">
@@ -26,27 +26,27 @@
         </div>
       </section>
 
-      <!-- AV Blog List Card -->
-      <ul class="blog-listing">
-        <li>
+      <!-- AV Blog Card -->
+      <section class="featured-blog">
+        <h3>
           <a href="https://www.analyticsvidhya.com/blog/author/akashdas/" target="_blank">
-            My Past Blogs for Analytics Vidhya
+            My Past Blogs for Analytics Vidhya →
           </a>
-          <p class="ownership-note">(Articles owned and published by AV)</p>
-        </li>
-      </ul>
+        </h3>
+        <p class="ownership-note">(Articles owned and published by AV)</p>
+      </section>
 
     </section>
 
     <!-- About Me (right) -->
     <aside class="about-box">
-      <img src="images/akash.png" alt="Akash's Photo" class="profile-pic">
+      <img src="images/akash.png" alt="Akash's Photo" class="profile-pic" />
       <h2>About Me</h2>
       <p>
         I'm a machine learning researcher specializing in building foundational models and agentic AI systems, with works published at AAAI, ICLR, KDD, and EAAI. My focus lies in advancing LLM fine-tuning strategies, designing efficient AI pipelines, and developing intelligent workflows for real-world automation and digital twin applications.
       </p>
       <p>
-        <a href="https://www.linkedin.com/in/akashd2000/?originalSubdomain=in" target="_blank">Connect on LinkedIn →</a><br>
+        <a href="https://www.linkedin.com/in/akashd2000/?originalSubdomain=in" target="_blank">Connect on LinkedIn →</a><br />
         <a href="https://scholar.google.com/citations?user=wikJ0m8AAAAJ&hl=en" target="_blank">View Google Scholar →</a>
       </p>
     </aside>
@@ -57,28 +57,24 @@
     <p>© 2025 Akash D</p>
   </footer>
 
-  <!-- Navbar JS -->
+  <!-- Navbar Script -->
   <script>
     fetch("navbar.html")
       .then(res => res.text())
       .then(data => {
         document.getElementById("navbar-placeholder").innerHTML = data;
-
         const hamburger = document.querySelector(".hamburger");
         const dropdown = document.getElementById("menuDropdown");
-
         if (hamburger && dropdown) {
           hamburger.addEventListener("click", () => dropdown.classList.toggle("show"));
-          window.addEventListener("click", event => {
-            if (!event.target.closest(".menu-container")) {
-              dropdown.classList.remove("show");
-            }
+          window.addEventListener("click", e => {
+            if (!e.target.closest(".menu-container")) dropdown.classList.remove("show");
           });
         }
       });
   </script>
 
-  <!-- Carousel JS -->
+  <!-- Carousel Script -->
   <script>
     async function findFeaturedImage(slug) {
       const exts = ['jpg', 'jpeg', 'png', 'webp'];
@@ -118,9 +114,7 @@
           inner.appendChild(slide);
 
           const dot = document.createElement("button");
-          dot.addEventListener("click", () => {
-            goToSlide(Array.from(dotsContainer.children).indexOf(dot));
-          });
+          dot.addEventListener("click", () => goToSlide(Array.from(dotsContainer.children).indexOf(dot)));
           dotsContainer.appendChild(dot);
         }
 
