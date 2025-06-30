@@ -3,15 +3,15 @@
   display: flex;
   justify-content: center;
   margin: 0 auto;
-  max-width: 1400px;
-  padding: 2rem 1rem;
+  max-width: 1600px; /* widened from 1400px */
+  padding: 2rem 2rem; /* added more horizontal room */
 }
 
 /* === Left Ad Sidebar === */
 .left-ad-slot {
   flex: 0 0 160px;
   padding: 2rem 1rem;
-  margin-right: 3rem; /* Added spacing between ad and content */
+  margin-right: 3rem;
   border-right: 1px solid #eee;
 }
 .ad-slot.sidebar {
@@ -29,8 +29,7 @@
 
 /* === Blog Main Content Area === */
 .blog-layout {
-  flex: 1;
-  max-width: 700px;
+  flex: 1 1 800px; /* increased from 700px */
   padding: 0 2rem;
 }
 main {
@@ -80,9 +79,8 @@ main a:hover {
 
 /* === Table of Contents Sidebar === */
 .right-toc-slot {
-  flex: 0 0 220px;
-  padding: 2rem 1rem;
-  border-left: 1px solid #eee;
+  flex: 0 0 260px; /* widened from 220px */
+  padding: 2rem 1rem 2rem 2.5rem; /* more left spacing */
 }
 .right-toc-slot .toc-box {
   position: sticky;
@@ -103,8 +101,8 @@ main a:hover {
   padding-left: 0;
 }
 .toc-box li {
-  font-size: 14px;
-  margin-bottom: 0.35rem;
+  font-size: 15px;
+  margin-bottom: 0.5rem;
 }
 .toc-box a {
   color: #007acc;
