@@ -8,50 +8,56 @@
 </head>
 <body>
 
-  <div class="blog-layout">
+  <!-- 📦 Outer wrapper: aligns sidebar left, content right -->
+  <div class="blog-wrapper">
 
-    <!-- 📌 Left Sidebar Ad Slot -->
+    <!-- 📌 Left Sidebar Ad Slot (Sticky) -->
     <aside class="left-ad-slot">
       <div class="ad-slot sidebar">Ad Placeholder</div>
     </aside>
 
     <!-- 📌 Main Blog Area -->
-    <main>
+    <div class="blog-layout">
+      <main>
 
-      <!-- 📌 Top Ad Slot -->
-      <div class="ad-slot ad-top"></div>
+        <!-- 📌 Top Ad Slot -->
+        <div class="ad-slot ad-top"></div>
 
-      <!-- 📌 Post Content -->
-      <div id="post-content">Loading content...</div>
+        <!-- 📄 Blog Content Area -->
+        <div id="post-content">Loading content...</div>
 
-      <!-- 📌 Bottom Ad Slot -->
-      <div class="ad-slot ad-bottom"></div>
+        <!-- 📌 Bottom Ad Slot -->
+        <div class="ad-slot ad-bottom"></div>
 
-      <!-- 👏 Interactions -->
-      <section id="interactions">
-        <button id="clap-button">👏 Clap (<span id="clap-count">0</span>)</button>
-        <button id="toggle-comments">💬 Comments</button>
-      </section>
+        <!-- 👏 Interactions Section -->
+        <section id="interactions">
+          <button id="clap-button">👏 Clap (<span id="clap-count">0</span>)</button>
+          <button id="toggle-comments">💬 Comments</button>
+        </section>
 
-      <section id="comments-section" style="display: none;">
-        <h2>Leave a Comment</h2>
-        <form id="comment-form">
-          <input type="text" id="name" placeholder="Your name" required />
-          <textarea id="comment" placeholder="Your comment" rows="5" required></textarea>
-          <button type="submit">Post Comment</button>
-        </form>
+        <!-- 💬 Comments Section -->
+        <section id="comments-section" style="display: none;">
+          <h2>Leave a Comment</h2>
+          <form id="comment-form">
+            <input type="text" id="name" placeholder="Your name" required />
+            <textarea id="comment" placeholder="Your comment" rows="5" required></textarea>
+            <button type="submit">Post Comment</button>
+          </form>
 
-        <h2>Comments</h2>
-        <div id="comments-list">Loading comments...</div>
-      </section>
+          <h2>Comments</h2>
+          <div id="comments-list">Loading comments...</div>
+        </section>
 
-    </main>
+      </main>
+    </div>
   </div>
 
+  <!-- 🔗 Footer -->
   <footer>
     <p><a href="index.html">← Back to Home</a></p>
   </footer>
 
+  <!-- 🚀 Scripts -->
   <script type="module" src="postLoader.js"></script>
   <script type="module" src="firebaseLogic.js"></script>
 </body>
