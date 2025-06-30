@@ -93,33 +93,51 @@
     async function loadCarousel() {
       const inner = document.getElementById("carousel-inner");
       const dotsContainer = document.getElementById("carousel-dots");
+
       try {
         const indexRes = await fetch("data/index.json");
+        if (!indexRes.ok) throw new Error(`Could not fetch index.json (${indexRes.status})`);
         const blogList = await indexRes.json();
 
+        // clear any existing slides/dots
+        inner.innerHTML = "";
+        dotsContainer.innerHTML = "";
+
         for (const blog of blogList) {
-          const slug = blog.slug;
-          const metaRes = await fetch(`posts/${slug}/meta.json`);
-          const meta = await metaRes.json();
-          const imgSrc = await findFeaturedImage(slug);
+          try {
+            const metaRes = await fetch(`posts/${blog.slug}/meta.json`);
+            if (!metaRes.ok) throw new Error(`meta.json not found (${metaRes.status})`);
+            const meta = await metaRes.json();
+            const imgSrc = await findFeaturedImage(blog.slug);
 
-          const slide = document.createElement("div");
-          slide.classList.add("carousel-slide");
-          slide.innerHTML = `
-            <img src="${imgSrc}" alt="${meta.title}" class="carousel-image" />
-            <h3 class="carousel-title">${meta.title}</h3>
-            <p class="carousel-summary">${meta.summary}</p>
-            <a href="post?postId=${slug}" class="read-more-btn">Read More →</a>
-          `;
-          inner.appendChild(slide);
+            // build slide
+            const slide = document.createElement("div");
+            slide.classList.add("carousel-slide");
+            slide.innerHTML = `
+              <img src="${imgSrc}" alt="${meta.title}" class="carousel-image" />
+              <h3 class="carousel-title">${meta.title}</h3>
+              <p class="carousel-summary">${meta.summary}</p>
+              <a href="post?postId=${blog.slug}" class="read-more-btn">Read More →</a>
+            `;
+            inner.appendChild(slide);
 
-          const dot = document.createElement("button");
-          dot.addEventListener("click", () => goToSlide(Array.from(dotsContainer.children).indexOf(dot)));
-          dotsContainer.appendChild(dot);
+            // build dot
+            const dot = document.createElement("button");
+            dot.addEventListener("click", () => goToSlide(Array.from(dotsContainer.children).indexOf(dot)));
+            dotsContainer.appendChild(dot);
+
+          } catch (slideErr) {
+            console.warn(`Skipping slide for “${blog.slug}”:`, slideErr);
+          }
         }
 
-        updateCarousel();
-        timer = setInterval(() => goToSlide(currentIndex + 1), 4000);
+        // only start auto-advance if we have slides
+        const slides = document.querySelectorAll(".carousel-slide");
+        if (slides.length) {
+          updateCarousel();
+          timer = setInterval(() => goToSlide(currentIndex + 1), 4000);
+        }
+
       } catch (err) {
         console.error("Error loading carousel:", err);
       }
@@ -131,8 +149,8 @@
       const dots = document.querySelectorAll(".carousel-dots button");
 
       if (!slides.length) return;
+      // wrap index
       currentIndex = (currentIndex + slides.length) % slides.length;
-
       inner.style.transform = `translateX(-${currentIndex * 100}%)`;
 
       dots.forEach(dot => dot.classList.remove("active"));
