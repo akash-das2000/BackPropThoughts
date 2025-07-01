@@ -11,14 +11,14 @@
     The authors compare human conceptual structure—derived from classic categorization experiments—with the representational geometry of LLM token embeddings. Their goal is to measure whether LLMs trade off <strong>compression</strong> and <strong>semantic fidelity</strong> the same way humans do.
   </p>
   <p>
-    This blog expands on the paper’s framework and results with careful mathematical and visual detail, strictly referencing only material from the original PDF (arXiv:2505.17117v2).
+    This blog expands on the paper’s framework and results.
   </p>
   <h2 id="concepts-and-compression">2. Concepts and Cognitive Compression</h2>
   <p>
     Human cognition excels at forming compact representations of the world. This process, termed <strong>semantic compression</strong>, allows us to group perceptually and functionally diverse items into coherent categories (e.g., robin and ostrich both as “bird”). Crucially, these categories preserve meaning by capturing the essence of the group.
   </p>
   <p>
-    As discussed in the paper (p. 1–2), this trade-off between <em>representational simplicity</em> and <em>expressive fidelity</em> enables humans to generalize from sparse data, reason causally, and communicate effectively. Cognitive scientists have long observed that this process is <em>adaptive</em>, prioritizing nuanced distinctions (e.g., typicality of robin vs penguin) even at the cost of statistical compactness.
+    This trade-off between <em>representational simplicity</em> and <em>expressive fidelity</em> enables humans to generalize from sparse data, reason causally, and communicate effectively. Cognitive scientists have long observed that this process is <em>adaptive</em>, prioritizing nuanced distinctions (e.g., typicality of robin vs penguin) even at the cost of statistical compactness.
   </p>
   <p>
     By contrast, LLMs are optimized to statistically compress vast textual data. Whether they mirror this human trade-off remains the key question the authors address using an information-theoretic framework.
@@ -64,7 +64,7 @@
 
   <h3>4.1 Human Categorization Datasets</h3>
   <p>
-    Three seminal benchmarks are used (p. 3–4):
+    Three seminal benchmarks are used:
   </p>
   <ul>
     <li><strong>Rosch (1973)</strong>: 48 items across 8 categories with prototypicality scores (e.g., robin &gt; ostrich in birds).</li>
@@ -77,7 +77,7 @@
 
   <h3>4.2 LLMs Evaluated</h3>
   <p>
-    A wide variety of LLMs are analyzed (Section 3.2): 
+    A wide variety of LLMs are analyzed: 
   </p>
   <ul>
     <li><strong>BERT</strong> family: bert-large-uncased, deberta-large, roberta-large</li>
@@ -89,7 +89,7 @@
   </p>
   <h2 id="empirical-findings">5. Empirical Investigation: Alignment, Typicality, and Tradeoffs</h2>
   <p>
-    To empirically evaluate how LLMs and humans differ in their conceptual strategies, the authors pose three central research questions (Section 2, p. 2):
+    To empirically evaluate how LLMs and humans differ in their conceptual strategies, the authors pose three central research questions:
   </p>
   <ul>
     <li><strong>RQ1:</strong> Do LLM-derived concepts align with human-defined categories?</li>
@@ -107,7 +107,7 @@
     <li><strong>Adjusted Rand Index (ARI)</strong></li>
   </ul>
   <p>
-    Figure 1 of the paper (p. 6) shows that <strong>all LLMs performed significantly better than random</strong>. Interestingly, <strong>encoder models like BERT-large-uncased outperformed larger decoder-only models</strong> in terms of category alignment.
+    Below figure shows that <strong>all LLMs performed significantly better than random</strong>. Interestingly, <strong>encoder models like BERT-large-uncased outperformed larger decoder-only models</strong> in terms of category alignment.
   </p>
   <img src="paper_figures/figure1_ami_scores.png" alt="Figure 1: Adjusted Mutual Information scores by model" />
 
@@ -116,14 +116,14 @@
     This experiment examines whether LLMs preserve fine-grained semantic information like humans do. Specifically, the authors tested whether the <strong>cosine similarity between an item and its category label</strong> in embedding space aligns with <strong>human-rated typicality scores</strong>.
   </p>
   <p>
-    Figure 6 (Appendix A.6, p. 18) and Table 2 (Appendix A.5, p. 17) show that:
+    The below figure shows that:
   </p>
   <ul>
     <li><strong>Correlations are weak or insignificant</strong> across most models.</li>
     <li><strong>BERT-large</strong> again performs relatively better but still falls short.</li>
     <li>This suggests <strong>prototype effects</strong> are not well encoded in LLM representations.</li>
   </ul>
-  <img src="paper_figures/figure6_typicality_correlation.png" alt="Figure 6: Typicality correlation across models" />
+  <img src="paper_figures/figure6_typicality_correlation.png" alt="Figure 2: Typicality correlation across models" />
 
   <h3 id="rq3">5.3 Compression vs Meaning Trade-off (RQ3)</h3>
   <p>
@@ -134,14 +134,14 @@
     <li><strong>L objective score</strong>: lower = better overall compression-meaning trade-off</li>
   </ul>
   <p>
-    Results from Figure 2 (p. 8) and Figures 7–8 (Appendix A.8, p. 18–19) show:
+    Results from below figure show:
   </p>
   <ul>
     <li><strong>Human categories</strong> had consistently <strong>higher entropy</strong> and <strong>higher L</strong></li>
     <li><strong>LLMs are more efficient</strong> by these metrics—but less rich semantically</li>
     <li>This strongly supports the claim that humans prioritize semantic nuance over statistical compressibility</li>
   </ul>
-  <img src="paper_figures/figure2_tradeoff.png" alt="Figure 2: Entropy and L score tradeoff by model and human" />
+  <img src="paper_figures/figure2_tradeoff.png" alt="Figure 3: Entropy and L score tradeoff by model and human" />
   <h2 id="discussion">6. Interpretation and Implications</h2>
   <p>
     The authors’ findings across RQ1–RQ3 suggest a core divergence between how LLMs and humans conceptualize the world. The results show that while LLMs are highly efficient from an information-theoretic perspective, their conceptual systems are far less nuanced than those of humans.
@@ -149,7 +149,7 @@
 
   <h3>6.1 Diverging Optimization Objectives</h3>
   <p>
-    LLMs are optimized for <strong>statistical regularity and compression</strong>. Their training objective prioritizes prediction performance, leading to tight, efficient clusters that minimize redundancy. This is reflected in their <strong>low distortion and low entropy</strong> scores in Figure 2 (p. 8) and Figures 7–8 (Appendix A.8).
+    LLMs are optimized for <strong>statistical regularity and compression</strong>. Their training objective prioritizes prediction performance, leading to tight, efficient clusters that minimize redundancy. This is reflected in their <strong>low distortion and low entropy</strong> scores in Figure 3.
   </p>
   <p>
     In contrast, <strong>human cognition tolerates redundancy</strong> in exchange for richer, more adaptable category structures. Human concepts encode:
@@ -165,7 +165,7 @@
 
   <h3>6.2 Cognitive Pressures vs Data Pressures</h3>
   <p>
-    The paper (p. 8–9) highlights that human conceptual systems are shaped by functional pressures such as:
+    The paper highlights that human conceptual systems are shaped by functional pressures such as:
   </p>
   <ul>
     <li>Efficient generalization from sparse data</li>
@@ -179,7 +179,7 @@
 
   <h3>6.3 Architectural Insights</h3>
   <p>
-    An unexpected finding (p. 6) was that <strong>smaller encoder models like BERT</strong> often aligned better with human categories than larger decoder-only models like LLaMA-70B. This implies that:
+    An unexpected finding was that <strong>smaller encoder models like BERT</strong> often aligned better with human categories than larger decoder-only models like LLaMA-70B. This implies that:
   </p>
   <ul>
     <li><strong>Architecture matters</strong>: bidirectional encoders may better encode categorical geometry</li>
