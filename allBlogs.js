@@ -10,7 +10,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let visibleCount = 0;
   const LOAD_COUNT = 6;
 
-  // Load blog index
   async function fetchBlogs() {
     const res = await fetch("data/index.json");
     const index = await res.json();
@@ -32,7 +31,6 @@ document.addEventListener("DOMContentLoaded", () => {
     renderBlogs();
   }
 
-  // Load blog filters from categories
   function renderFilters() {
     const allTags = new Set();
     blogs.forEach(blog => {
@@ -40,7 +38,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     categoryWrap.innerHTML = "";
-
     const allBtn = createFilterButton("All", true);
     categoryWrap.appendChild(allBtn);
 
@@ -88,7 +85,6 @@ document.addEventListener("DOMContentLoaded", () => {
     visibleCount += LOAD_COUNT;
     blogCount.textContent = `${filtered.length} blog${filtered.length !== 1 ? "s" : ""}`;
 
-    // Load more if needed
     if (visibleCount < filtered.length) {
       const btn = document.createElement("button");
       btn.className = "load-more-btn";
@@ -101,17 +97,50 @@ document.addEventListener("DOMContentLoaded", () => {
   function createBlogCard(blog) {
     const card = document.createElement("div");
     card.className = "blog-card";
-    card.innerHTML = `
-      <img src="${blog.image}" alt="${blog.title}" class="blog-image" />
-      <div class="blog-content">
-        <div class="category-tag-group">
-          ${(blog.category || []).map(tag => `<span class="category-tag">${tag}</span>`).join("")}
-        </div>
-        <h3 class="blog-title">${blog.title}</h3>
-        <p class="blog-summary">${blog.summary}</p>
-        <a href="post?postId=${blog.slug}" class="read-more-link">Read More →</a>
-      </div>
-    `;
+
+    // Thumbnail
+    const img = document.createElement("img");
+    img.className = "blog-image";
+    img.src = blog.image;
+    img.alt = blog.title;
+
+    // Content container
+    const content = document.createElement("div");
+    content.className = "blog-content";
+
+    // Tags (as badges)
+    const tags = document.createElement("div");
+    tags.className = "blog-tags";
+    (blog.category || []).forEach(tagText => {
+      const tag = document.createElement("span");
+      tag.className = "tag-badge";
+      tag.textContent = tagText;
+      tags.appendChild(tag);
+    });
+    content.appendChild(tags);
+
+    // Title
+    const title = document.createElement("h3");
+    title.className = "blog-title";
+    title.textContent = blog.title;
+    content.appendChild(title);
+
+    // Summary
+    const summary = document.createElement("p");
+    summary.className = "blog-summary";
+    summary.textContent = blog.summary;
+    content.appendChild(summary);
+
+    // Read more link
+    const link = document.createElement("a");
+    link.className = "read-more-link";
+    link.href = `post?postId=${blog.slug}`;
+    link.textContent = "Read More →";
+    content.appendChild(link);
+
+    // Final assembly
+    card.appendChild(img);
+    card.appendChild(content);
     return card;
   }
 
