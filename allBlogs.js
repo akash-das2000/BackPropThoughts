@@ -5,9 +5,13 @@ const categoryFilters = document.getElementById("categoryFilters");
 const blogCount = document.getElementById("blogCount");
 
 let allBlogs = [];
+let filteredBlogs = [];
 let currentCategory = "All";
 let currentSearch = "";
 let currentSort = "latest";
+
+const BLOGS_PER_BATCH = 6;
+let visibleCount = BLOGS_PER_BATCH;
 
 // Load blogs on page load
 window.addEventListener("DOMContentLoaded", async () => {
@@ -35,10 +39,9 @@ window.addEventListener("DOMContentLoaded", async () => {
     });
 
     const blogs = await Promise.all(blogPromises);
-    allBlogs = blogs.filter(Boolean); // Remove failed loads
-
+    allBlogs = blogs.filter(Boolean); // Remove nulls
     renderCategoryFilters();
-    renderBlogCards();
+    applyFilters();
   } catch (err) {
     console.error("Failed to load blog data:", err);
   }
@@ -47,12 +50,12 @@ window.addEventListener("DOMContentLoaded", async () => {
 // 🔍 Search and sort
 searchInput.addEventListener("input", (e) => {
   currentSearch = e.target.value.trim().toLowerCase();
-  renderBlogCards();
+  resetAndRender();
 });
 
 sortSelect.addEventListener("change", (e) => {
   currentSort = e.target.value;
-  renderBlogCards();
+  resetAndRender();
 });
 
 // 🖼 Try to find blog thumbnail
@@ -79,41 +82,58 @@ function renderCategoryFilters() {
       currentCategory = cat;
       document.querySelectorAll("#categoryFilters button").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
-      renderBlogCards();
+      resetAndRender();
     });
     categoryFilters.appendChild(btn);
   });
 }
 
-// 🧠 Render blog cards
-function renderBlogCards() {
-  let filtered = [...allBlogs];
+// 🔁 Reset visible count and re-render
+function resetAndRender() {
+  visibleCount = BLOGS_PER_BATCH;
+  applyFilters();
+}
+
+// 🧠 Apply all filters
+function applyFilters() {
+  filteredBlogs = [...allBlogs];
 
   if (currentCategory !== "All") {
-    filtered = filtered.filter(b => b.category === currentCategory);
+    filteredBlogs = filteredBlogs.filter(b => b.category === currentCategory);
   }
 
   if (currentSearch) {
-    filtered = filtered.filter(b =>
+    filteredBlogs = filteredBlogs.filter(b =>
       b.title.toLowerCase().includes(currentSearch) ||
       b.summary.toLowerCase().includes(currentSearch)
     );
   }
 
   if (currentSort === "latest") {
-    filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+    filteredBlogs.sort((a, b) => new Date(b.date) - new Date(a.date));
+  } else if (currentSort === "oldest") {
+    filteredBlogs.sort((a, b) => new Date(a.date) - new Date(b.date));
   } else if (currentSort === "title") {
-    filtered.sort((a, b) => a.title.localeCompare(b.title));
+    filteredBlogs.sort((a, b) => a.title.localeCompare(b.title));
+  } else if (currentSort === "title-desc") {
+    filteredBlogs.sort((a, b) => b.title.localeCompare(a.title));
   }
 
-  blogCount.textContent = `${filtered.length} blog${filtered.length !== 1 ? "s" : ""}`;
+  blogCount.textContent = `${filteredBlogs.length} blog${filteredBlogs.length !== 1 ? "s" : ""}`;
 
-  if (filtered.length === 0) {
+  renderBlogCards();
+}
+
+// 📦 Render cards (limited to visibleCount)
+function renderBlogCards() {
+  const blogsToRender = filteredBlogs.slice(0, visibleCount);
+
+  if (blogsToRender.length === 0) {
     blogGrid.innerHTML = `<p class="no-results">No blogs found. Try another category or search term.</p>`;
     return;
   }
 
-  blogGrid.innerHTML = filtered.map(b => `
+  blogGrid.innerHTML = blogsToRender.map(b => `
     <div class="blog-card">
       <img src="${b.image}" alt="${b.title}" class="blog-thumbnail" />
       <div class="blog-content">
@@ -123,4 +143,30 @@ function renderBlogCards() {
       </div>
     </div>
   `).join("");
+
+  // Show or hide "Load More" button
+  updateLoadMoreButton();
+}
+
+// ➕ Load More Button Handling
+function updateLoadMoreButton() {
+  let btn = document.getElementById("loadMoreBtn");
+
+  if (!btn) {
+    btn = document.createElement("button");
+    btn.id = "loadMoreBtn";
+    btn.textContent = "Load More";
+    btn.className = "load-more-btn";
+    btn.addEventListener("click", () => {
+      visibleCount += BLOGS_PER_BATCH;
+      renderBlogCards();
+    });
+    blogGrid.parentElement.appendChild(btn);
+  }
+
+  if (visibleCount >= filteredBlogs.length) {
+    btn.style.display = "none";
+  } else {
+    btn.style.display = "block";
+  }
 }
