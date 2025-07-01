@@ -2,6 +2,7 @@ const blogGrid = document.getElementById("blogGrid");
 const searchInput = document.getElementById("searchInput");
 const sortSelect = document.getElementById("sortSelect");
 const categoryFilters = document.getElementById("categoryFilters");
+const blogCount = document.getElementById("blogCount");
 
 let allBlogs = [];
 let currentCategory = "All";
@@ -34,16 +35,16 @@ window.addEventListener("DOMContentLoaded", async () => {
     });
 
     const blogs = await Promise.all(blogPromises);
-    allBlogs = blogs.filter(Boolean); // Remove any nulls
+    allBlogs = blogs.filter(Boolean); // Remove failed loads
 
     renderCategoryFilters();
     renderBlogCards();
   } catch (err) {
-    console.error("Failed to load blogs:", err);
+    console.error("Failed to load blog data:", err);
   }
 });
 
-// 🔍 Search & Sort
+// 🔍 Search and sort
 searchInput.addEventListener("input", (e) => {
   currentSearch = e.target.value.trim().toLowerCase();
   renderBlogCards();
@@ -54,7 +55,7 @@ sortSelect.addEventListener("change", (e) => {
   renderBlogCards();
 });
 
-// 🖼️ Try to find thumbnail
+// 🖼 Try to find blog thumbnail
 async function findThumbnail(slug) {
   const exts = ["jpg", "jpeg", "png", "webp"];
   for (const ext of exts) {
@@ -63,13 +64,12 @@ async function findThumbnail(slug) {
       if (res.ok) return `posts/${slug}/featured.${ext}`;
     } catch (_) {}
   }
-  return "images/featured_blog.jpg"; // default fallback
+  return "images/featured_blog.jpg";
 }
 
-// 🏷️ Build unique category buttons
+// 🏷 Build filter buttons
 function renderCategoryFilters() {
   const categories = ["All", ...new Set(allBlogs.map(b => b.category))];
-
   categoryFilters.innerHTML = "";
   categories.forEach(cat => {
     const btn = document.createElement("button");
@@ -85,7 +85,7 @@ function renderCategoryFilters() {
   });
 }
 
-// 🧠 Main render logic
+// 🧠 Render blog cards
 function renderBlogCards() {
   let filtered = [...allBlogs];
 
@@ -104,6 +104,13 @@ function renderBlogCards() {
     filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
   } else if (currentSort === "title") {
     filtered.sort((a, b) => a.title.localeCompare(b.title));
+  }
+
+  blogCount.textContent = `${filtered.length} blog${filtered.length !== 1 ? "s" : ""}`;
+
+  if (filtered.length === 0) {
+    blogGrid.innerHTML = `<p class="no-results">No blogs found. Try another category or search term.</p>`;
+    return;
   }
 
   blogGrid.innerHTML = filtered.map(b => `
