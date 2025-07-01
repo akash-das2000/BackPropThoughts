@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>All Blogs | BackPropThoughts</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/allBlogs.css" />
+</head>
+<body>
+
+  <!-- Navbar -->
+  <div id="navbar-placeholder"></div>
+
+  <!-- Main Content -->
+  <main class="allblogs-main">
+
+    <h2 class="section-heading">All Blogs</h2>
+
+    <!-- 🔘 Category Filter Buttons -->
+    <div id="categoryFilters" class="category-filters">
+      <!-- JS will insert category buttons -->
+    </div>
+
+    <!-- 🔍 Search and Sort -->
+    <div class="blog-controls">
+      <input type="text" id="searchInput" placeholder="Search blogs..." class="search-bar" />
+      <select id="sortSelect" class="sort-dropdown">
+        <option value="latest">Sort by: Latest</option>
+        <option value="title">Sort by: Title A–Z</option>
+      </select>
+    </div>
+
+    <!-- 📚 Blog Grid -->
+    <section id="blogGrid" class="blog-grid">
+      <!-- JS will populate blog cards here -->
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>© 2025 Akash D</p>
+  </footer>
+
+  <!-- Navbar Script -->
+  <script>
+    fetch("navbar.html")
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById("navbar-placeholder").innerHTML = data;
+        const hamburger = document.querySelector(".hamburger");
+        const dropdown = document.getElementById("menuDropdown");
+        if (hamburger && dropdown) {
+          hamburger.addEventListener("click", () => dropdown.classList.toggle("show"));
+          window.addEventListener("click", e => {
+            if (!e.target.closest(".menu-container")) dropdown.classList.remove("show");
+          });
+        }
+      });
+  </script>
+
+  <!-- Blog Logic -->
+  <script src="js/allBlogs.js" defer></script>
+
+</body>
+</html>
