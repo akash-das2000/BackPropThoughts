@@ -1,0 +1,154 @@
+<section>
+  <h1 id="eval-llm-agents">Evaluating the Minds of Machines: A Deep Dive into LLM-based Agent Evaluation</h1>
+  <p><em>A comprehensive and technically rigorous look at how researchers evaluate the cognitive and functional capacities of LLM-based agents, beyond single-call language models.</em></p>
+
+  <h2 id="introduction">1. Introduction</h2>
+  <p>
+    As Large Language Models (LLMs) evolve from static, text-to-text engines into agentic systems capable of sequential reasoning, decision-making, and tool use, a crucial challenge has emerged: <strong>how do we rigorously evaluate these systems?</strong> This is not merely a matter of performance metrics on benchmark datasets like MMLU or GSM8K; instead, the complexity lies in evaluating systems that dynamically interact with environments, maintain state across multiple steps, and adapt their trajectories based on memory, planning, and feedback.
+  </p>
+
+  <p>
+    LLM-based agents are LLMs augmented with <em>agentic capabilities</em>—they reason through multi-step plans, invoke external tools, learn from intermediate feedback, and maintain both short-term and long-term memory. Evaluating these agents requires rethinking traditional NLP benchmarks. We now care not only about answer correctness but also about <strong>plan fidelity, tool-chain robustness, reflection quality, memory usage patterns</strong>, and more. Thus, the evaluation problem for LLM-based agents is inherently <strong>multi-dimensional, dynamic, and fine-grained</strong>.
+  </p>
+
+  <p>
+    This blog draws from the foundational survey by Yehudai et al. (2025) to analyze the emerging ecosystem of benchmarks and frameworks for evaluating LLM agents. Our lens is sharply focused on the technical challenges: What capabilities should we measure? What failure modes matter? And what does a "good" evaluation framework look like for an autonomous reasoning agent?
+  </p>
+
+  <p>
+    We begin by decomposing agentic evaluation across four core dimensions: <strong>planning & reasoning, tool usage, self-reflection, and memory</strong>. We then examine domain-specific evaluations (e.g., for web or scientific agents), before exploring frameworks, trajectory-based analysis, and future challenges such as efficiency, safety, and real-time evaluation.
+  </p>
+
+  <h2 id="agent-capabilities">2. Fundamental Agent Capabilities</h2>
+
+  <h3 id="planning">2.1 Planning and Multi-Step Reasoning</h3>
+  <p>
+    Planning is the most fundamental of agentic faculties—without it, there is no strategic sequencing of actions, no long-horizon reasoning, and no ability to decompose goals. The technical challenge lies in assessing whether an agent can create, execute, and revise a coherent plan involving multiple LLM calls and tool invocations.
+  </p>
+
+  <p>
+    Benchmarks like <code>GSM8K</code>, <code>MATH</code>, and <code>ARC</code> evaluate LLM reasoning in single-call settings. But agents must go further—tracking state, updating beliefs, and dynamically recovering from errors. Planning-specific benchmarks like <code>PlanBench</code>, <code>AutoPlanBench</code>, <code>FlowBench</code>, and <code>MINT</code> evaluate such capacities. These test whether an agent can break down a problem into atomic tasks, chain tools appropriately, and react to failed subgoals.
+  </p>
+
+  <p>
+    Core evaluation criteria include:
+    <ul>
+      <li><strong>Task decomposition:</strong> Can the agent segment problems into actionable units?</li>
+      <li><strong>Belief tracking:</strong> Can it update internal state over time?</li>
+      <li><strong>Error recovery:</strong> Can it revise the plan when actions fail?</li>
+      <li><strong>Strategic abstraction:</strong> Can it plan over longer time horizons, beyond 3–5 steps?</li>
+    </ul>
+  </p>
+
+  <h3 id="tool-use">2.2 Function Calling & Tool Use</h3>
+  <p>
+    Tool use transforms an LLM into an interactive agent. Function calling involves intent recognition, argument binding, tool selection, execution, and output interpretation. In practice, agents must call APIs with structured arguments, handle errors, and resolve ambiguity over multiple steps.
+  </p>
+
+  <p>
+    Early benchmarks like <code>ToolBench</code>, <code>APIBench</code>, and <code>ToolAlpaca</code> focused on single-turn function invocation. Modern benchmarks—<code>ToolSandbox</code>, <code>BFCL v3</code>, <code>ComplexFuncBench</code>, <code>NESTFUL</code>—introduce nested tool use, multi-turn dialogue, and implicit parameter recovery.
+  </p>
+
+  <p>
+    Evaluation dimensions:
+    <ul>
+      <li><strong>Structured slot filling</strong>: How accurately does the agent map language to structured input?</li>
+      <li><strong>Implicit constraint handling</strong>: Can it infer arguments not explicitly mentioned?</li>
+      <li><strong>Sequential tool composition</strong>: Can the agent chain tool outputs?</li>
+      <li><strong>On-policy evaluation</strong>: How does the agent perform over a live trajectory, not just gold paths?</li>
+    </ul>
+  </p>
+
+  <h3 id="self-reflection">2.3 Self-Reflection</h3>
+  <p>
+    Reflection benchmarks probe metacognition—can an agent recognize when it is wrong, revise its reasoning, and improve through iterative thought? Benchmarks like <code>LLF-Bench</code>, <code>LLM-Evolve</code>, and <code>ReflectionBench</code> formalize this by measuring error correction and belief revision over feedback loops.
+  </p>
+
+  <p>
+    Unlike static prompting, reflection requires:
+    <ul>
+      <li>Tracking the success/failure of past steps</li>
+      <li>Evaluating intermediate results</li>
+      <li>Altering reasoning pathways in light of failure</li>
+    </ul>
+    This adds a new dimension to agent evaluation—<strong>trajectory-level improvement over time</strong>.
+  </p>
+
+  <h3 id="memory">2.4 Memory Mechanisms</h3>
+  <p>
+    Memory underpins long-term coherence in LLM agents. From document summarization to user-specific chat histories, agents rely on memory for continuity. Evaluation benchmarks like <code>ReadAgent</code>, <code>MemGPT</code>, <code>StreamBench</code>, and <code>LoCoMo</code> stress-test episodic memory, retrieval quality, and reasoning over past context.
+  </p>
+
+  <p>
+    Metrics include:
+    <ul>
+      <li><strong>Retrieval Accuracy</strong>: Can the agent locate relevant past information?</li>
+      <li><strong>Memory Hit Rate</strong>: How often does the agent reuse useful memories?</li>
+      <li><strong>Compression Quality</strong>: Are stored memories coherent and informative?</li>
+    </ul>
+  </p>
+
+  <h2 id="application-specific">3. Application-Specific Agent Evaluation</h2>
+
+  <h3 id="web">3.1 Web Agents</h3>
+  <p>
+    Web agents simulate real-world digital assistants. Benchmarks like <code>MiniWoB++</code>, <code>WebShop</code>, <code>Mind2Web</code>, and <code>WebArena</code> assess browsing, search, form submission, and multi-site coordination. Visual variants like <code>VisualWebArena</code> introduce image and layout parsing.
+  </p>
+
+  <h3 id="swe">3.2 Software Engineering Agents</h3>
+  <p>
+    SWE agents are benchmarked on real GitHub issues in <code>SWE-bench</code>, <code>SWE-bench+</code>, <code>SWE-bench Multimodal</code>, and <code>SWE-Lancer</code>. The latter evaluates agents' ability to complete freelance tasks, tracking value creation over time.
+  </p>
+
+  <h3 id="sci">3.3 Scientific Agents</h3>
+  <p>
+    Agents like <code>ScienceAgentBench</code>, <code>LAB-Bench</code>, <code>AAAR</code>, and <code>DiscoveryWorld</code> evaluate capabilities across the scientific pipeline—ideation, experiment planning, hypothesis testing, and peer review generation.
+  </p>
+
+  <h3 id="chat">3.4 Conversational Agents</h3>
+  <p>
+    These are tested on datasets like <code>ABCD</code>, <code>MultiWOZ</code>, and <code>τ-Bench</code>. IntellAgent (2025) benchmarks agents' performance against compliance policies and real user objectives in customer service settings.
+  </p>
+
+  <h2 id="generalist">4. Generalist Agent Evaluation</h2>
+  <p>
+    Generalist agents must perform well across modalities, tools, and tasks. Benchmarks like <code>AgentBench</code>, <code>GAIA</code>, <code>CRMArena</code>, and <code>HAL</code> assess reasoning, tool chaining, system navigation, and workflow completion.
+  </p>
+
+  <h2 id="frameworks">5. Evaluation Frameworks</h2>
+  <p>
+    LangSmith, Langfuse, Google Vertex AI, and Galileo Agentic are leading evaluation frameworks. They support:
+    <ul>
+      <li><strong>Final Output Judging</strong>: LLM-based judges assess correctness.</li>
+      <li><strong>Stepwise Evaluation</strong>: Measures action-level progress.</li>
+      <li><strong>Trajectory Assessment</strong>: Evaluates plan coherence and deviation.</li>
+    </ul>
+  </p>
+
+  <p>
+    Modern frameworks support synthetic data generation, OpenTelemetry monitoring, and human-in-the-loop comparison. Many now offer A/B testing across model versions or planning strategies.
+  </p>
+
+  <h2 id="discussion">6. Discussion</h2>
+
+  <h3 id="trends">6.1 Current Trends</h3>
+  <p>
+    We observe two major trends: (1) <strong>realistic environments</strong>—agents are benchmarked in increasingly lifelike tasks (e.g., SWE-Lancer, DiscoveryWorld), and (2) <strong>live benchmarks</strong>—tools like <code>BFCL</code> evolve continuously to remain difficult.
+  </p>
+
+  <h3 id="future">6.2 Emerging Directions</h3>
+  <p>
+    Future directions include:
+    <ul>
+      <li><strong>Granular Metrics</strong>: Better breakdowns of reasoning and tool failures</li>
+      <li><strong>Cost-Efficiency</strong>: Measuring latency, token use, and energy per call</li>
+      <li><strong>Automated Evaluators</strong>: Agents judging other agents (e.g., Agent-as-a-Judge)</li>
+      <li><strong>Safety & Compliance</strong>: Domain-specific and societal safety metrics</li>
+    </ul>
+  </p>
+
+  <h2 id="conclusion">7. Conclusion</h2>
+  <p>
+    Evaluating LLM-based agents is no longer about simple accuracy. It requires multi-dimensional benchmarking across planning, tool use, reflection, and memory. As agents become more capable and autonomous, so too must our evaluation frameworks become more nuanced, interactive, and cost-aware. Only then can we hope to understand—not just what these models say—but what they know, what they remember, and how they reason.
+  </p>
+</section>
