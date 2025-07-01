@@ -306,3 +306,21 @@ html {
     order: -1;
   }
 }
+
+/* === MathJax Equation Responsiveness === */
+mjx-container {
+  overflow-x: auto;
+  overflow-y: hidden;
+  display: block;
+  max-width: 100% !important;
+}
+
+mjx-container[jax="CHTML"] {
+  padding: 0.5rem 0;
+}
+
+mjx-container > svg {
+  max-width: 100% !important;
+  height: auto !important;
+}
+
