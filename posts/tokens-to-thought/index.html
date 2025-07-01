@@ -109,8 +109,11 @@
   <p>
     Below figure shows that <strong>all LLMs performed significantly better than random</strong>. Interestingly, <strong>encoder models like BERT-large-uncased outperformed larger decoder-only models</strong> in terms of category alignment.
   </p>
-  <img src="posts/tokens-to-thought/assets/Figure1.JPG" alt="Figure 1: Adjusted Mutual Information scores by model" />
-
+  <figure>
+    <img src="posts/tokens-to-thought/assets/Figure1.JPG" alt="Figure 1: Adjusted Mutual Information scores by model" />
+    <figcaption><strong>Figure 1:</strong> AMI scores across LLMs for human-concept alignment. BERT variants outperform larger autoregressive models.</figcaption>
+  </figure>
+  
   <h3 id="rq2">5.2 Internal Semantic Structure (RQ2)</h3>
   <p>
     This experiment examines whether LLMs preserve fine-grained semantic information like humans do. Specifically, the authors tested whether the <strong>cosine similarity between an item and its category label</strong> in embedding space aligns with <strong>human-rated typicality scores</strong>.
@@ -123,8 +126,11 @@
     <li><strong>BERT-large</strong> again performs relatively better but still falls short.</li>
     <li>This suggests <strong>prototype effects</strong> are not well encoded in LLM representations.</li>
   </ul>
-  <img src="posts/tokens-to-thought/assets/Figure2.JPG alt="Figure 2: Typicality correlation across models" />
-
+  <figure>
+    <img src="posts/tokens-to-thought/assets/Figure2.JPG" alt="Figure 2: Typicality correlation across models" />
+    <figcaption><strong>Figure 2:</strong> Spearman correlation between LLM cosine similarity and human typicality judgments. Weak or no alignment in most models.</figcaption>
+  </figure>
+  
   <h3 id="rq3">5.3 Compression vs Meaning Trade-off (RQ3)</h3>
   <p>
     The unified objective function \\( \\mathcal{L}(X, C; \\beta) \\) was used to compare humans and LLMs in terms of their overall representational efficiency. Two metrics were key:
@@ -141,7 +147,11 @@
     <li><strong>LLMs are more efficient</strong> by these metrics—but less rich semantically</li>
     <li>This strongly supports the claim that humans prioritize semantic nuance over statistical compressibility</li>
   </ul>
-  <img src="posts/tokens-to-thought/assets/Figure3.JPG" alt="Figure 3: Entropy and L score tradeoff by model and human" />
+  <figure>
+    <img src="posts/tokens-to-thought/assets/Figure3.JPG" alt="Figure 3: Entropy and L score tradeoff by model and human" />
+    <figcaption><strong>Figure 3:</strong> Comparison of entropy and L scores between human and LLM-derived categories. Humans show higher diversity; LLMs are more compressed.</figcaption>
+  </figure>
+
   <h2 id="discussion">6. Interpretation and Implications</h2>
   <p>
     The authors’ findings across RQ1–RQ3 suggest a core divergence between how LLMs and humans conceptualize the world. The results show that while LLMs are highly efficient from an information-theoretic perspective, their conceptual systems are far less nuanced than those of humans.
