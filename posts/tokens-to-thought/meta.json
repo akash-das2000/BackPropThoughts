@@ -1,0 +1,14 @@
+{
+  "title": "From Tokens to Thoughts: Compression vs Meaning in LLMs and Humans",
+  "slug": "llms-vs-humans-compression-vs-meaning",
+  "description": "An in-depth technical exploration of how large language models and humans form concepts using Rate-Distortion Theory, Information Bottleneck, semantic fidelity, and mutual information tradeoffs—backed by cognitive science and empirical evaluations.",
+  "readingTime": "8 min",
+  "tags": ["LLMs", "Cognitive Science", "Information Theory", "Concept Learning", "AI Alignment", "Mutual Information"],
+  "published": true,
+  "date": "2025-07-01",
+  "author": "Your Name",
+  "math": true,
+  "toc": true,
+  "share": true,
+  "comment": true
+}
