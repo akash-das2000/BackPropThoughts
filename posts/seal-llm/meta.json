@@ -1,5 +1,5 @@
 {
   "title": "SEAL the Future: Self-Adapting Language Models",
   "summary": "Exploring SEAL, a novel framework that enables language models to generate their own training data and evolve autonomously.",
-  "category": "Generative AI"
+  "category": ["Generative AI", "Research+"]
 }
