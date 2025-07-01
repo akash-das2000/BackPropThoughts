@@ -307,13 +307,19 @@ html {
   }
 }
 
-/* === MathJax Equation Responsiveness === */
+/* === MathJax Equation Responsiveness & Scaling Fix === */
 mjx-container {
   display: block;
   overflow-x: auto;
   overflow-y: hidden;
   max-width: 100%;
   padding: 0.5rem 0;
+  font-size: 1.05em; /* Scale down math to fit text */
+}
+
+mjx-container[display="block"] {
+  text-align: center;
+  margin: 1rem 0;
 }
 
 mjx-container > svg {
@@ -324,7 +330,9 @@ mjx-container > svg {
 
 mjx-container[display="inline"] {
   white-space: normal !important;
+  font-size: 1em !important;
 }
+
 
 
 
