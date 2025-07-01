@@ -1,0 +1,85 @@
+<section>
+  <h1 id="llms-vs-humans">From Tokens to Thoughts: Compression vs Meaning in LLMs and Humans</h1>
+  <p><em>An in-depth technical exploration of how large language models and humans form conceptual structures: Rate-Distortion Theory, Information Bottleneck principle, semantic fidelity, mutual information, human typicality, cluster entropy, compression-measure tradeoffs, and implications for cognitively aligned AI—mathematically and intuitively analyzed.</em></p>
+
+  <h2 id="introduction">1. Introduction</h2>
+  <p>
+    Do LLMs truly understand the world like humans—or do they merely compress data to mimic language patterns? Human cognition naturally forms abstract concepts to navigate the world. This compression of sensory experience into semantic categories is both efficient and meaning-preserving. But LLMs, trained on vast corpora, may optimize for different priorities.
+  </p>
+  <p>
+    This post presents a theoretical and empirical dive into how LLMs and humans compare when forming conceptual representations, based on the recent paper <strong>"From Tokens to Thoughts"</strong> (Shani et al., 2025). We explore how humans and LLMs balance <strong>representational complexity</strong> and <strong>semantic fidelity</strong>, using tools from information theory.
+  </p>
+
+  <h2 id="compression-vs-fidelity">2. Compression vs. Semantic Fidelity</h2>
+  <p>
+    Human categorization compresses the world by grouping diverse instances into meaningful categories (e.g., robin and sparrow both map to "bird"). This process involves a trade-off:
+  </p>
+  <ul>
+    <li><strong>Compression</strong>: Form fewer, simpler categories (lower cognitive load)</li>
+    <li><strong>Fidelity</strong>: Retain rich distinctions (e.g., robin more typical than penguin)</li>
+  </ul>
+  <p>
+    LLMs also represent words and concepts through embeddings. But do they make similar trade-offs?
+  </p>
+
+  <h2 id="theory">3. An Information-Theoretic Framework</h2>
+  <p>The study draws from two core principles:</p>
+  <ul>
+    <li><strong>Rate-Distortion Theory (RDT)</strong>: Optimal trade-off between complexity (rate) and distortion.</li>
+    <li><strong>Information Bottleneck (IB)</strong>: Compress input \( X \) into representation \( C \) retaining information about a target \( Y \).</li>
+  </ul>
+  <p>The authors define a unified objective function:</p>
+  <div>
+  \[ \mathcal{L}(X, C; \beta) = \text{Complexity}(X, C) + \beta \cdot \text{Distortion}(X, C) \]</div>
+  <p>
+    Where:
+    <ul>
+      <li>\( \text{Complexity}(X, C) = I(X; C) \): Mutual information between inputs and their cluster labels</li>
+      <li>\( \text{Distortion}(X, C) = \frac{1}{|X|} \sum_{c \in C} |C_c| \cdot \sigma_c^2 \): Intra-cluster embedding variance</li>
+    </ul>
+  </p>
+
+  <h2 id="benchmarks">4. Empirical Comparison: Humans vs LLMs</h2>
+  <p>They compare LLM clusters with human conceptual data from classic psychology datasets (Rosch 1973/75, McCloskey & Glucksberg 1978). Models evaluated include BERT, LLaMA, Phi, Gemma, and others.</p>
+
+  <h3>4.1 RQ1: Do LLMs Recover Human-Like Categories?</h3>
+  <p>Using Adjusted Mutual Information (AMI), LLM embeddings were clustered using k-means and compared to human labels. Key finding:</p>
+  <ul><li><strong>LLMs recover broad category structures</strong> (e.g., birds, fruit, furniture) but not all fine distinctions.</li></ul>
+
+  <h3>4.2 RQ2: Do LLMs Capture Typicality?</h3>
+  <p>They compared cosine similarity between item and category name embeddings to human-rated typicality scores.</p>
+  <ul>
+    <li>Correlations were weak or insignificant across models</li>
+    <li>LLMs do not replicate human prototype gradients (e.g., robin > penguin for "bird")</li>
+  </ul>
+
+  <h3>4.3 RQ3: Compression-Meaning Efficiency</h3>
+  <p>The total \( \mathcal{L} \) objective was computed. Key results:</p>
+  <ul>
+    <li>LLMs achieve <strong>lower \( \mathcal{L} \)</strong> than human categories → more statistically efficient</li>
+    <li>But humans exhibit <strong>higher semantic diversity</strong> (more entropy within categories)</li>
+  </ul>
+
+  <h2 id="interpretation">5. Interpretation and Insights</h2>
+  <p>
+    LLMs prioritize compression — creating tightly clustered embeddings with minimal internal variance. Humans, in contrast, maintain looser clusters that support rich, context-sensitive inference and prototype effects.
+  </p>
+  <p>
+    LLMs are <em>efficient</em> in an information-theoretic sense, but <em>less faithful</em> to human cognitive structure. This suggests that high performance on language tasks doesn’t imply human-like concept understanding.
+  </p>
+
+  <h2 id="implications">6. Implications for AI Alignment</h2>
+  <ul>
+    <li>Designing LLMs with more human-aligned representations may require relaxing strict compression objectives.</li>
+    <li>Using tools like \( \mathcal{L} \) and mutual information offers a path to <em>diagnose</em> and <em>steer</em> internal representations.</li>
+    <li>Architectural choices (e.g., encoder vs decoder) and pretraining tasks significantly affect conceptual abstraction.</li>
+  </ul>
+
+  <h2 id="conclusion">7. Conclusion</h2>
+  <p>
+    Human cognition isn’t optimized purely for statistical compression—it values adaptability, nuance, and semantic richness. LLMs, in contrast, encode a narrower, cleaner abstraction of language categories. Bridging this gap will require new modeling paradigms that embrace the complexity of human meaning.
+  </p>
+  <p>
+    This study marks an important step toward understanding—and eventually closing—the conceptual chasm between tokens and thoughts.
+  </p>
+</section>
