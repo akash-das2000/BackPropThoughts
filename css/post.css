@@ -307,15 +307,13 @@ html {
   }
 }
 
-/* === Final MathJax SVG Uniform Sizing and Responsiveness === */
+/* === Final MathJax SVG Styling for Consistent Size === */
 mjx-container {
-  display: inline-block;
-  font-size: 1.05rem;       /* Sets uniform size for inline and block math */
-  line-height: 1.4;
+  font-size: 1.05rem;
   overflow-x: auto;
   overflow-y: hidden;
   max-width: 100%;
-  vertical-align: middle;
+  line-height: 1.6;
 }
 
 mjx-container[display="block"] {
@@ -324,12 +322,10 @@ mjx-container[display="block"] {
   margin: 1rem 0;
 }
 
-mjx-container > svg {
-  height: 1.25em !important;
-  width: auto !important;
-  max-width: 100%;
-  display: inline-block;
+mjx-container[display="inline"] {
+  white-space: normal !important;
 }
+
 
 
 
