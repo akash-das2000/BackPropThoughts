@@ -1,4 +1,5 @@
 {
   "title": "Maximal Margins: Understanding Support Vector Machines",
-  "summary": "A rigorous exploration of Support Vector Machines, covering primal & dual formulations, KKT conditions, the kernel trick, optimization algorithms, and theoretical generalization guarantees."
+  "summary": "A rigorous exploration of Support Vector Machines, covering primal & dual formulations, KKT conditions, the kernel trick, optimization algorithms, and theoretical generalization guarantees.",
+  "category": "Classical ML"
 }
