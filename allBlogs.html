@@ -17,19 +17,25 @@
 
     <h2 class="section-heading">All Blogs</h2>
 
-    <!-- 🔘 Category Filter Buttons -->
+    <!-- 🏷 Category Filters -->
     <div id="categoryFilters" class="category-filters">
-      <!-- JS will insert category buttons -->
+      <!-- JS-generated filter buttons -->
     </div>
 
-    <!-- 🔍 Search and Sort -->
+    <!-- 🔍 Search & Sort -->
     <div class="blog-controls">
       <input type="text" id="searchInput" placeholder="Search blogs..." class="search-bar" />
-      <select id="sortSelect" class="sort-dropdown">
-        <option value="latest">Sort by: Latest</option>
-        <option value="title">Sort by: Title A–Z</option>
-      </select>
+      <div class="sort-group">
+        <label for="sortSelect" class="sort-label">Sort:</label>
+        <select id="sortSelect" class="sort-dropdown">
+          <option value="latest">Latest</option>
+          <option value="title">Title A–Z</option>
+        </select>
+      </div>
     </div>
+
+    <!-- 📊 Count -->
+    <p id="blogCount" class="blog-count"></p>
 
     <!-- 📚 Blog Grid -->
     <section id="blogGrid" class="blog-grid">
@@ -38,12 +44,11 @@
 
   </main>
 
-  <!-- Footer -->
   <footer>
     <p>© 2025 Akash D</p>
   </footer>
 
-  <!-- Navbar Script -->
+  <!-- Navbar Loader -->
   <script>
     fetch("navbar.html")
       .then(res => res.text())
@@ -61,7 +66,7 @@
   </script>
 
   <!-- Blog Logic -->
-  <script src="js/allBlogs.js" defer></script>
+  <script src="allBlogs.js" defer></script>
 
 </body>
 </html>
