@@ -22,21 +22,29 @@
 }
 
 .category-filters button {
-  padding: 0.4rem 0.8rem;
-  border: 1px solid #ccc;
+  padding: 0.4rem 0.9rem;
+  margin: 0.4rem;
+  border: 1.5px solid #ccc;
   background-color: white;
+  color: #333;
   border-radius: 20px;
   font-size: 0.9rem;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.3s ease; /* 🎞 Smooth transitions */
 }
 
-.category-filters button.active,
-.category-filters button:hover {
-  background-color: #005fa3;
+.category-filters button.active {
+  background-color: #005fa3; /* 🔵 Deeper blue */
   border-color: #005fa3;
-  color: white;
+  color: #fff;
 }
+
+.category-filters button:hover {
+  background-color: #e6f0fb;
+  border-color: #005fa3;
+  color: #005fa3;
+}
+
 
 /* Search + Sort */
 .blog-controls {
