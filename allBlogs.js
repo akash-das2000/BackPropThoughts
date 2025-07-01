@@ -72,9 +72,27 @@ async function findThumbnail(slug) {
 
 // 🏷 Build filter buttons
 function renderCategoryFilters() {
-  const categories = ["All", ...new Set(allBlogs.map(b => b.category))];
+  const categoryCounts = {};
+
+  // Count how often each category appears
+  allBlogs.forEach(blog => {
+    const category = blog.category || "Uncategorized";
+    categoryCounts[category] = (categoryCounts[category] || 0) + 1;
+  });
+
+  // Sort by frequency
+  const sortedCategories = Object.entries(categoryCounts)
+    .sort((a, b) => b[1] - a[1])
+    .map(([cat]) => cat);
+
+  // Show only top 4 most common (you can change this number)
+  const topCategories = sortedCategories.slice(0, 5);  // ← change this to 5, 6, etc. if needed
+
+  // Final categories to show in filter bar
+  const displayCategories = ["All", ...topCategories];
+
   categoryFilters.innerHTML = "";
-  categories.forEach(cat => {
+  displayCategories.forEach(cat => {
     const btn = document.createElement("button");
     btn.textContent = cat;
     btn.classList.toggle("active", cat === currentCategory);
