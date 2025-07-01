@@ -316,19 +316,15 @@ mjx-container {
   padding: 0.5rem 0;
 }
 
-mjx-container[jax="CHTML"] {
-  text-align: left;
-}
-
 mjx-container > svg {
   width: 100% !important;
   height: auto !important;
   display: block;
 }
 
-/* Inline equations: allow wrapping on narrow screens */
 mjx-container[display="inline"] {
   white-space: normal !important;
 }
+
 
 
