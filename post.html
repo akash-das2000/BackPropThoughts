@@ -15,9 +15,14 @@
         displayMath: [['\\[', '\\]']]
       },
       svg: {
-        scale: 1,
-        minScale: 0.5,
-        matchFontHeight: false
+        scale: 1,               // scale relative to surrounding text
+        minScale: 1,            // prevent shrinking
+        fontCache: 'none',      // render each expression independently
+      },
+      options: {
+        renderActions: {
+          addMenu: []
+        }
       },
       startup: {
         typeset: false
