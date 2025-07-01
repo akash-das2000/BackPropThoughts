@@ -1,5 +1,5 @@
-
 {
   "title": "Rooted in Wisdom: Understanding the Random Forest Algorithm",
-  "summary": "Understanding the nitti-grities of one of the classical ML algorithms - the Random Forest."
+  "summary": "A deep dive into Random Forests — from tree construction and splitting to bagging, bias-variance decomposition, and consistency guarantees.",
+  "category": "Classical ML"
 }
