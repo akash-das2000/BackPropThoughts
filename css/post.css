@@ -309,18 +309,26 @@ html {
 
 /* === MathJax Equation Responsiveness === */
 mjx-container {
+  display: block;
   overflow-x: auto;
   overflow-y: hidden;
-  display: block;
-  max-width: 100% !important;
-}
-
-mjx-container[jax="CHTML"] {
+  max-width: 100%;
   padding: 0.5rem 0;
 }
 
-mjx-container > svg {
-  max-width: 100% !important;
-  height: auto !important;
+mjx-container[jax="CHTML"] {
+  text-align: left;
 }
+
+mjx-container > svg {
+  width: 100% !important;
+  height: auto !important;
+  display: block;
+}
+
+/* Inline equations: allow wrapping on narrow screens */
+mjx-container[display="inline"] {
+  white-space: normal !important;
+}
+
 
