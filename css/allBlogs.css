@@ -142,6 +142,22 @@
   -webkit-box-orient: vertical;
 }
 
+.blog-tags {
+  margin-bottom: 0.5rem;
+}
+
+.tag-badge {
+  display: inline-block;
+  background-color: #eaf3fc;
+  color: #0070cc;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.25rem 0.6rem;
+  margin-right: 0.4rem;
+  border-radius: 20px;
+}
+
+
 /* Summary with line clamp */
 .blog-summary {
   font-size: 0.95rem;
