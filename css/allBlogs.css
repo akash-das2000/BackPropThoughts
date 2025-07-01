@@ -150,3 +150,20 @@
   color: #666;
   margin-bottom: 1rem;
 }
+
+.load-more-btn {
+  margin: 2rem auto 1rem;
+  display: block;
+  padding: 0.6rem 1.5rem;
+  background-color: #333;
+  color: white;
+  font-size: 0.95rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.load-more-btn:hover {
+  background-color: #555;
+}
