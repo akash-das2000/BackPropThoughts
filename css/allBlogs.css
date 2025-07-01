@@ -30,11 +30,11 @@
   border-radius: 20px;
   font-size: 0.9rem;
   cursor: pointer;
-  transition: all 0.3s ease; /* 🎞 Smooth transitions */
+  transition: all 0.3s ease;
 }
 
 .category-filters button.active {
-  background-color: #005fa3; /* 🔵 Deeper blue */
+  background-color: #005fa3;
   border-color: #005fa3;
   color: #fff;
 }
@@ -44,7 +44,6 @@
   border-color: #005fa3;
   color: #005fa3;
 }
-
 
 /* Search + Sort */
 .blog-controls {
@@ -85,11 +84,11 @@
 /* Blog Grid */
 .blog-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 2rem;
   margin-top: 1rem;
   justify-content: center;
-  align-items: start;
+  align-items: stretch;
 }
 
 /* Blog Card */
@@ -97,13 +96,11 @@
   background: white;
   border: 1px solid #ddd;
   border-radius: 12px;
-  overflow: hidden;
   box-shadow: 0 4px 10px rgba(0,0,0,0.05);
   transition: transform 0.2s ease;
   display: flex;
   flex-direction: column;
-  max-width: 400px; /* 🔵 Optional, ensures clean width */
-  margin: 0 auto;   /* centers cards even when fewer in row */
+  height: 100%;
 }
 
 .blog-card:hover {
@@ -118,6 +115,7 @@
   background-color: #f0f0f0;
 }
 
+/* Card content */
 .blog-content {
   padding: 1rem;
   display: flex;
@@ -125,18 +123,34 @@
   flex-grow: 1;
 }
 
+/* Title with line clamp */
 .blog-title {
   font-size: 1.1rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
   color: #222;
+  line-height: 1.4;
+  max-height: 2.8em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
+/* Summary with line clamp */
 .blog-summary {
-  flex-grow: 1;
   font-size: 0.95rem;
   color: #555;
+  line-height: 1.5;
+  flex-grow: 1;
   margin-bottom: 1rem;
+  max-height: 6em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
 }
 
 .read-more-link {
@@ -165,6 +179,7 @@
   margin-bottom: 1rem;
 }
 
+/* Load more button */
 .load-more-btn {
   margin: 2rem auto 1rem;
   display: block;
