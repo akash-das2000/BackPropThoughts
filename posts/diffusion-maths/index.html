@@ -1159,3 +1159,70 @@ trace_est = (Hv * v).sum()              # vᵀ H v ≈ tr(H)
   keeping the computational footprint on par with ordinary back-prop.
 </p>
 
+  <!-- =====================================================
+     7. Why Killing the Partition Function Zθ Is Essential
+     ===================================================== -->
+<h2 id="partition">7.&nbsp;Why&nbsp;Killing&nbsp;the&nbsp;Partition&nbsp;Function&nbsp;<em>Z</em><sub>θ</sub>&nbsp;Is&nbsp;Essential</h2>
+
+<p class="lead">
+  Maximum-likelihood training of deep energy models is crippled by the
+  partition function&nbsp;\(Z_\theta\).
+  Score matching sidesteps it entirely, turning a hopeless high-dim problem
+  into an ordinary regression task.
+</p>
+
+<!-- 7.1 the obstacles table -->
+<table class="tbl">
+  <caption>What makes <em>Z</em><sub>θ</sub> impossible in images?</caption>
+  <thead>
+    <tr><th>Obstacle</th><th>Concrete scale for 256 × 256 RGB</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Integral dimension</strong></td>
+        <td>\(d = 3 \times 256 \times 256 = 196{,}608\).  
+            A Monte-Carlo normaliser would need &raquo; 10<sup>6</sup>
+            samples &mdash; <em>per gradient step</em>.</td></tr>
+
+    <tr><td><strong>MCMC mixing</strong></td>
+        <td>Deep energy landscapes are multi-modal; Langevin/Hamiltonian
+            chains can take minutes or hours of burn-in <em>per image</em>.</td></tr>
+
+    <tr><td><strong>Non-factorised likelihood</strong></td>
+        <td>Pixels are globally coupled; there is no tractable
+            autoregressive or factorial decomposition of the partition function.</td></tr>
+  </tbody>
+</table>
+
+<!-- 7.2 score matching amputates Zθ -->
+<h3 id="partition-score">7.1&nbsp;Score matching cuts <em>Z</em><sub>θ</sub> out</h3>
+<p>
+  For an energy model
+  \( p_\theta(x)=\exp[-E_\theta(x)]/Z_\theta \),
+</p>
+
+<div class="eq-scroll">\[
+  \nabla_x\log p_\theta(x)
+  = -\nabla_x E_\theta(x),
+  \qquad
+  \nabla_x\log Z_\theta = 0 .
+\]</div>
+
+<p class="explain">
+  The constant log-normaliser disappears <em>before</em> we take any
+  gradients wrt&nbsp;\(\theta\).
+  Training a 100-million-parameter U-Net by score matching therefore costs
+  no more than an equally-sized supervised network &mdash; no inner-loop
+  MCMC, no partition-function estimates.
+</p>
+
+<!-- 7.3 takeaway -->
+<h3 id="partition-takeaway">7.2&nbsp;Take-away</h3>
+<ul>
+  <li><strong>Evaluation</strong>: you still can’t get an exact
+      likelihood, but you <em>can</em> sample once the score field is
+      trained.</li>
+  <li><strong>Training</strong>: score matching converts a
+      global-normalisation problem into a local-derivative regression, the
+      only reason diffusion models scale to megapixel images.</li>
+</ul>
+
