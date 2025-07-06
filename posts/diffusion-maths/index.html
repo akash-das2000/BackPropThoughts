@@ -47,6 +47,14 @@ table.tbl .shape{
   width: 160px;
 }
 
+/* --- Table Notes --- */
+.note{
+  font-size: 0.93rem;
+  font-style: italic;
+  margin: -0.5rem 0 2rem 0;   /* tighten space above, keep space below */
+  color: #444;
+}
+
 </style>
 <section>
 <!-- =======================  Header   ======================= -->
@@ -76,7 +84,7 @@ table.tbl .shape{
   </p>
 </aside>
 
-<h2 id="notations-and-big-picture">Notations and Big Picture</h2>
+<h2 id="notations-and-big-picture">1. Notations and Big Picture</h2>
   <!-- ============  Notation Cheat-Sheet & Shapes  ============ -->
 <table class="tbl note-table">
   <caption>Notation Cheat-Sheet &amp; Typical Shapes</caption>
@@ -155,6 +163,69 @@ table.tbl .shape{
 <p class="note">
   Keep these identities at hand&mdash;we&rsquo;ll cite them explicitly in the derivations below.
 </p>
+
+
+<!--  =====================================================
+      Forward (Noising) Process — From One Step to Closed Form
+      ===================================================== -->
+<h2 id="forward">1.&nbsp;Forward&nbsp;(Noising)&nbsp;Process — derivation from first principles</h2>
+
+<!-- 1.1 one tiny noise injection -->
+<h3>1.1 One tiny noise injection</h3>
+<p>
+  <strong>Principle&nbsp;&raquo;</strong>
+  A single DDPM step keeps a fraction \( \sqrt{1-\beta} \) of the signal and
+  blends in \( \sqrt{\beta} \) of fresh Gaussian noise:
+</p>
+
+<p class="display-math">\[
+  x' \;=\; \sqrt{1-\beta}\,x \;+\; \sqrt{\beta}\,\varepsilon,
+  \qquad
+  \varepsilon \sim \mathcal N(0, I_d).
+\tag{1.1}\]</p>
+
+<p class="explain">
+  The square roots ensure that the variance of \( x' \) is exactly
+  \( \beta \) larger than that of \( x \).
+</p>
+
+<!-- 1.2 repeat t times -->
+<h3>1.2 Repeat \( t \) times &rarr; closed form</h3>
+<p>
+  Let \( \beta_s = 1-\alpha_s \) and
+  \( \bar\alpha_t = \prod_{s=1}^{t} \alpha_s \).
+  Re-applying (1.1) \( t \) times yields
+</p>
+
+<p class="display-math">\[
+  x_t \;=\; \sqrt{\bar\alpha_t}\,x_0
+        \;+\; \sqrt{1-\bar\alpha_t}\,\varepsilon.
+\tag{1.2}\]</p>
+
+<p class="explain">
+  Define \( \sigma_t := \sqrt{1-\bar\alpha_t} \) for later use.
+</p>
+
+<!-- 1.3 conditional kernel -->
+<h3>1.3 Conditional density \( q(x_t\mid x_0) \)</h3>
+<p>
+  An affine transform of a Gaussian is Gaussian, so
+</p>
+
+<p class="display-math">\[
+  q(x_t\mid x_0)
+  \;=\;
+  \mathcal N\!\bigl(
+    x_t; \sqrt{\bar\alpha_t}\,x_0,\,
+    \sigma_t^2 I_d
+  \bigr).
+\tag{1.3}\]</p>
+
+<p class="explain">
+  We’ll differentiate (1.3) next; its gradient becomes a “free” supervised
+  label during training.
+</p>
+
 
 
 
