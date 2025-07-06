@@ -485,62 +485,73 @@ table.tbl th, table.tbl td{
   subsection.
 </p>
 
-<!-- 2.5 three-line Bayes proof of unbiasedness -->
-<h3 id="three-line-proof">2.5&nbsp;Three-line&nbsp;Bayes proof&nbsp;of&nbsp;unbiasedness</h3>
+<!-- 2.5 Three-line Bayes proof — y_t is an unbiased target -->
+<h3 id-"three-liner-proof">2.5&nbsp;Three-line&nbsp;Bayes proof — <code>y_t</code> is an unbiased target</h3>
 
+<!-- intro sentence -->
 <p class="bridge">
-  Our goal is to show that the free label
-  \( y_t = -\varepsilon / \sigma_t \)
-  satisfies
-  \( \mathbb E\!\bigl[\,y_t \mid x_t\bigr] = s^{\star}(x_t,t) \).
-  The proof is nothing more than the chain rule for logs, an
-  interchange of <span class="math">∇</span> and ∫, and Bayes’ rule.
+  We need to prove
+  \( \mathbb E\!\bigl[\,y_t \mid x_t\bigr] = \nabla_{x_t}\log p_t(x_t) \).
+  The derivation uses only the chain rule, a gradient-under-the-integral swap,
+  and Bayes’ rule.
 </p>
 
-<!-- line 1 -->
+<!-- ---- LINE 1 ---- -->
+<p><strong>Line&nbsp;1&nbsp;&mdash; chain rule for logs</strong></p>
 <div class="eq-scroll">\[
-  \underbrace{\nabla_{x_t}\log p_t(x_t)}_{\text{wanted score}}
+  \nabla_{x_t}\log p_t(x_t)
   \;=\;
-  \frac{\nabla_{x_t}p_t(x_t)}{p_t(x_t)}
-  \quad
-  \text{(chain rule)}
+  \frac{\nabla_{x_t}p_t(x_t)}{p_t(x_t)} .
 \tag{2.4a}\]</div>
 
-<!-- line 2 -->
+<!-- ---- LINE 2 ---- -->
+<p><strong>Line&nbsp;2&nbsp;&mdash; move ∇ under the integral</strong><br>
+  (dominated-convergence applies because the Gaussian kernel has bounded
+  derivatives):
+</p>
 <div class="eq-scroll">\[
   \nabla_{x_t}p_t(x_t)
   \;=\;
   \int p_{\text{data}}(x_0)\,
-       \nabla_{x_t}q(x_t \mid x_0)\,dx_0
-  \quad
-  \text{(swap ∇ and ∫)}
+       \nabla_{x_t}q(x_t\mid x_0)\,dx_0 .
 \tag{2.4b}\]</div>
 
-<!-- line 3 -->
+<!-- ---- LINE 3 ---- -->
+<p><strong>Line&nbsp;3&nbsp;&mdash; split the gradient &amp; recognise the posterior</strong></p>
+<ul>
+  <li><em>Split the gradient:</em>
+      \( \nabla_{x_t}q = q\,\nabla_{x_t}\log q \).  
+      Insert the one-liner from&nbsp;(2.1),
+      \( \nabla_{x_t}\log q = -\,\varepsilon/\sigma_t \), which is exactly
+      \( y_t \).</li>
+
+  <li><em>Bayes’ identity:</em>
+      \( p_{\text{data}}(x_0)\,q(x_t\mid x_0) / p_t(x_t)
+         = p(x_0\mid x_t) \).</li>
+</ul>
+
 <div class="eq-scroll">\[
   \frac{1}{p_t(x_t)}
   \int p_{\text{data}}(x_0)\,
-       q(x_t\mid x_0)\;
+       q(x_t\mid x_0)\,
        \Bigl(-\tfrac{\varepsilon}{\sigma_t}\Bigr)\,dx_0
   \;=\;
-  \mathbb E_{x_0\sim p(\,\cdot\mid x_t)}
-          \bigl[\,y_t\,\bigr]
-  \quad
-  \text{(plug \(y_t\), recognise posterior)}
+  \mathbb E_{x_0\sim p(\,\cdot\mid x_t)}[\,y_t\,] .
 \tag{2.4c}\]</div>
 
+<!-- summary -->
 <p class="explain">
-  Combine (2.4a)–(2.4c) and the conditional expectation equals the
-  marginal score:
+  Combine (2.4a)–(2.4c):
   \[
-     \boxed{\;
-       \mathbb E\!\bigl[\,y_t \mid x_t\bigr]
-       \;=\;
-       s^{\star}(x_t,t)
-     \;}. \tag{2.5}
+    \boxed{\;
+      \mathbb E\!\bigl[\,y_t \mid x_t\bigr]
+      \;=\;
+      \nabla_{x_t}\log p_t(x_t)
+    \;}. \tag{2.5}
   \]
-  An outer expectation over \(x_t\) keeps the equality, so
-  replacing the unknown score by \(y_t\) in our loss is <em>unbiased</em>.
+  Taking an outer expectation over \(x_t\) preserves the equality, so
+  swapping the unknown score with \(y_t\) inside our loss
+  introduces <em>no bias whatsoever</em>.
 </p>
 
 
