@@ -131,15 +131,28 @@ table.tbl th, table.tbl td{
   color:#444;
 
   /* === python code === */
-.codeblock{
-  background: #f6f8fa;
+.codebox{
+  margin: 1.4rem 0 2rem 0;
   border: 1px solid #e1e4e8;
   border-radius: 6px;
-  padding: .75rem 1rem;
+  background: #f6f8fa;
+}
+
+.codebox figcaption{
+  font-size: .85rem;
+  padding: .35rem .9rem;
+  background:#eef1f7;
+  border-bottom:1px solid #e1e4e8;
+  font-family: system-ui,sans-serif;
+}
+
+.codebox pre{
+  margin:0;
+  padding: .8rem .9rem;
+  overflow-x:auto;
   font-family: ui-monospace, "SF Mono", "Roboto Mono", monospace;
   font-size: .93rem;
-  overflow-x: auto;          /* side-scroll on narrow screens   */
-  margin: 1rem 0 1.5rem 0;
+  background: inherit;   /* same grey as container */
 }
 
 }
@@ -610,6 +623,18 @@ table.tbl th, table.tbl td{
 <!-- 3.1 one-timestep Fisher divergence -->
 <h3>3.1&nbsp;Single-timestep Fisher divergence</h3>
 
+<p class="bridge">
+  We now translate the Fisher divergence primer into a concrete loss.
+  Because diffusion training iterates over noise levels, it is natural to
+  start with <em>one</em> timestep&nbsp;<code>t</code>.
+  The single-step objective below measures how far the network’s score
+  \( s_\theta(x_t,t) \) is from the <em>true</em> marginal score
+  \( \nabla_{x_t}\log p_t(x_t) \).  We will immediately swap the latter
+  for its unbiased label \( y_t \), but writing it once in full keeps the
+  statistical grounding clear.
+</p>
+
+
 <div class="eq-scroll">\[
   \mathcal L_t(\theta)
   \;=\;
@@ -690,9 +715,12 @@ table.tbl th, table.tbl td{
   In PyTorch that reduces to the canonical&nbsp;one-liner:
 </p>
 
-<pre class="codeblock"><code class="language-python">
-loss = F.mse_loss(pred_eps, eps)   # identical objective
+<figure class="codebox">
+  <figcaption>PyTorch one-liner&nbsp;&mdash; identical objective</figcaption>
+<pre><code class="language-python">
+loss = F.mse_loss(pred_eps, eps)
 </code></pre>
+</figure>
 
 
 
