@@ -931,20 +931,52 @@ pre code{background:none;padding:0}
 \]</div>
 
 <!-- 5.2 optimal decoder -->
-<h3 id="dae-optimal">5.2&nbsp;Optimal decoder</h3>
+<h3 id="dae-optimal">5.2&nbsp;Optimal decoder – line-by-line calculus</h3>
+
 <p>
-  For a fixed noisy input \(x'\) the quadratic (5.1) is minimised by the
-  conditional mean&mdash;exactly the Bayesian MMSE estimator:
+  Fix one noisy input \(x'\) and treat
+  \(f(x') \in \mathbb R^{d}\) as an unknown vector.  
+  The inner part of the loss (5.1) becomes the quadratic
 </p>
 
 <div class="eq-scroll">\[
-  f^{\star}(x')
-  = \mathbb E[\,x \mid x'\,].
-  \tag{5.2}
+  R_{x'}(f)
+  \;:=\;
+  \mathbb E_{x\mid x'}\!
+    \bigl\|
+      x - f(x')
+    \bigr\|^{2}.
+\]</div>
+
+<p class="bridge">
+  <strong>Take the gradient&nbsp;w.r.t.&nbsp;<code>f(x')</code></strong>
+  (remember \(x'\) is held constant inside this expectation):
+</p>
+
+<div class="eq-scroll">\[
+  \nabla_{f(x')} R_{x'}(f)
+  = -2\,
+    \mathbb E_{x\mid x'}
+      \bigl[
+        x - f(x')
+      \bigr].
+\]</div>
+
+<p>
+  <strong>Set the derivative to zero</strong>—that kills the factor 2 and
+  yields
+</p>
+
+<div class="eq-scroll">\[
+  \mathbb E_{x\mid x'}[\,x\,] \;=\; f^{\star}(x').
+\tag{5.2}
 \]</div>
 
 <p class="explain">
-  Take the derivative with respect to \(f(x')\), set to zero, solve.
+  In words: the decoder that minimises the mean-squared reconstruction
+  error for this particular noisy input is simply the
+  <em>conditional mean</em> of the clean sample given that input.
+  This is the classic Bayesian MMSE estimator.
 </p>
 
 <!-- 5.3 small-σ Taylor -->
