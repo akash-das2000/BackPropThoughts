@@ -153,6 +153,31 @@ pre code{background:none;padding:0}
   }
 }
 
+/* ----------  Responsive heading wraps & scaling ---------- */
+
+/* Allow long words in headings to break */
+h1, h2, h3, h4, h5, h6 {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  hyphens: auto;
+  white-space: normal;       /* override any no-wrap */
+}
+
+/* Shrink heading text on narrow viewports */
+@media (max-width: 600px) {
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.3rem; }
+  h3 { font-size: 1.15rem; }
+  /* you can add h4, h5 as needed */
+}
+
+/* Optional: make the entire page text flow better on mobile */
+body {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+
 </style>
 <section>
   <h1 id="diffusion-maths-updated">
