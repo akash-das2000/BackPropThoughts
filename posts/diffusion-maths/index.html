@@ -142,34 +142,55 @@ pre code{background:none;padding:0}
 
 </style>
 <section>
-<!-- =======================  Header   ======================= -->
-<h1 id="diffusion-maths">The Mathematical Foundations of Diffusion Models <small>(A self-contained mini-monograph)</small></h1>
+  <h1 id="diffusion-maths-updated">
+    A Mathematical Approach to Score-Based Diffusion Models: From Foundations to Photorealistic Sampling
+  </h1>
 
-<!-- =======================  TL;DR box ======================= -->
-<aside class="tldr">
-  <h2 id="TL;DR">TL;DR</h2>
-  <p>
-    Diffusion models generate images in two conceptual moves:
-  </p>
-  <ol>
-    <li>
-      <strong>Corrupt&nbsp;the data.</strong>  
-      Each clean image is progressively blended with analytically-tractable Gaussian noise.
-    </li>
-    <li>
-      <strong>Learn&nbsp;the score.</strong>  
-      A neural network is trained—via an ordinary mean-squared-error loss—to predict the <em>gradient</em> of the log-density (the “score”) of every noisy distribution.
-    </li>
-  </ol>
-  <p>
-    Once that score field is known, a <em>reverse-time stochastic differential equation</em>
-    (or an equivalent deterministic ODE) can be integrated to
-    push pure white noise back onto the data manifold—yielding photorealistic
-    images without adversarial training or intractable likelihoods.
-  </p>
-</aside>
+  <!-- =======================  TL;DR box ======================= -->
+  <aside class="tldr">
+    <h2 id="TL;DR">TL;DR</h2>
+    <p>
+      This post unpacks the core math that powers diffusion models, turning
+      image generation into a straightforward regression problem:
+    </p>
+    <ol>
+      <li>
+        <strong>Forward noising.</strong>
+        Derive a closed-form Gaussian corruption \(q(x_t\mid x_0)\)
+        so you can sample \(x_t\) analytically at any noise level.
+      </li>
+      <li>
+        <strong>Unbiased score labels.</strong>
+        Use Bayes’ rule to show
+        \(\mathbb{E}[-\varepsilon/\sigma_t \mid x_t] = \nabla_{x_t}\log p_t(x_t)\),
+        yielding a free supervised target.
+      </li>
+      <li>
+        <strong>Score matching &amp; Hyvärinen.</strong>
+        Integration-by-parts removes the intractable partition function
+        \(Z_\theta\), yielding a loss computable via autograd.
+      </li>
+      <li>
+        <strong>Denoising auto-encoder link.</strong>
+        Vincent’s small-σ Taylor shows denoising MSE → Fisher divergence,
+        so each timestep is one finite-σ DAE objective.
+      </li>
+      <li>
+        <strong>Numerical tricks.</strong>
+        The Hutchinson trace trick makes any Laplacian
+        \(O(d)\) in memory; diffusion cleverly sidesteps even that
+        via the Gaussian label.
+      </li>
+    </ol>
+    <p>
+      Four lines of PyTorch—U-Net, forward kernel, label = \(-\varepsilon/\sigma_t\),
+      MSE loss—are all you need to turn noise into photorealistic images.
+    </p>
+  </aside>
+</section>
 
-<h2 id="notations-and-big-picture">1. Notations and Big Picture</h2>
+
+<h2 id="notations-and-big-picture">Notations and Big Picture</h2>
   <!-- ============  Notation Cheat-Sheet & Shapes  ============ -->
 <table class="tbl note-table">
   <caption>Notation Cheat-Sheet &amp; Typical Shapes</caption>
@@ -1356,5 +1377,5 @@ trace_est = (Hv * v).sum()              # vᵀ H v ≈ tr(H)
   sense the journey from probability calculus to photorealistic images is
   short: a direct footpath paved by careful mathematics.
 </p>
-
+</section>
 
