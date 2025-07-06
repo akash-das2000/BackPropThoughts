@@ -15,7 +15,7 @@
 
 <!-- =======================  TL;DR box ======================= -->
 <aside class="tldr">
-  <h2>TL;DR</h2>
+  <h2 id="TL;DR">TL;DR</h2>
   <p>
     Diffusion models generate images in two conceptual moves:
   </p>
@@ -36,3 +36,82 @@
     images without adversarial training or intractable likelihoods.
   </p>
 </aside>
+
+  <table class="tbl">
+  <!-- ============  Notation  ============ -->
+  <thead>
+    <tr>
+      <th colspan="3">Notation Cheat-Sheet &amp; Shapes</th>
+    </tr>
+    <tr>
+      <th>Symbol</th>
+      <th>Plain-language meaning</th>
+      <th>Typical shape / note</th>
+    </tr>
+  </thead>
+
+  <h2 id="notations">Notations</h2>
+
+  <tbody>
+    <tr><td><code>x_0&nbsp;∈&nbsp;ℝ<sup>d</sup></code></td>
+        <td>clean data vector (flattened image)</td>
+        <td><code>d&nbsp;=&nbsp;3HW</code></td></tr>
+
+    <tr><td><code>t&nbsp;∈&nbsp;{0,…,T}</code></td>
+        <td>discrete diffusion timestep</td>
+        <td>integer</td></tr>
+
+    <tr><td><code>α_t&nbsp;(0&lt;α_t&lt;1)</code></td>
+        <td>retain-signal factor at step&nbsp;<code>t</code></td>
+        <td>scalar</td></tr>
+
+    <tr><td><code>𝛼̄_t&nbsp;=&nbsp;∏_{s=1}^{t}α_s</code></td>
+        <td>cumulative signal survival</td>
+        <td>scalar</td></tr>
+
+    <tr><td><code>σ_t&nbsp;=&nbsp;√(1−𝛼̄_t)</code></td>
+        <td>total noise std-dev after step&nbsp;<code>t</code></td>
+        <td>scalar</td></tr>
+
+    <tr><td><code>ε&nbsp;∼&nbsp;𝒩(0,I_d)</code></td>
+        <td>fresh isotropic Gaussian noise</td>
+        <td><code>ℝ<sup>d</sup></code></td></tr>
+
+    <tr><td><code>p<sub>data</sub></code></td>
+        <td>true—but unknown—data density</td>
+        <td>never written in closed form</td></tr>
+
+    <tr><td><code>q(x_t&nbsp;|&nbsp;x_0)</code></td>
+        <td>forward/noising kernel (Gaussian)</td>
+        <td>analytic</td></tr>
+
+    <tr><td><code>p_t(x_t)</code></td>
+        <td>marginal noisy density after corruption</td>
+        <td>unknown but samplable</td></tr>
+
+    <tr><td><code>s_θ(x_t,t)</code></td>
+        <td>neural network score estimator</td>
+        <td>same shape as <code>x_t</code></td></tr>
+
+    <!-- ============  Toolbox  ============ -->
+    <tr><th colspan="3" style="text-align:center">Stock-the-Toolbox Facts</th></tr>
+
+    <tr><td><strong>Gaussian&nbsp;PDF</strong></td>
+        <td colspan="2">
+          <code>ϕ_Σ(z)=exp(-½ z<sup>⊤</sup>Σ<sup>−1</sup>z) / √((2π)<sup>d</sup> det Σ)</code>
+        </td></tr>
+
+    <tr><td><strong>Quadratic&nbsp;grad</strong></td>
+        <td colspan="2"><code>∇_x‖x−a‖<sup>2</sup> = 2(x−a)</code></td></tr>
+
+    <tr><td><strong>Chain rule for logs</strong></td>
+        <td colspan="2"><code>∇ log f = (∇f) / f</code></td></tr>
+
+    <tr><td><strong>Affine–Gaussian rule</strong></td>
+        <td colspan="2">
+          If <code>Z∼𝒩(0,I)</code> and <code>Y=a+BZ</code> then
+          <code>Y∼𝒩(a, B B<sup>⊤</sup>)</code>.
+        </td></tr>
+  </tbody>
+</table>
+
