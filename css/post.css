@@ -1,4 +1,4 @@
-/* === General Blog Layout === */
+/* ==============  General Blog Layout  ============== */
 .blog-wrapper {
   display: flex;
   justify-content: center;
@@ -13,6 +13,7 @@
   margin-right: 2rem;
   border-right: 1px solid #eee;
 }
+
 .ad-slot.sidebar {
   position: sticky;
   top: 2rem;
@@ -37,25 +38,12 @@
   color: #777;
 }
 
-.blog-layout {
-  flex: 1 1 800px;
-  padding: 0 2rem;
-}
-main {
-  flex: 1;
-}
+.blog-layout { flex: 1 1 800px; padding: 0 2rem; }
+main { flex: 1; }
 
-/* === Typography === */
-main h1 {
-  font-weight: 700;
-  color: #111;
-  margin-bottom: 0.8rem;
-}
-main h2 {
-  font-weight: 600;
-  color: #222;
-  margin-top: 2rem;
-}
+/* ==============  Typography  ============== */
+main h1 { font-weight: 700; color: #111; margin-bottom: 0.8rem; }
+main h2 { font-weight: 600; color: #222; margin-top: 2rem; }
 main h3 {
   font-weight: 600;
   font-size: 1.1rem;
@@ -63,6 +51,9 @@ main h3 {
   margin-top: 1.5rem;
   margin-bottom: 0.5rem;
 }
+/* Monochrome headings everywhere (incl. TOC highlight) */
+main h1, main h2, main h3 { color: #111; }
+
 main p {
   font-size: 1.125rem;
   margin-bottom: 1.25rem;
@@ -72,21 +63,13 @@ main p {
   text-overflow: initial !important;
   display: block !important;
 }
-main a {
-  color: #0077cc;
-  text-decoration: none;
-}
-main a:hover {
-  text-decoration: underline;
-}
-main img {
-  max-width: 100%;
-  height: auto;
-  display: block;
-  margin: 1.5rem auto;
-}
 
-/* === Reading Time Box with Icons === */
+main a { color: #0077cc; text-decoration: none; }
+main a:hover { text-decoration: underline; }
+
+main img { max-width: 100%; height: auto; display: block; margin: 1.5rem auto; }
+
+/* ==============  Reading-Time Box  ============== */
 .reading-time-display {
   display: flex;
   justify-content: flex-end;
@@ -98,26 +81,16 @@ main img {
   border-radius: 6px;
   margin: 0.5rem 0 1.25rem 0;
   cursor: default;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
   gap: 1rem;
 }
-.reading-time-display i {
-  color: #444;
-  cursor: pointer;
-  transition: color 0.3s ease;
-}
-.reading-time-display i:hover {
-  color: #000;
-}
-.reading-time-display i.fa-clock + span {
-  margin-left: 1px;
-}
+.reading-time-display i { color: #444; cursor: pointer; transition: color 0.3s ease; }
+.reading-time-display i:hover { color: #000; }
+.reading-time-display i.fa-clock + span { margin-left: 1px; }
 
-/* === TOC Sidebar === */
-.right-toc-slot {
-  flex: 0 0 260px;
-  padding: 2rem 1.5rem 2rem 2.5rem;
-}
+/* ==============  TOC Sidebar  ============== */
+.right-toc-slot { flex: 0 0 260px; padding: 2rem 1.5rem 2rem 2.5rem; }
+
 .toc-box {
   position: sticky;
   top: 2rem;
@@ -127,31 +100,41 @@ main img {
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
-.toc-box .toc-header {
+
+/* Header (stays visible) */
+.toc-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
+  position: sticky;          /* keeps header fixed while list scrolls */
+  top: 0;
+  background: #fafafa;
+  padding-block: 0.25rem;
+  z-index: 1;
 }
-.toc-box .toc-header span {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #222;
+.toc-header span { font-size: 1.1rem; font-weight: 600; color: #222; }
+.toc-box .toggle-icon { font-size: 1.1rem; user-select: none; }
+
+/* Scrollable list wrapper */
+.toc-body {
+  max-height: 70vh;          /* 70 % of viewport height before scrolling */
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
-.toc-box .toggle-icon {
-  font-size: 1.1rem;
-  user-select: none;
+
+/* Minimalist scrollbar (WebKit) */
+.toc-body::-webkit-scrollbar { width: 6px; }
+.toc-body::-webkit-scrollbar-track { background: transparent; }
+.toc-body::-webkit-scrollbar-thumb {
+  background: #a0a0a0;       /* keep grayscale palette */
+  border-radius: 3px;
 }
-.toc-box ul {
-  list-style: none;
-  padding-left: 0;
-  margin-top: 1rem;
-}
-.toc-box li {
-  font-size: 15px;
-  margin-bottom: 0.6rem;
-  padding-left: 0.3rem;
-}
+.toc-body { scrollbar-width: thin; }  /* Firefox */
+
+/* List items */
+.toc-box ul { list-style: none; padding-left: 0; margin-top: 1rem; }
+.toc-box li   { font-size: 15px; margin-bottom: 0.6rem; padding-left: 0.3rem; }
 .toc-box li.subsection {
   margin-left: 1.2rem;
   font-size: 0.95em;
@@ -162,10 +145,7 @@ main img {
   text-decoration: none;
   transition: all 0.2s ease;
 }
-.toc-box a:hover {
-  color: #111;
-  text-decoration: underline;
-}
+.toc-box a:hover { color: #111; text-decoration: underline; }
 .toc-box a.active {
   font-weight: 600;
   border-left: 3px solid #222;
@@ -174,11 +154,11 @@ main img {
   color: #111;
   display: inline-block;
 }
-.toc-box.collapsed ul {
-  display: none;
-}
 
-/* === Interactions (Clap + Comments) === */
+/* Collapse support */
+.toc-box.collapsed .toc-body { display: none; }
+
+/* ==============  Interactions  ============== */
 #interactions {
   display: flex;
   gap: 2rem;
@@ -194,19 +174,12 @@ main img {
   color: #444;
   transition: color 0.3s ease;
 }
-.icon-button i {
-  font-size: 1.4rem;
-}
+.icon-button i { font-size: 1.4rem; }
 .icon-button:hover,
-.icon-button.active {
-  color: #007acc;
-}
-#clap-count {
-  font-weight: 600;
-  color: #007acc;
-}
+.icon-button.active { color: #007acc; }
+#clap-count { font-weight: 600; color: #007acc; }
 
-/* === Comments === */
+/* ==============  Comments  ============== */
 #comment-form {
   display: flex;
   flex-direction: column;
@@ -232,22 +205,14 @@ main img {
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
-#comment-form button:hover {
-  background-color: #005f99;
-}
-#comments-list .comment {
-  margin-bottom: 1.25rem;
-}
-#comments-list .comment p {
-  margin: 0.25rem 0 0.75rem;
-}
+#comment-form button:hover { background-color: #005f99; }
+#comments-list .comment { margin-bottom: 1.25rem; }
+#comments-list .comment p { margin: 0.25rem 0 0.75rem; }
 
-/* === Smooth Scroll === */
-html {
-  scroll-behavior: smooth;
-}
+/* ==============  Smooth Scroll  ============== */
+html { scroll-behavior: smooth; }
 
-/* === Scroll to Top Button === */
+/* ==============  Scroll-to-Top Button  ============== */
 #scrollToTopBtn {
   position: fixed;
   bottom: 40px;
@@ -259,55 +224,43 @@ html {
   font-size: 18px;
   font-weight: bold;
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
   z-index: 1000;
   opacity: 0;
   visibility: hidden;
   transform: translateY(20px);
   transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s ease;
 }
-
 #scrollToTopBtn.show {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
 }
+#scrollToTopBtn:hover { background-color: #111; }
 
-#scrollToTopBtn:hover {
-  background-color: #111;
-}
-
-/* === Footer Link === */
+/* ==============  Footer Link  ============== */
 .footer-link {
   text-align: center;
   font-size: 1rem;
   padding: 2rem 0;
 }
-.footer-link a {
-  color: #333;
-  text-decoration: none;
-}
-.footer-link a:hover {
-  text-decoration: underline;
-}
+.footer-link a { color: #333; text-decoration: none; }
+.footer-link a:hover { text-decoration: underline; }
 
-/* === Responsive === */
+/* ==============  Responsive  ============== */
 @media (max-width: 768px) {
-  .blog-wrapper {
-    flex-direction: column;
-    padding: 1rem;
-  }
-  .left-ad-slot {
-    display: none;
-  }
+  .blog-wrapper { flex-direction: column; padding: 1rem; }
+  .left-ad-slot { display: none; }
   .right-toc-slot {
     width: 100%;
     margin-top: 2rem;
     order: -1;
   }
+  /* Slightly shorter TOC on small screens */
+  .toc-body { max-height: 55vh; }
 }
 
-/* === Final MathJax SVG Styling for Consistent Size === */
+/* ==============  MathJax SVG Styling  ============== */
 mjx-container {
   font-size: 1.05rem;
   overflow-x: auto;
@@ -315,19 +268,11 @@ mjx-container {
   max-width: 100%;
   line-height: 1.6;
 }
-
 mjx-container[display="block"] {
   display: block;
   text-align: center;
   margin: 1rem 0;
 }
-
 mjx-container[display="inline"] {
   white-space: normal !important;
 }
-
-
-
-
-
-
