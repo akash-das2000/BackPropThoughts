@@ -485,6 +485,65 @@ table.tbl th, table.tbl td{
   subsection.
 </p>
 
+<!-- 2.5 three-line Bayes proof of unbiasedness -->
+<h3>2.5&nbsp;Three-line&nbsp;Bayes proof&nbsp;of&nbsp;unbiasedness</h3>
+
+<p class="bridge">
+  Our goal is to show that the free label
+  \( y_t = -\varepsilon / \sigma_t \)
+  satisfies
+  \( \mathbb E\!\bigl[\,y_t \mid x_t\bigr] = s^{\star}(x_t,t) \).
+  The proof is nothing more than the chain rule for logs, an
+  interchange of <span class="math">∇</span> and ∫, and Bayes’ rule.
+</p>
+
+<!-- line 1 -->
+<div class="eq-scroll">\[
+  \underbrace{\nabla_{x_t}\log p_t(x_t)}_{\text{wanted score}}
+  \;=\;
+  \frac{\nabla_{x_t}p_t(x_t)}{p_t(x_t)}
+  \quad
+  \text{(chain rule)}
+\tag{2.4a}\]</div>
+
+<!-- line 2 -->
+<div class="eq-scroll">\[
+  \nabla_{x_t}p_t(x_t)
+  \;=\;
+  \int p_{\text{data}}(x_0)\,
+       \nabla_{x_t}q(x_t \mid x_0)\,dx_0
+  \quad
+  \text{(swap ∇ and ∫)}
+\tag{2.4b}\]</div>
+
+<!-- line 3 -->
+<div class="eq-scroll">\[
+  \frac{1}{p_t(x_t)}
+  \int p_{\text{data}}(x_0)\,
+       q(x_t\mid x_0)\;
+       \Bigl(-\tfrac{\varepsilon}{\sigma_t}\Bigr)\,dx_0
+  \;=\;
+  \mathbb E_{x_0\sim p(\,\cdot\mid x_t)}
+          \bigl[\,y_t\,\bigr]
+  \quad
+  \text{(plug \(y_t\), recognise posterior)}
+\tag{2.4c}\]</div>
+
+<p class="explain">
+  Combine (2.4a)–(2.4c) and the conditional expectation equals the
+  marginal score:
+  \[
+     \boxed{\;
+       \mathbb E\!\bigl[\,y_t \mid x_t\bigr]
+       \;=\;
+       s^{\star}(x_t,t)
+     \;}. \tag{2.5}
+  \]
+  An outer expectation over \(x_t\) keeps the equality, so
+  replacing the unknown score by \(y_t\) in our loss is <em>unbiased</em>.
+</p>
+
+
 
 
 
