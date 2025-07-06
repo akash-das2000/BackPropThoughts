@@ -124,10 +124,24 @@ table.tbl th, table.tbl td{
   .eq-scroll{ font-size: .9rem; }
 }
 
+  /* === bridge === */
 .bridge{
   font-size: .95rem;
   margin: .8rem 0 1.1rem 0;
   color:#444;
+
+  /* === python code === */
+.codeblock{
+  background: #f6f8fa;
+  border: 1px solid #e1e4e8;
+  border-radius: 6px;
+  padding: .75rem 1rem;
+  font-family: ui-monospace, "SF Mono", "Roboto Mono", monospace;
+  font-size: .93rem;
+  overflow-x: auto;          /* side-scroll on narrow screens   */
+  margin: 1rem 0 1.5rem 0;
+}
+
 }
 
 </style>
@@ -566,6 +580,33 @@ table.tbl th, table.tbl td{
   diffusion code-bases.
 </p>
 
+<p class="bridge">
+  <strong>A 30-second Fisher–divergence refresher.</strong><br>
+  Whereas maximum likelihood measures the gap between two densities by
+  comparing their <em>heights</em>, the Fisher divergence compares their
+  <em>slopes</em>:
+  \[
+    D_F\bigl(p_{\text{data}}\|p_\theta\bigr)
+    \;=\;
+    \tfrac12
+    \int p_{\text{data}}(x)\,
+         \bigl\|
+           \nabla_x \log p_\theta(x)
+           -
+           \nabla_x \log p_{\text{data}}(x)
+         \bigr\|^{2}\,dx .
+  \]
+  Matching slopes is golden for diffusion models because
+  the gradient of a log-density
+  \( \nabla_x\log p_\theta(x) \)
+  <em>does not depend</em> on the intractable normalising constant
+  \( Z_\theta \).
+  By driving this slope-gap to zero, we avoid the partition-function
+  bottleneck altogether and still push the model toward the true data
+  manifold.
+</p>
+
+
 <!-- 3.1 one-timestep Fisher divergence -->
 <h3>3.1&nbsp;Single-timestep Fisher divergence</h3>
 
@@ -649,8 +690,10 @@ table.tbl th, table.tbl td{
   In PyTorch that reduces to the canonical&nbsp;one-liner:
 </p>
 
-```python
-loss = F.mse_loss(pred_eps, eps)    # identical objective
+<pre class="codeblock"><code class="language-python">
+loss = F.mse_loss(pred_eps, eps)   # identical objective
+</code></pre>
+
 
 
 
