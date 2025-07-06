@@ -4,62 +4,46 @@
   <meta charset="UTF-8" />
   <title>Blog Post</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Stylesheets -->
   <link rel="stylesheet" href="css/post.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
   <!-- MathJax configuration FIRST -->
   <script>
     window.MathJax = {
-      tex: {
-        inlineMath: [['\\(', '\\)']],
-        displayMath: [['\\[', '\\]']]
-      },
-      svg: {
-        scale: 1,               // scale relative to surrounding text
-        minScale: 1,            // prevent shrinking
-        fontCache: 'none',      // render each expression independently
-      },
-      options: {
-        renderActions: {
-          addMenu: []
-        }
-      },
-      startup: {
-        typeset: false
-      }
+      tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+      svg: { scale: 1, minScale: 1, fontCache: 'none' },
+      options: { renderActions: { addMenu: [] } },
+      startup: { typeset: false }
     };
   </script>
   <script defer id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2643907020636961"
-     crossorigin="anonymous"></script>
-</head>
-<body>
 
+  <!-- Google Ads (optional) -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2643907020636961" crossorigin="anonymous"></script>
+</head>
+
+<body>
   <div class="blog-wrapper">
 
-    <!-- Left Ad Slot -->
+    <!-- Left Ad -->
     <aside class="left-ad-slot">
       <div class="ad-slot sidebar">Ad Placeholder</div>
     </aside>
 
-    <!-- Main Blog Content -->
+    <!-- Main Content -->
     <div class="blog-layout">
       <main>
 
-        <!-- Ad at Top of Post -->
-        <div class="ad-slot top-ad">
-          <em>Ad Placeholder (Top)</em>
-        </div>
+        <!-- Top Ad -->
+        <div class="ad-slot top-ad"><em>Ad Placeholder (Top)</em></div>
 
-        <!-- Blog content -->
-        <div id="post-content">
-          <!-- Content injected by postLoader.js -->
-        </div>
+        <!-- Blog content injected by JS -->
+        <div id="post-content"></div>
 
-        <!-- Ad at Bottom of Post -->
-        <div class="ad-slot bottom-ad">
-          <em>Ad Placeholder (Bottom)</em>
-        </div>
+        <!-- Bottom Ad -->
+        <div class="ad-slot bottom-ad"><em>Ad Placeholder (Bottom)</em></div>
 
         <!-- Interactions -->
         <section id="interactions">
@@ -74,7 +58,7 @@
         </section>
 
         <!-- Comments -->
-        <section id="comments-section" style="display: none;">
+        <section id="comments-section" style="display:none;">
           <h2>Leave a Comment</h2>
           <form id="comment-form">
             <input type="text" id="name" placeholder="Your name" required />
@@ -92,8 +76,17 @@
     <!-- Right TOC -->
     <aside class="right-toc-slot">
       <div class="toc-box">
-        <div class="toc-header"></div>
-        <ul id="toc-list"></ul>
+
+        <!-- Header stays visible while list scrolls -->
+        <div class="toc-header" id="tocToggle" aria-expanded="true">
+          <span>Table of Contents</span>
+          <i class="fa-solid fa-chevron-down toggle-icon"></i>
+        </div>
+
+        <!-- Scrollable wrapper -->
+        <div class="toc-body">
+          <ul id="toc-list"></ul>   <!-- JS injects links here -->
+        </div>
       </div>
     </aside>
   </div>
@@ -103,7 +96,7 @@
     <p class="footer-link"><a href="allBlogs.html">← Back to Home</a></p>
   </footer>
 
-  <!-- Scroll to Top Button -->
+  <!-- Scroll-to-Top -->
   <button id="scrollToTopBtn" title="Scroll to top">
     <i class="fa-solid fa-chevron-up"></i>
   </button>
