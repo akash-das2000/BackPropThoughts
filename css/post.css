@@ -68,43 +68,42 @@ main a         { color: #0077cc; text-decoration: none; }
 main a:hover   { text-decoration: underline; }
 main img       { max-width: 100%; height: auto; display: block; margin: 1.5rem auto; }
 
-/* ==============  Meta Bar (date | icons | time)  ============== */
+/* === Meta bar (date | icons | time) ======================= */
 .reading-time-display{
-  display: flex;
-  justify-content: space-between;   /* date left | icons right */
-  align-items: center;
-  font-size: 0.9rem;
-  color: #333;
-  background: #f7f7f7;
-  padding: 4px 10px;
-  border-radius: 6px;
-  margin: 0.5rem 0 1.25rem 0;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  display:flex;
+  justify-content:space-between;   /* date left | icons right */
+  align-items:center;
+  font-size:0.9rem;
+  color:#333;
+  background:#f7f7f7;
+  padding:4px 10px;
+  border-radius:6px;
+  margin:0.5rem 0 1.25rem 0;
+  box-shadow:0 1px 3px rgba(0,0,0,0.08);
 }
 
-.post-date{                          /* left-side date */
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-weight: 500;
-  color: #444;
+.post-date{                         /* date block */
+  display:flex;
+  align-items:center;
+  gap:0.35rem;
+  font-weight:500;
+  color:#444;
 }
 
-.meta-icons{                         /* right-side group */
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+.meta-icons{                        /* icon cluster */
+  display:flex;
+  align-items:center;
+  gap:1.2rem;
 }
 
 .meta-icons i{
-  color: #444;
-  cursor: pointer;
-  transition: color 0.3s ease;
+  color:#444;
+  cursor:pointer;
+  transition:color 0.3s ease;
 }
-.meta-icons i:hover{ color: #000; }
+.meta-icons i:hover{ color:#000; }
 
-/* tiny adjustment for “19 min” spacing */
-.meta-icons i.fa-clock + span{ margin-left: 1px; }
+.meta-icons i.fa-clock + span{ margin-left:2px; }
 
 /* ==============  TOC Sidebar  ============== */
 .right-toc-slot { flex: 0 0 260px; padding: 2rem 1.5rem 2rem 2.5rem; }
