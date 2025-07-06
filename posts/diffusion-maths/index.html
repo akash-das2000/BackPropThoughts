@@ -1,1 +1,38 @@
+<style>
+  /* Put your styles here */
+  .tldr{
+    border: 2px solid #4f81ff;
+    padding:1rem 1.25rem;
+    border-radius:0.5rem;
+    background:#f7fbff;
+  }
+  .tldr h2{margin-top:0}
+  .tldr ol{margin-left:1.2rem}
+</style>
+<section>
+<!-- =======================  Header   ======================= -->
+<h1 id="diffusion-maths">The Mathematical Foundations of Diffusion Models <small>(A self-contained mini-monograph)</small></h1>
 
+<!-- =======================  TL;DR box ======================= -->
+<aside class="tldr">
+  <h2>TL;DR</h2>
+  <p>
+    Diffusion models generate images in two conceptual moves:
+  </p>
+  <ol>
+    <li>
+      <strong>Corrupt&nbsp;the data.</strong>  
+      Each clean image is progressively blended with analytically-tractable Gaussian noise.
+    </li>
+    <li>
+      <strong>Learn&nbsp;the score.</strong>  
+      A neural network is trained—via an ordinary mean-squared-error loss—to predict the <em>gradient</em> of the log-density (the “score”) of every noisy distribution.
+    </li>
+  </ol>
+  <p>
+    Once that score field is known, a <em>reverse-time stochastic differential equation</em>
+    (or an equivalent deterministic ODE) can be integrated to
+    push pure white noise back onto the data manifold—yielding photorealistic
+    images without adversarial training or intractable likelihoods.
+  </p>
+</aside>
