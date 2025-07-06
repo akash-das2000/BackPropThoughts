@@ -262,7 +262,7 @@ table.tbl th, table.tbl td{
   Master these three steps and you hold the <em>entire</em> forward half of a diffusion model in your hands.
 </p>
 <!-- 1.1 one tiny noise injection -->
-<h3>1.1&nbsp;One tiny noise injection</h3>
+<h3 id="noise-injection">1.1&nbsp;One tiny noise injection</h3>
 
 <p>
   Think of the forward process as a photographic fade-out:
@@ -285,7 +285,7 @@ table.tbl th, table.tbl td{
 </p>
 
 <!-- 1.2 repeat t times -->
-<h3>1.2&nbsp;Repeat <em>t</em> steps &rarr; one closed-form jump</h3>
+<h3 id="repeat-steps">1.2&nbsp;Repeat <em>t</em> steps &rarr; one closed-form jump</h3>
 
 <p>
   Apply (1.1) successively with variances
@@ -309,7 +309,7 @@ table.tbl th, table.tbl td{
 </p>
 
 <!-- 1.3 conditional kernel -->
-<h3>1.3&nbsp;Conditional density \( q(x_t \mid x_0) \)</h3>
+<h3 id="conditional-density">1.3&nbsp;Conditional density \( q(x_t \mid x_0) \)</h3>
 
 <p>
   Any affine map of a Gaussian remains Gaussian, so conditioning on the
@@ -348,7 +348,7 @@ table.tbl th, table.tbl td{
 </p>
 
 <!-- 2.1 What is a score? -->
-<h3>2.1&nbsp;What is a score?</h3>
+<h3 id="what-is-score">2.1&nbsp;What is a score?</h3>
 <p>
   For any probability density \( p(z) \) the&nbsp;
   <em>score</em> is defined as
@@ -359,7 +359,7 @@ table.tbl th, table.tbl td{
 </p>
 
 <!-- 2.2 Gradient of the Gaussian kernel -->
-<h3>2.2&nbsp;Gradient of the Gaussian&nbsp;kernel (one-liner!)</h3>
+<h3 id="graodent-of-gaussian">2.2&nbsp;Gradient of the Gaussian&nbsp;kernel (one-liner!)</h3>
 <!-- quick recap of x_t and alpha-bar_t -->
 <p class="bridge">
   <strong>Recall the forward step.</strong>&nbsp;
@@ -397,7 +397,7 @@ table.tbl th, table.tbl td{
 </p>
 
 <!-- 2.3 Training label inside each mini-batch -->
-<h3>2.3&nbsp;Training label in every mini-batch</h3>
+<h3 id="train-label">2.3&nbsp;Training label in every mini-batch</h3>
 <p>
   During training we <em>know</em> the exact noise
   \( \varepsilon \) we injected when we built \( x_t \).
