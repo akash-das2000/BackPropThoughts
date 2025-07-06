@@ -1,5 +1,6 @@
 <style>
   /* Put your styles here */
+  /* --- TL;DR --- */
   .tldr{
     border: 2px solid #4f81ff;
     padding:1rem 1.25rem;
@@ -8,6 +9,44 @@
   }
   .tldr h2{margin-top:0}
   .tldr ol{margin-left:1.2rem}
+
+  /* --- shared table look --- */
+table.tbl{
+  width: 100%;
+  border-collapse: collapse;
+  margin: 2rem 0 2.5rem 0;
+  font-size: 0.95rem;
+}
+
+table.tbl caption{
+  caption-side: top;
+  font-weight: 600;
+  margin-bottom: .4rem;
+}
+
+table.tbl th,
+table.tbl td{
+  border: 1px solid #d0d0d0;
+  padding: .45rem .65rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+table.tbl thead{
+  background: #f5f7ff;
+}
+
+table.tbl .shape{
+  font-family: "Roboto Mono", ui-monospace, monospace;
+  white-space: nowrap;
+}
+
+/* separate tone for the “facts” table */
+.fact-table th{
+  background:#f5f5f5;
+  width: 160px;
+}
+
 </style>
 <section>
 <!-- =======================  Header   ======================= -->
@@ -37,81 +76,76 @@
   </p>
 </aside>
 
-  <table class="tbl">
-  <!-- ============  Notation  ============ -->
+  <!-- ============  Notation Cheat-Sheet & Shapes  ============ -->
+<table class="tbl note-table">
+  <caption>Notation Cheat-Sheet &amp; Typical Shapes</caption>
   <thead>
     <tr>
-      <th colspan="3">Notation Cheat-Sheet &amp; Shapes</th>
-    </tr>
-    <tr>
       <th>Symbol</th>
-      <th>Plain-language meaning</th>
-      <th>Typical shape / note</th>
+      <th>Meaning (plain language)</th>
+      <th class="shape">Typical shape / note</th>
     </tr>
   </thead>
 
-  <h2 id="notations">Notations</h2>
-
   <tbody>
-    <tr><td><code>x_0&nbsp;∈&nbsp;ℝ<sup>d</sup></code></td>
+    <tr><td><code>x<sub>0</sub> ∈ ℝ<sup>d</sup></code></td>
         <td>clean data vector (flattened image)</td>
-        <td><code>d&nbsp;=&nbsp;3HW</code></td></tr>
+        <td class="shape"><code>d = 3 H W</code></td></tr>
 
-    <tr><td><code>t&nbsp;∈&nbsp;{0,…,T}</code></td>
+    <tr><td><code>t ∈ {0,…,T}</code></td>
         <td>discrete diffusion timestep</td>
-        <td>integer</td></tr>
+        <td class="shape">integer</td></tr>
 
-    <tr><td><code>α_t&nbsp;(0&lt;α_t&lt;1)</code></td>
-        <td>retain-signal factor at step&nbsp;<code>t</code></td>
-        <td>scalar</td></tr>
+    <tr><td><code>α<sub>t</sub></code></td>
+        <td>retain-signal factor at step <code>t</code></td>
+        <td class="shape">scalar in (0,1)</td></tr>
 
-    <tr><td><code>𝛼̄_t&nbsp;=&nbsp;∏_{s=1}^{t}α_s</code></td>
+    <tr><td><code>𝛼̄<sub>t</sub> = ∏<sub>s=1</sub><sup>t</sup> α<sub>s</sub></code></td>
         <td>cumulative signal survival</td>
-        <td>scalar</td></tr>
+        <td class="shape">scalar</td></tr>
 
-    <tr><td><code>σ_t&nbsp;=&nbsp;√(1−𝛼̄_t)</code></td>
-        <td>total noise std-dev after step&nbsp;<code>t</code></td>
-        <td>scalar</td></tr>
+    <tr><td><code>σ<sub>t</sub> = √(1-𝛼̄<sub>t</sub>)</code></td>
+        <td>total noise std-dev after step <code>t</code></td>
+        <td class="shape">scalar</td></tr>
 
-    <tr><td><code>ε&nbsp;∼&nbsp;𝒩(0,I_d)</code></td>
+    <tr><td><code>ε ∼ 𝒩(0,I<sub>d</sub>)</code></td>
         <td>fresh isotropic Gaussian noise</td>
-        <td><code>ℝ<sup>d</sup></code></td></tr>
+        <td class="shape"><code>ℝ<sup>d</sup></code></td></tr>
 
     <tr><td><code>p<sub>data</sub></code></td>
-        <td>true—but unknown—data density</td>
-        <td>never written in closed form</td></tr>
+        <td>true—but unknown—image data density</td>
+        <td class="shape">never explicit</td></tr>
 
-    <tr><td><code>q(x_t&nbsp;|&nbsp;x_0)</code></td>
-        <td>forward/noising kernel (Gaussian)</td>
-        <td>analytic</td></tr>
+    <tr><td><code>q(x<sub>t</sub> | x<sub>0</sub>)</code></td>
+        <td>designer-chosen Gaussian noising kernel</td>
+        <td class="shape">analytic</td></tr>
 
-    <tr><td><code>p_t(x_t)</code></td>
+    <tr><td><code>p<sub>t</sub>(x<sub>t</sub>)</code></td>
         <td>marginal noisy density after corruption</td>
-        <td>unknown but samplable</td></tr>
+        <td class="shape">unknown but samplable</td></tr>
 
-    <tr><td><code>s_θ(x_t,t)</code></td>
+    <tr><td><code>s<sub>θ</sub>(x<sub>t</sub>,t)</code></td>
         <td>neural network score estimator</td>
-        <td>same shape as <code>x_t</code></td></tr>
-
-    <!-- ============  Toolbox  ============ -->
-    <tr><th colspan="3" style="text-align:center">Stock-the-Toolbox Facts</th></tr>
-
-    <tr><td><strong>Gaussian&nbsp;PDF</strong></td>
-        <td colspan="2">
-          <code>ϕ_Σ(z)=exp(-½ z<sup>⊤</sup>Σ<sup>−1</sup>z) / √((2π)<sup>d</sup> det Σ)</code>
-        </td></tr>
-
-    <tr><td><strong>Quadratic&nbsp;grad</strong></td>
-        <td colspan="2"><code>∇_x‖x−a‖<sup>2</sup> = 2(x−a)</code></td></tr>
-
-    <tr><td><strong>Chain rule for logs</strong></td>
-        <td colspan="2"><code>∇ log f = (∇f) / f</code></td></tr>
-
-    <tr><td><strong>Affine–Gaussian rule</strong></td>
-        <td colspan="2">
-          If <code>Z∼𝒩(0,I)</code> and <code>Y=a+BZ</code> then
-          <code>Y∼𝒩(a, B B<sup>⊤</sup>)</code>.
-        </td></tr>
+        <td class="shape">same shape as <code>x<sub>t</sub></code></td></tr>
   </tbody>
 </table>
+
+<!-- ============  Stock-the-Toolbox Facts  ============ -->
+<table class="tbl fact-table">
+  <caption>Stock-the-Toolbox Facts (handy formulas)</caption>
+  <tbody>
+    <tr><th>Gaussian PDF</th>
+        <td><code>ϕ<sub>Σ</sub>(z) = exp(-½ z<sup>⊤</sup>Σ<sup>-1</sup>z) / √((2π)<sup>d</sup> det Σ)</code></td></tr>
+
+    <tr><th>Quadratic gradient</th>
+        <td><code>∇<sub>x</sub>‖x-a‖<sup>2</sup> = 2 (x-a)</code></td></tr>
+
+    <tr><th>Chain rule for logs</th>
+        <td><code>∇ log f = (∇f) / f</code></td></tr>
+
+    <tr><th>Affine-Gaussian rule</th>
+        <td>If <code>Z∼𝒩(0,I)</code> and <code>Y=a+BZ</code> then <code>Y∼𝒩(a, B B<sup>⊤</sup>)</code>.</td></tr>
+  </tbody>
+</table>
+
 
