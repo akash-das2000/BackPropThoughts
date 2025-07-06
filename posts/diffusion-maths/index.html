@@ -1278,7 +1278,7 @@ trace_est = (Hv * v).sum()              # vᵀ H v ≈ tr(H)
 <h2 id="conclusion">9.&nbsp;Conclusion</h2>
 
 <p>
-  We began with the simplest act of “adding Gaussian snow” to an image and
+  We began with the simplest act of “adding Gaussian noise” to an image and
   uncovered a chain of results whose elegance belies their impact.  A
   closed-form forward kernel let us write the conditional score in a single
   line; Bayes’ rule then turned that score into an <em>unbiased label</em>
@@ -1300,7 +1300,7 @@ trace_est = (Hv * v).sum()              # vᵀ H v ≈ tr(H)
 
 <p>
   What finally matters for practitioners is that this entire theoretical
-  scaffold collapses into four terse lines of PyTorch: build a U-Net,
+  scaffold collapses into four lines of PyTorch: build an architecture,
   corrupt data with the forward kernel, fabricate the label
   <code>-ε/σ<sub>t</sub></code>, and drive an MSE loss.  Everything else—
   schedules, EMA, or GPU wizardry—merely polishes those four lines.  In that
