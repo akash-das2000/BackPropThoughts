@@ -452,6 +452,40 @@ table.tbl th, table.tbl td{
   we do that in the next subsection using a three-line Bayes trick.
 </p>
 
+<!-- 2.4 the marginal score we really want -->
+<h3 id="marginal-score">2.4&nbsp;The marginal score we really want</h3>
+
+<p class="bridge">
+  The label \( y_t \) we just fabricated is derived from the
+  <em>conditional</em> density \( q(x_t\mid x_0) \),
+  but generation will ultimately need the score of the
+  <strong>marginal</strong> noisy distribution&nbsp;
+  \( p_t(x_t) \).
+  Let’s write that object explicitly.
+</p>
+
+<div class="eq-scroll">\[
+  s^{\star}(x_t,t) \;:=\;
+  \nabla_{x_t}\log p_t(x_t),
+  \qquad
+  p_t(x_t)
+  \;=\;
+  \int p_{\text{data}}(x_0)\,
+       q(x_t \mid x_0)\,
+       dx_0.
+\tag{2.3}\]</div>
+
+<p class="explain">
+  Sadly, \( p_t(x_t) \) has no closed form because
+  \( p_{\text{data}} \) is unknown.
+  The magic of diffusion is that the label
+  \( y_t = -\varepsilon / \sigma_t \)
+  turns out to be an <em>unbiased</em> estimator of this intractable
+  score.  We prove that with a three-line Bayes trick in the next
+  subsection.
+</p>
+
+
 
 
 
