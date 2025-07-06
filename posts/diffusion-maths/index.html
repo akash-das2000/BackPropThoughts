@@ -73,6 +73,43 @@ table.tbl .shape{
 
 }
 
+/* ========= 1. responsive tables ========= */
+table.tbl{
+  width:100%;
+  border-collapse:collapse;
+  margin: 2rem 0 2.5rem 0;
+  font-size:.95rem;
+  display:block;              /*  <— ensures its own scroll box  */
+  overflow-x:auto;            /*  <— side-scroll on mobile        */
+}
+table.tbl thead, table.tbl tbody{
+  width:100%;                 /* keeps header & body aligned      */
+}
+table.tbl th, table.tbl td{
+  white-space:nowrap;         /* keep long symbols on one line    */
+}
+
+/* ========= 2. responsive display equations ========= */
+.display-math{
+  display:block;
+  overflow-x:auto;            /* side-scroll if too wide          */
+  white-space:nowrap;         /* KaTeX/MathJax span stays together*/
+  text-align:center;
+  margin:1.2rem auto;
+  font-size:1.02rem;
+}
+
+/* shrink math a bit on narrow screens */
+@media (max-width: 600px){
+  .display-math{
+    font-size:.9rem;
+  }
+  table.tbl{
+    font-size:.9rem;
+  }
+}
+
+
 </style>
 <section>
 <!-- =======================  Header   ======================= -->
