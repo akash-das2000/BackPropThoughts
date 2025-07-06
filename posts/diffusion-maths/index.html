@@ -109,6 +109,21 @@ table.tbl th, table.tbl td{
   }
 }
 
+/* === scrollable equations === */
+.eq-scroll{
+  overflow-x: auto;           /* side-scroll on phones            */
+  overflow-y: hidden;
+  white-space: nowrap;        /* keep the math in one line        */
+  -webkit-overflow-scrolling: touch;
+  text-align: center;
+  margin: 1.2rem auto;
+  padding: 0.15rem 0;         /* a hair of breathing room         */
+  font-size: 1.02rem;         /* desktop size                     */
+}
+@media (max-width:600px){
+  .eq-scroll{ font-size: .9rem; }
+}
+
 
 </style>
 <section>
@@ -251,12 +266,12 @@ table.tbl th, table.tbl td{
   exactly how much signal versus noise we keep.
 </p>
 
-<p class="display-math">\[
+<div class="eq-scroll">\[
   x' \;=\; \sqrt{\,1-\beta\,}\;x
         \;+\; \sqrt{\beta}\;\varepsilon,
   \qquad
   \varepsilon \sim \mathcal N(0,I_d).
-\tag{1.1}\]</p>
+\tag{1.1}\]</div>
 
 <p>
   The square-root factors guarantee the variance of \(x'\) is
@@ -274,12 +289,12 @@ table.tbl th, table.tbl td{
   Induction collapses the chain into one affine transform:
 </p>
 
-<p class="display-math">\[
+<div class="eq-scroll">\[
   x_t \;=\; \sqrt{\bar\alpha_t}\,x_0
         \;+\; \sqrt{1-\bar\alpha_t}\,\varepsilon,
   \qquad
   \bar\alpha_t := \prod_{s=1}^{t}\alpha_s .
-\tag{1.2}\]</p>
+\tag{1.2}\]</div>
 
 <p>
   In words: after \(t\) steps a fixed share
@@ -296,7 +311,7 @@ table.tbl th, table.tbl td{
   clean image \(x_0\) we obtain an <em>analytic</em> forward kernel:
 </p>
 
-<p class="display-math">\[
+<div class="eq-scroll">\[
   q(x_t \mid x_0)
   \;=\;
   \mathcal N\!\bigl(
@@ -304,7 +319,7 @@ table.tbl th, table.tbl td{
       \sqrt{\bar\alpha_t}\,x_0,\;
       \sigma_t^2 I_d
   \bigr).
-\tag{1.3}\]</p>
+\tag{1.3}\]</div>
 
 <p>
   Equation&nbsp;(1.3) is a workhorse: its gradient will give us a
@@ -346,7 +361,7 @@ table.tbl th, table.tbl td{
   (using the quadratic-gradient rule) gives
 </p>
 
-<p class="display-math">\[
+<div class="eq-scroll">\[
   \nabla_{x_t}\log q(x_t\mid x_0)
   \;=\;
   -\frac{x_t - \sqrt{\bar\alpha_t}\,x_0}{1-\bar\alpha_t}
@@ -354,7 +369,7 @@ table.tbl th, table.tbl td{
   -\frac{\varepsilon}{\sigma_t},
   \qquad
   \bigl(\sigma_t^2 = 1-\bar\alpha_t\bigr).
-\tag{2.1}\]</p>
+\tag{2.1}\]</div>
 
 <p class="explain">
   Beautifully simple: the score of the <em>conditional</em> Gaussian is
@@ -369,9 +384,9 @@ table.tbl th, table.tbl td{
   Hence we can compute a <strong>free, per-image, per-timestep label</strong>
 </p>
 
-<p class="display-math">\[
+<div class="eq-scroll">\[
   y_t := -\,\varepsilon / \sigma_t.
-\tag{2.2}\]</p>
+\tag{2.2}\]</div>
 
 <p class="explain">
   No approximation, no Monte-Carlo &mdash; \( y_t \) drops out of thin air
