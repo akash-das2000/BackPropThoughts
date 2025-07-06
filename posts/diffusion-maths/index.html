@@ -554,6 +554,103 @@ table.tbl th, table.tbl td{
   introduces <em>no bias whatsoever</em>.
 </p>
 
+<!-- =====================================================
+     3. From Fisher Divergence to a One-Line PyTorch Loss
+     ===================================================== -->
+<h2 id="loss">3.&nbsp;From Fisher Divergence&nbsp;to a One-Line&nbsp;PyTorch&nbsp;Loss</h2>
+
+<p class="lead">
+  With an unbiased label \(y_t\) in hand, we can rewrite the
+  Fisher-divergence objective so that <em>every unknown quantity drops
+  out</em>.  The result is the single MSE line that powers all modern
+  diffusion code-bases.
+</p>
+
+<!-- 3.1 one-timestep Fisher divergence -->
+<h3>3.1&nbsp;Single-timestep Fisher divergence</h3>
+
+<div class="eq-scroll">\[
+  \mathcal L_t(\theta)
+  \;=\;
+  \tfrac12\,
+  \mathbb E_{p_t}
+    \bigl\|
+      s_\theta(x_t,t)
+      -\nabla_{x_t}\log p_t(x_t)
+    \bigr\|^{2}.
+\tag{3.1}\]</div>
+
+<!-- 3.2 swap score for label -->
+<h3>3.2&nbsp;Swap the unknown score for its label</h3>
+
+<p class="bridge">
+  Using the equality
+  \( \mathbb E[\,y_t \mid x_t] = \nabla_{x_t}\log p_t(x_t) \)
+  proved in Section 2.5, we can replace the intractable score by
+  \( y_t = -\varepsilon/\sigma_t \):
+</p>
+
+<div class="eq-scroll">\[
+  \mathcal L_t(\theta)
+  \;=\;
+  \tfrac12\,
+  \mathbb E_{x_0,\varepsilon}
+    \bigl\|
+      s_\theta(x_t,t)
+      +\tfrac{\varepsilon}{\sigma_t}
+    \bigr\|^{2}.
+\tag{3.2}\]</div>
+
+<!-- 3.3 aggregate over timesteps -->
+<h3>3.3&nbsp;Aggregate over all timesteps</h3>
+
+<p>
+  Sample \(t\) uniformly (or with any weighting schedule) to get the full
+  training objective:
+</p>
+
+<div class="eq-scroll">\[
+  \boxed{%
+  \mathcal L(\theta)
+  \;=\;
+  \mathbb E_{\,t,x_0,\varepsilon}
+    \bigl\|
+      s_\theta(x_t,t)
+      +\tfrac{\varepsilon}{\sigma_t}
+    \bigr\|^{2}
+  }.
+\tag{3.3}\]</div>
+
+<p class="explain">
+  All expectations are taken over quantities we <em>sample directly</em>
+  (data, noise, timestep), so the loss is fully computable.
+</p>
+
+<!-- 3.4 predict-noise variant -->
+<h3>3.4&nbsp;Predict-noise variant &amp; PyTorch one-liner</h3>
+
+<p>
+  Many implementations train the network to output raw noise rather than
+  the score.  Define
+  \( \hat\varepsilon_\theta := -\sigma_t\,s_\theta(x_t,t) \); then
+  Eq.&nbsp;(3.3) becomes
+</p>
+
+<div class="eq-scroll">\[
+  \mathcal L(\theta)
+  \;=\;
+  \mathbb E_{\,t,x_0,\varepsilon}
+    \bigl\|
+      \hat\varepsilon_\theta - \varepsilon
+    \bigr\|^{2}.
+\tag{3.4}\]</div>
+
+<p class="explain">
+  In PyTorch that reduces to the canonical&nbsp;one-liner:
+</p>
+
+```python
+loss = F.mse_loss(pred_eps, eps)    # identical objective
 
 
 
