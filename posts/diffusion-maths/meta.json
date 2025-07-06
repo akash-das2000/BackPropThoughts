@@ -1,5 +1,5 @@
 {
-  "title": A Mathematical Approach to Score-Based Diffusion Models: From Foundations to Photorealistic Sampling,
+  "title": "A Mathematical Approach to Score-Based Diffusion Models: From Foundations to Photorealistic Sampling",
   "summary": "An in-depth mathematical journey through score-based diffusion: derive the analytic noising kernel, obtain unbiased score labels via Bayes’ rule, eliminate partition functions with Hyvärinen’s integration-by-parts, connect denoising auto-encoders through Vincent’s Taylor expansion, and implement everything in four lines of PyTorch with numerical hacks like the Hutchinson trace trick.",
   "category": ["Foundations", "Algorithms"]
 }
