@@ -131,41 +131,40 @@ table.tbl th, table.tbl td{
   color:#444;
 
   /* === python code === */
-/* ----------  code styling  ---------- */
-  pre,
-  code{
-    font-family: "Fira Code", "SFMono-Regular", ui-monospace, monospace;
-    font-size: 0.92rem;          /* default desktop size */
-  }
+/* ——— GitHub-ish grey “code card” ——— */
+.code-card{
+  background:#f6f8fa;           /* light-grey panel */
+  border:1px solid #d0d7de;     /* mid-grey outline */
+  border-radius:6px;
+  overflow:hidden;
+  margin:1.6rem 0;              /* spacing above/below */
+}
 
-  /* inline code (pill) */
-  code{
-    background:#f3f4f6;
-    color:#1a1a1a;
-    padding:0 .25em;
-    border-radius:4px;
-  }
+.code-card .code-header{
+  background:#eaeef2;           /* slightly darker strip */
+  border-bottom:1px solid #d0d7de;
+  font: .75rem/1 system-ui, sans-serif;
+  color:#24292f;
+  padding:.45rem .9rem;
+  text-transform:lowercase;
+}
 
-  /* multi-line code blocks */
-  pre{
-    background:#f8f9fb;
-    border:1px solid #cfd2d7;
-    border-radius:6px;
-    padding:0.9rem 1rem;
-    line-height:1.45;
-    overflow-x:auto;
-    margin:1.6rem 0;
-  }
-  pre code{                     /* remove double background */
-    background:none;
-    padding:0;
-  }
+.code-card pre{
+  margin:0;
+  padding:.8rem 1rem;
+  background:inherit;           /* same as card */
+  overflow-x:auto;
+  font-family:"Fira Code","SFMono-Regular",ui-monospace,monospace;
+  font-size:.92rem;
+  line-height:1.45;
+  white-space:pre;              /* keep indentation */
+}
 
-  /* ----------  shrink code on phones  ---------- */
-  @media (max-width: 600px){
-    pre{  font-size: 0.82rem; } /* multi-line blocks */
-    code{ font-size: 0.86rem; } /* inline pills      */
-  }
+/* shrink code font on narrow screens */
+@media (max-width:600px){
+  .code-card pre{ font-size:.82rem; }
+}
+
 
 }
 
@@ -727,14 +726,10 @@ table.tbl th, table.tbl td{
   In PyTorch that reduces to the canonical&nbsp;one-liner:
 </p>
 
-<pre><code class="language-python">
-# forward pass
-pred_eps = model(x_t, t_embed)
-
-# loss (identical objective)
-loss = F.mse_loss(pred_eps, eps)
-loss.backward()
-</code></pre>
+<div class="code-card">
+  <div class="code-header">python</div>
+  <pre><code>loss = F.mse_loss(pred_eps, eps)</code></pre>
+</div>
 
 
 
