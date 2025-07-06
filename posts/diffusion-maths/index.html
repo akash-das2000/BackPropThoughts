@@ -705,9 +705,9 @@ pre code{background:none;padding:0}
 
 
 <!-- =====================================================
-     6. Hyvärinen Score Matching — Full Integration-by-Parts Walk-Through
+     4. Hyvärinen Score Matching — Full Integration-by-Parts Walk-Through
      ===================================================== -->
-<h2 id="hyvarinen">6.&nbsp;Hyvärinen&nbsp;Score&nbsp;Matching &mdash; Integration-by-Parts Walk-Through</h2>
+<h2 id="hyvarinen">4.&nbsp;Hyvärinen&nbsp;Score&nbsp;Matching &mdash; Integration-by-Parts Walk-Through</h2>
 
 <p class="lead">
   Fisher divergence lets us compare two probability densities without
@@ -722,8 +722,8 @@ pre code{background:none;padding:0}
   leaving a loss we can evaluate with automatic differentiation alone.
 </p>
 
-<!-- 6.1 why we need it -->
-<h3 id="hyvarinen-why">6.1&nbsp;Why we need it</h3>
+<!-- 4.1 why we need it -->
+<h3 id="hyvarinen-why">4.1&nbsp;Why we need it</h3>
 <p>
   We want a discrepancy measure
   \( D_F(p_{\text{data}}\Vert p_\theta) \)
@@ -759,8 +759,8 @@ pre code{background:none;padding:0}
   of the model’s log-density, using the divergence theorem.
 </p>
 
-<!-- 6.1 step-by-step derivation -->
-<h3 id="hyvarinen-derivation">6.2&nbsp;Step-by-step derivation</h3>
+<!-- 4.2 step-by-step derivation -->
+<h3 id="hyvarinen-derivation">4.2&nbsp;Step-by-step derivation</h3>
 
 <!-- (a) expand the square -->
 <p><strong>Step&nbsp;1 &mdash; expand the squared norm</strong></p>
@@ -778,12 +778,12 @@ pre code{background:none;padding:0}
 
 <div class="eq-scroll">\[
   J(\theta)
-  =\tfrac12\!
+  =\tfrac12
      \int p_{\text{data}}\|a\|^2dx
   -\!\!
      \int p_{\text{data}}\,a\!\cdot\!b\,dx
   +\text{const}.
-  \tag{6.1}
+  \tag{4.1}
 \]</div>
 
 <p class="explain">
@@ -806,7 +806,7 @@ pre code{background:none;padding:0}
   C(\theta)
   :=\int p_{\text{data}}\,a\!\cdot\!b\,dx
   =\int \nabla_x p_{\text{data}}\,\cdot\,a\,dx .
-  \tag{6.2}
+  \tag{4.2}
 \]</div>
 
 <!-- (c) integration by parts -->
@@ -842,11 +842,11 @@ pre code{background:none;padding:0}
   \int \nabla_x p_{\text{data}}\!\cdot a\,dx
   = -\int p_{\text{data}}\,
            \nabla_x^{2}\!\log p_\theta\,dx .
-  \tag{6.3}
+  \tag{4.3}
 \]</div>
 
 <!-- (d) plug back -->
-<p><strong>Step&nbsp;4 &mdash; plug (6.3) into&nbsp;(6.1)</strong></p>
+<p><strong>Step&nbsp;4 &mdash; plug (4.3) into&nbsp;(4.1)</strong></p>
 
 <div class="eq-scroll">\[
   \boxed{
@@ -860,7 +860,7 @@ pre code{background:none;padding:0}
   \Bigr]dx
   +\text{const}.
   }
-  \tag{6.4}
+  \tag{4.4}
 \]</div>
 
 <p class="explain">
@@ -876,7 +876,7 @@ pre code{background:none;padding:0}
 </p>
 
 <!-- summary takeaway -->
-<h3 id="hyvarinen-takeaway">6.3&nbsp;What to remember</h3>
+<h3 id="hyvarinen-takeaway">4.3&nbsp;What to remember</h3>
 <ul>
   <li>The data-score term was replaced by a Laplacian of
       \( \log p_\theta \) via a single divergence-theorem step.</li>
@@ -886,12 +886,3 @@ pre code{background:none;padding:0}
       trick (covered next), but diffusion training with a
       <em>Gaussian label</em> cleverly sidesteps even that.</li>
 </ul>
-
-
-
-
-
-
-
-
-
