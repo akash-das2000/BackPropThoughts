@@ -207,39 +207,52 @@ function initScrollToTop() {
     window.scrollY > 500 ? btn.classList.add("show") : btn.classList.remove("show"));
 }
 
-/* Mobile: place TOC after the *entire* first section (h2 + its content) */
+/* Mobile: place TOC after the first section’s initial content
+   ─────────────────────────────────────────────────────────── */
 function relocateMobileTOC() {
   try {
-    if (window.innerWidth > 768) return;      // desktop → keep sidebar
+    if (window.innerWidth > 768) return;            // desktop → leave sidebar
 
     const rightSlot = document.querySelector(".right-toc-slot");
     if (!rightSlot) return;
 
-    /* first section heading = first <h2> that appears in content */
     const firstH2 = contentDiv.querySelector("h2");
-    if (!firstH2) return;
+    if (!firstH2) return;                           // no sections → skip
 
-    /* walk forward until the next <h2> (or end) */
-    let insertPoint = firstH2.nextElementSibling;
-    while (insertPoint && insertPoint.tagName.toLowerCase() !== "h2") {
-      insertPoint = insertPoint.nextElementSibling;
+    /* Walk until the next <h2>.
+       While walking, remember the *first* block element after firstH2. */
+    let walker = firstH2.nextElementSibling;
+    let firstBlockAfterH2 = null;
+
+    const isBlock = el =>
+      el && ["P","DIV","UL","OL","TABLE","PRE","BLOCKQUOTE"].includes(el.tagName);
+
+    while (walker && walker.tagName.toLowerCase() !== "h2") {
+      if (!firstBlockAfterH2 && isBlock(walker)) firstBlockAfterH2 = walker;
+      walker = walker.nextElementSibling;
     }
 
-    /* wrap TOC box so CSS still works */
     const wrapper = document.createElement("div");
     wrapper.className = "mobile-toc-wrapper";
-    wrapper.appendChild(rightSlot);           // move the existing sidebar
+    wrapper.appendChild(rightSlot);                 // move existing sidebar
 
-    /* insert before the next section or at end if no more <h2> */
-    if (insertPoint) {
-      insertPoint.before(wrapper);
-    } else {
-      contentDiv.appendChild(wrapper);
+    /* Priority 1: insert *before* the next <h2> if we found one. */
+    if (walker) {
+      walker.before(wrapper);
+    }
+    /* Priority 2: insert *after* the first block in this section. */
+    else if (firstBlockAfterH2) {
+      firstBlockAfterH2.after(wrapper);
+    }
+    /* Fallback: place right after the heading itself. */
+    else {
+      firstH2.after(wrapper);
     }
   } catch (e) {
     console.warn("Mobile TOC placement failed:", e);
   }
 }
+
 
 
 /* Meta title (optional posts/{slug}/meta.json) */
