@@ -53,6 +53,24 @@ table.tbl .shape{
   font-style: italic;
   margin: -0.5rem 0 2rem 0;   /* tighten space above, keep space below */
   color: #444;
+
+/* --- lead paragraph that introduces a major section --- */
+.lead{
+  font-size: 1.05rem;          /* slightly larger than body text   */
+  line-height: 1.6;
+  margin: 1.2rem 0 2rem 0;     /* extra space above & below        */
+  color: #333;
+}
+
+.lead ul{
+  margin: .6rem 0 .6rem 1.4rem;   /* tighter list spacing            */
+  padding-left: 0;
+}
+
+.lead ul li{
+  margin-bottom: .25rem;
+}
+
 }
 
 </style>
@@ -169,7 +187,23 @@ table.tbl .shape{
      1. Forward (Noising) Process — From One Step to Closed Form
      ===================================================== -->
 <h2 id="forward">1.&nbsp;Forward&nbsp;(Noising) Process &mdash; from a single&nbsp;noise injection to a closed-form kernel</h2>
-
+<p class="lead">
+  Imagine pressing a camera’s shutter while slowly cranking up the ISO:
+  each tick makes the photo grainier until only static remains.
+  The <em>forward&nbsp;process</em> in diffusion models is exactly that:
+  a time-indexed recipe that <strong>systematically degrades</strong> a clean
+  image into pure Gaussian noise.
+  <br>
+  In this section we:
+  <ul>
+    <li>quantify one such “grain-up” tick (<span class="math">\( \beta \)</span>-noise injection),</li>
+    <li>show how chaining many ticks collapses into a single closed-form
+        distribution, and</li>
+    <li>write that distribution analytically, so its gradient becomes a
+        free supervised label in later training.</li>
+  </ul>
+  Master these three steps and you hold the <em>entire</em> forward half of a diffusion model in your hands.
+</p>
 <!-- 1.1 one tiny noise injection -->
 <h3>1.1&nbsp;One tiny noise injection</h3>
 
