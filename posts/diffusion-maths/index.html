@@ -131,29 +131,42 @@ table.tbl th, table.tbl td{
   color:#444;
 
   /* === python code === */
-.codebox{
-  margin: 1.4rem 0 2rem 0;
-  border: 1px solid #e1e4e8;
+/* ===== GitHub-style code card ===== */
+.code-card{
+  border: 1px solid #d0d7de;       /* GitHub light grey */
   border-radius: 6px;
-  background: #f6f8fa;
+  background: #f6f8fa;             /* subtle grey fill  */
+  overflow: hidden;                /* round the header too */
+  margin: 1.4rem 0 2rem 0;
 }
 
-.codebox figcaption{
-  font-size: .85rem;
-  padding: .35rem .9rem;
-  background:#eef1f7;
-  border-bottom:1px solid #e1e4e8;
-  font-family: system-ui,sans-serif;
+.code-header{
+  background: #eaeef2;             /* slightly darker strip */
+  padding: .35rem .8rem;
+  border-bottom: 1px solid #d0d7de;
+  font-size: .75rem;
+  font-family: system-ui, sans-serif;
+  color: #57606a;
+  text-transform: lowercase;
 }
 
-.codebox pre{
-  margin:0;
+.code-card pre{
+  margin: 0;
   padding: .8rem .9rem;
-  overflow-x:auto;
+  overflow-x: auto;                /* side-scroll on phones */
+  white-space: pre;                /* keep indentation      */
   font-family: ui-monospace, "SF Mono", "Roboto Mono", monospace;
   font-size: .93rem;
-  background: inherit;   /* same grey as container */
+  line-height: 1.45;
+  color: #24292f;                  /* GitHub code text      */
+  background: inherit;             /* same grey as card     */
 }
+
+/* shrink font a hair on narrow screens */
+@media (max-width: 600px){
+  .code-card pre{ font-size: .85rem; }
+}
+
 
 }
 
@@ -715,12 +728,13 @@ table.tbl th, table.tbl td{
   In PyTorch that reduces to the canonical&nbsp;one-liner:
 </p>
 
-<figure class="codebox">
-  <figcaption>PyTorch one-liner&nbsp;&mdash; identical objective</figcaption>
-<pre><code class="language-python">
-loss = F.mse_loss(pred_eps, eps)
-</code></pre>
-</figure>
+<!-- GitHub-style boxed code snippet -->
+<div class="code-card">
+  <div class="code-header">python</div>
+  <pre><code>
+loss = F.mse_loss(pred_eps, eps)   # identical objective
+  </code></pre>
+</div>
 
 
 
