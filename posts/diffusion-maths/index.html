@@ -318,6 +318,18 @@ pre code{background:none;padding:0}
   \( \sigma_t := \sqrt{1-\bar\alpha_t} \).
 </p>
 
+<!-- ================= Figure 1: Forward Noising ================= -->
+<figure>
+  <img src="posts/diffusion-maths/assets/figure1.png"
+       alt="Clean vs Noisy ring dataset"
+       style="max-width:100%;height:auto;">
+  <figcaption>
+    <strong>Figure 1.</strong>
+    This section showed a 2D ring before and after applying
+    the forward kernel \(x_t = \sqrt{\bar\alpha_t}x_0 + \sigma_t\varepsilon\) with σ = 1.
+  </figcaption>
+</figure>
+
 <!-- 1.3 conditional kernel -->
 <h3 id="conditional-density">1.3&nbsp;Conditional density \( q(x_t \mid x_0) \)</h3>
 
@@ -441,6 +453,18 @@ pre code{background:none;padding:0}
   Beautifully simple: the score of the <em>conditional</em> Gaussian is
   just &ldquo;negative noise divided by&nbsp;\(\sigma_t\).&rdquo;
 </p>
+
+<!-- ================= Figure 2: Score Field ================= -->
+<figure>
+  <img src="posts/diffusion-maths/assets/figure2.png"
+       alt="True score field vector plot"
+       style="max-width:100%;height:auto;">
+  <figcaption>
+    <strong>Figure 2.</strong>
+    This section demonstrated the true marginal score
+    field \(\nabla_{x_t}\log p_t(x_t)\) on the noisy ring, visualized as red arrows.
+  </figcaption>
+</figure>
 
 <!-- 2.3 Training label inside each mini-batch -->
 <h3 id="train-label">2.3&nbsp;Training label in every mini-batch</h3>
@@ -1027,6 +1051,19 @@ pre code{background:none;padding:0}
   converges to score matching.
 </p>
 
+<!-- ================= Figure 3: Denoising Illustration ================= -->
+<figure>
+  <img src="posts/diffusion-maths/assets/figure3.png"
+       alt="Denoising autoencoder static example"
+       style="max-width:100%;height:auto;">
+  <figcaption>
+    <strong>Figure 3.</strong>
+    This section demonstrated the DAE training
+    on one noise level—(left) clean signal, (middle) noisy input, (right) Gaussian-denoised output—
+    recovering \(x\approx f^{\star}(x')\).
+  </figcaption>
+</figure>
+  
 <!-- 5.4 zoom-out to diffusion -->
 <h3 id="dae-diffusion-insight">5.4&nbsp;How this becomes diffusion training</h3>
 
@@ -1115,6 +1152,18 @@ pre code{background:none;padding:0}
   Proof: \( \mathbb E[v_i v_j] = \delta_{ij} \) so only the diagonal
   elements of&nbsp;H survive the expectation.
 </p>
+
+<!-- ================= Figure 4: Hutchinson Trace Trick ================= -->
+<figure>
+  <img src="posts/diffusion-maths/assets/figure4.png"
+       alt="Hutchinson trace trick illustration"
+       style="max-width:100%;height:auto;">
+  <figcaption>
+    <strong>Figure 4.</strong>
+    This illustrated the Hutchinson estimator
+    \(\mathrm{tr}(H)=\mathbb{E}_v[v^\top H v]\) with a Hessian heatmap, probe vector, and scalar result.
+  </figcaption>
+</figure>
 
 <!-- 6.2 autograd recipe -->
 <h3 id="hutchinson-autograd">6.2&nbsp;Autograd recipe&nbsp;(PyTorch)</h3>
