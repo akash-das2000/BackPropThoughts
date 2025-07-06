@@ -1,171 +1,125 @@
 <style>
   /* Put your styles here */
-  /* --- TL;DR --- */
-  .tldr{
-    border: 2px solid #4f81ff;
-    padding:1rem 1.25rem;
-    border-radius:0.5rem;
-    background:#f7fbff;
-  }
-  .tldr h2{margin-top:0}
-  .tldr ol{margin-left:1.2rem}
-
-  /* --- shared table look --- */
-table.tbl{
-  width: 100%;
-  border-collapse: collapse;
-  margin: 2rem 0 2.5rem 0;
-  font-size: 0.95rem;
+  /* ----------  TL;DR call-out ---------- */
+.tldr{
+  border:2px solid #4f81ff;
+  border-radius:.5rem;
+  padding:1rem 1.25rem;
+  background:#f7fbff;
 }
+.tldr h2{margin:0 0 .4rem 0}
+.tldr ol{margin-left:1.3rem}
 
-table.tbl caption{
-  caption-side: top;
-  font-weight: 600;
-  margin-bottom: .4rem;
-}
-
-table.tbl th,
-table.tbl td{
-  border: 1px solid #d0d0d0;
-  padding: .45rem .65rem;
-  text-align: left;
-  vertical-align: top;
-}
-
-table.tbl thead{
-  background: #f5f7ff;
-}
-
-table.tbl .shape{
-  font-family: "Roboto Mono", ui-monospace, monospace;
-  white-space: nowrap;
-}
-
-/* separate tone for the “facts” table */
-.fact-table th{
-  background:#f5f5f5;
-  width: 160px;
-}
-
-/* --- Table Notes --- */
-.note{
-  font-size: 0.93rem;
-  font-style: italic;
-  margin: -0.5rem 0 2rem 0;   /* tighten space above, keep space below */
-  color: #444;
-
-/* --- lead paragraph that introduces a major section --- */
-.lead{
-  font-size: 1.05rem;          /* slightly larger than body text   */
-  line-height: 1.6;
-  margin: 1.2rem 0 2rem 0;     /* extra space above & below        */
-  color: #333;
-}
-
-.lead ul{
-  margin: .6rem 0 .6rem 1.4rem;   /* tighter list spacing            */
-  padding-left: 0;
-}
-
-.lead ul li{
-  margin-bottom: .25rem;
-}
-
-}
-
-/* ========= 1. responsive tables ========= */
+/* ----------  table styling ---------- */
 table.tbl{
   width:100%;
   border-collapse:collapse;
-  margin: 2rem 0 2.5rem 0;
+  margin:2rem 0 2.5rem 0;
   font-size:.95rem;
-  display:block;              /*  <— ensures its own scroll box  */
-  overflow-x:auto;            /*  <— side-scroll on mobile        */
 }
-table.tbl thead, table.tbl tbody{
-  width:100%;                 /* keeps header & body aligned      */
+table.tbl caption{
+  caption-side:top;
+  font-weight:600;
+  margin-bottom:.4rem;
 }
-table.tbl th, table.tbl td{
-  white-space:nowrap;         /* keep long symbols on one line    */
+table.tbl th,
+table.tbl td{
+  border:1px solid #d0d0d0;
+  padding:.45rem .65rem;
+  text-align:left;
+  vertical-align:top;
+}
+table.tbl thead{background:#f5f7ff;}
+.tbl .shape{
+  font-family:"Roboto Mono",ui-monospace,monospace;
+  white-space:nowrap;
+}
+.fact-table th{
+  background:#f5f5f5;
+  width:160px;
 }
 
-/* ========= 2. responsive display equations ========= */
-.display-math{
+/* ----------  lead paragraph ---------- */
+.lead{
+  font-size:1.05rem;
+  line-height:1.6;
+  margin:1.2rem 0 2rem 0;
+  color:#333;
+}
+.lead ul{margin:.6rem 0 .6rem 1.4rem}
+
+/* ----------  bridge note ---------- */
+.bridge{
+  font-size:.95rem;
+  margin:.8rem 0 1.1rem 0;
+  color:#444;
+}            /* <— THIS was the missing brace */
+
+/* ----------  display equations ---------- */
+.eq-scroll{
   display:block;
-  overflow-x:auto;            /* side-scroll if too wide          */
-  white-space:nowrap;         /* KaTeX/MathJax span stays together*/
+  overflow-x:auto;
+  white-space:nowrap;
   text-align:center;
   margin:1.2rem auto;
   font-size:1.02rem;
 }
-
-/* shrink math a bit on narrow screens */
-@media (max-width: 600px){
-  .display-math{
-    font-size:.9rem;
-  }
-  table.tbl{
-    font-size:.9rem;
-  }
+@media(max-width:600px){
+  .eq-scroll{font-size:.9rem}
+  table.tbl{font-size:.9rem}
 }
 
-/* === scrollable equations === */
-.eq-scroll{
-  overflow-x: auto;           /* side-scroll on phones            */
-  overflow-y: hidden;
-  white-space: nowrap;        /* keep the math in one line        */
-  -webkit-overflow-scrolling: touch;
-  text-align: center;
-  margin: 1.2rem auto;
-  padding: 0.15rem 0;         /* a hair of breathing room         */
-  font-size: 1.02rem;         /* desktop size                     */
+/* ----------  inline & block code ---------- */
+code,pre{
+  font-family:"Fira Code","SFMono-Regular",ui-monospace,monospace;
+  font-size:.92rem;
 }
-@media (max-width:600px){
-  .eq-scroll{ font-size: .9rem; }
+code{
+  background:#f3f4f6;
+  color:#1a1a1a;
+  padding:0 .25em;
+  border-radius:4px;
+}
+pre{
+  background:#f8f9fb;
+  border:1px solid #cfd2d7;
+  border-radius:6px;
+  padding:.9rem 1rem;
+  line-height:1.45;
+  overflow-x:auto;
+  margin:1.6rem 0;
+}
+pre code{background:none;padding:0}
+@media(max-width:600px){
+  pre{font-size:.82rem}
+  code{font-size:.86rem}
 }
 
-  /* === bridge === */
-.bridge{
-  font-size: .95rem;
-  margin: .8rem 0 1.1rem 0;
-  color:#444;
-  }
-  /* === python code === */
-/* ——— GitHub-ish grey “code card” ——— */
+/* ----------  GitHub-style code card ---------- */
 .code-card{
-  background:#f6f8fa;           /* light-grey panel */
-  border:1px solid #d0d7de;     /* mid-grey outline */
+  background:#f6f8fa;
+  border:1px solid #d0d7de;
   border-radius:6px;
   overflow:hidden;
-  margin:1.6rem 0;              /* spacing above/below */
+  margin:1.6rem 0;
 }
-
 .code-card .code-header{
-  background:#eaeef2;           /* slightly darker strip */
+  background:#eaeef2;
   border-bottom:1px solid #d0d7de;
-  font: .75rem/1 system-ui, sans-serif;
+  font:.75rem/1 system-ui,sans-serif;
   color:#24292f;
   padding:.45rem .9rem;
   text-transform:lowercase;
 }
-
 .code-card pre{
   margin:0;
   padding:.8rem 1rem;
-  background:inherit;           /* same as card */
-  overflow-x:auto;
-  font-family:"Fira Code","SFMono-Regular",ui-monospace,monospace;
+  background:inherit;
   font-size:.92rem;
-  line-height:1.45;
-  white-space:pre;              /* keep indentation */
+  white-space:pre;
 }
-
-/* shrink code font on narrow screens */
-@media (max-width:600px){
-  .code-card pre{ font-size:.82rem; }
-}
-
-
+@media(max-width:600px){
+  .code-card pre{font-size:.82rem}
 }
 
 </style>
