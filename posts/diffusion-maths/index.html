@@ -23,6 +23,28 @@
   color: #000;                    /* highlight keywords in pure black */
 }
 
+/* Ensure TL;DR text wraps and can hyphenate */
+.tldr,
+.tldr p,
+.tldr ol,
+.tldr li {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  white-space: normal;
+  hyphens: auto;
+}
+
+/* If you need to shrink text slightly in the TL;DR on mobile: */
+@media (max-width: 600px) {
+  .tldr {
+    font-size: 0.93rem;   /* slightly smaller overall text */
+  }
+  .tldr h2 {
+    font-size: 1.2rem;    /* shrink heading if needed */
+  }
+}
+
+
 /* ----------  table styling ---------- */
 table.tbl{
   width:100%;
