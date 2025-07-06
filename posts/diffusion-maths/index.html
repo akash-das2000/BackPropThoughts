@@ -663,8 +663,10 @@ body {
 \tag{2.4c}\]</div>
 
 <!-- summary -->
-<div class="eq-scroll">
+<p class="explain">
   Combine (2.4a)–(2.4c):
+</p>
+<div class="eq-scroll">
   \[
     \boxed{\;
       \mathbb E\!\bigl[\,y_t \mid x_t\bigr]
@@ -672,10 +674,12 @@ body {
       \nabla_{x_t}\log p_t(x_t)
     \;}. \tag{2.5}
   \]
+  </div>
+  <p>
   Taking an outer expectation over \(x_t\) preserves the equality, so
   swapping the unknown score with \(y_t\) inside our loss
   introduces <em>no bias whatsoever</em>.
-</div>
+</p>
 
 <!-- =====================================================
      3. From Fisher Divergence to a One-Line PyTorch Loss
