@@ -349,6 +349,43 @@ table.tbl th, table.tbl td{
 
 <!-- 2.1 What is a score? -->
 <h3 id="what-is-score">2.1&nbsp;What is a score?</h3>
+<!-- bridge: why a quadratic appears in log q -->
+<p class="bridge">
+  <strong>Where does that quadratic originate?</strong><br>
+  The conditional kernel in Eq.&nbsp;(1.3) is a multivariate Gaussian,
+  so its probability density function is
+  \[
+     q(x_t \mid x_0)
+     = \frac{\exp\!\bigl(
+         -\tfrac12
+         \tfrac{\|x_t-\sqrt{\bar\alpha_t}\,x_0\|^2}
+               {\sigma_t^2}
+       \bigr)}
+       {(2\pi)^{d/2}\sigma_t^{\,d}} .
+  \]
+  When we take <em>log</em> of that PDF, every constant goes to an additive
+  “<code>const</code>,” and the exponent’s
+  squared-distance term
+  \(
+     \|x_t-\sqrt{\bar\alpha_t}x_0\|^2
+  \)
+  is the <em>quadratic</em> we differentiate.
+  Substituting
+  \( x_t = \sqrt{\bar\alpha_t}\,x_0 + \sqrt{1-\bar\alpha_t}\,\varepsilon \)
+  from Eq.&nbsp;(1.2) makes the difference
+  \( x_t-\sqrt{\bar\alpha_t}x_0 \)
+  collapse neatly to
+  \( \sqrt{1-\bar\alpha_t}\,\varepsilon \).
+  Divide by \( \sigma_t^2 = 1-\bar\alpha_t \),
+  apply the gradient of a norm-square
+  \( \nabla_x\|x\|^2 = 2x \),
+  and you land on the compact
+  \(
+     -\,\varepsilon/\sigma_t
+  \)
+  result shown next.
+</p>
+
 <p>
   For any probability density \( p(z) \) the&nbsp;
   <em>score</em> is defined as
