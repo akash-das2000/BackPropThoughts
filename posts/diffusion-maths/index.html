@@ -23,24 +23,32 @@
   color: #000;                    /* highlight keywords in pure black */
 }
 
-/* Ensure TL;DR text wraps and can hyphenate */
+/* ----------  Ensure TL;DR inline math and text wrap on mobile  ---------- */
 .tldr,
 .tldr p,
 .tldr ol,
 .tldr li {
-  overflow-wrap: break-word;
+  /* allow words, symbols, and math to break anywhere if needed */
   word-wrap: break-word;
-  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-word;
   hyphens: auto;
+  white-space: normal;
 }
 
-/* If you need to shrink text slightly in the TL;DR on mobile: */
-@media (max-width: 600px) {
+/* target KaTeX/MathJax inline spans if you’re using them */
+.tldr .katex,
+.tldr .MathJax,
+.tldr span {
+  display: inline-block;
+  max-width: 100%;
+  white-space: normal;
+}
+
+/* shrink font slightly for extra safety on very small screens */
+@media (max-width: 400px) {
   .tldr {
-    font-size: 0.93rem;   /* slightly smaller overall text */
-  }
-  .tldr h2 {
-    font-size: 1.2rem;    /* shrink heading if needed */
+    font-size: 0.90rem;
   }
 }
 
