@@ -165,66 +165,81 @@ table.tbl .shape{
 </p>
 
 
-<!--  =====================================================
-      Forward (Noising) Process — From One Step to Closed Form
-      ===================================================== -->
-<h2 id="forward">1.&nbsp;Forward&nbsp;(Noising)&nbsp;Process — derivation from first principles</h2>
+<!-- =====================================================
+     1. Forward (Noising) Process — From One Step to Closed Form
+     ===================================================== -->
+<h2 id="forward">1.&nbsp;Forward&nbsp;(Noising) Process &mdash; from a single&nbsp;noise injection to a closed-form kernel</h2>
 
 <!-- 1.1 one tiny noise injection -->
-<h3>1.1 One tiny noise injection</h3>
+<h3>1.1&nbsp;One tiny noise injection</h3>
+
 <p>
-  <strong>Principle&nbsp;&raquo;</strong>
-  A single DDPM step keeps a fraction \( \sqrt{1-\beta} \) of the signal and
-  blends in \( \sqrt{\beta} \) of fresh Gaussian noise:
+  Think of the forward process as a photographic fade-out:
+  each step <em>shrinks</em> the original signal and sprinkles in fresh Gaussian static.  
+  A blend parameter&nbsp;\( \beta\in(0,1) \) tells us
+  exactly how much signal versus noise we keep.
 </p>
 
 <p class="display-math">\[
-  x' \;=\; \sqrt{1-\beta}\,x \;+\; \sqrt{\beta}\,\varepsilon,
+  x' \;=\; \sqrt{\,1-\beta\,}\;x
+        \;+\; \sqrt{\beta}\;\varepsilon,
   \qquad
-  \varepsilon \sim \mathcal N(0, I_d).
+  \varepsilon \sim \mathcal N(0,I_d).
 \tag{1.1}\]</p>
 
-<p class="explain">
-  The square roots ensure that the variance of \( x' \) is exactly
-  \( \beta \) larger than that of \( x \).
+<p>
+  The square-root factors guarantee the variance of \(x'\) is
+  <span class="math">\( \beta \)</span> higher than that of \(x\):
+  the signal’s power is scaled by \(1-\beta\), the noise’s by \(\beta\).
 </p>
 
 <!-- 1.2 repeat t times -->
-<h3>1.2 Repeat \( t \) times &rarr; closed form</h3>
+<h3>1.2&nbsp;Repeat <em>t</em> steps &rarr; one closed-form jump</h3>
+
 <p>
-  Let \( \beta_s = 1-\alpha_s \) and
-  \( \bar\alpha_t = \prod_{s=1}^{t} \alpha_s \).
-  Re-applying (1.1) \( t \) times yields
+  Apply (1.1) successively with variances
+  \( \beta_1,\beta_2,\dots,\beta_t \) &nbsp;
+  \(\bigl(\alpha_s := 1-\beta_s\bigr)\).
+  Induction collapses the chain into one affine transform:
 </p>
 
 <p class="display-math">\[
   x_t \;=\; \sqrt{\bar\alpha_t}\,x_0
-        \;+\; \sqrt{1-\bar\alpha_t}\,\varepsilon.
+        \;+\; \sqrt{1-\bar\alpha_t}\,\varepsilon,
+  \qquad
+  \bar\alpha_t := \prod_{s=1}^{t}\alpha_s .
 \tag{1.2}\]</p>
 
-<p class="explain">
-  Define \( \sigma_t := \sqrt{1-\bar\alpha_t} \) for later use.
+<p>
+  In words: after \(t\) steps a fixed share
+  \( \sqrt{\bar\alpha_t} \) of the original image survives; the rest is
+  i.i.d.&nbsp;Gaussian noise with total standard deviation
+  \( \sigma_t := \sqrt{1-\bar\alpha_t} \).
 </p>
 
 <!-- 1.3 conditional kernel -->
-<h3>1.3 Conditional density \( q(x_t\mid x_0) \)</h3>
+<h3>1.3&nbsp;Conditional density \( q(x_t \mid x_0) \)</h3>
+
 <p>
-  An affine transform of a Gaussian is Gaussian, so
+  Any affine map of a Gaussian remains Gaussian, so conditioning on the
+  clean image \(x_0\) we obtain an <em>analytic</em> forward kernel:
 </p>
 
 <p class="display-math">\[
-  q(x_t\mid x_0)
+  q(x_t \mid x_0)
   \;=\;
   \mathcal N\!\bigl(
-    x_t; \sqrt{\bar\alpha_t}\,x_0,\,
-    \sigma_t^2 I_d
+      x_t;
+      \sqrt{\bar\alpha_t}\,x_0,\;
+      \sigma_t^2 I_d
   \bigr).
 \tag{1.3}\]</p>
 
-<p class="explain">
-  We’ll differentiate (1.3) next; its gradient becomes a “free” supervised
-  label during training.
+<p>
+  Equation&nbsp;(1.3) is a workhorse: its gradient will give us a
+  <em>free</em> supervised label when we train the score network.
 </p>
+
 
 
 
