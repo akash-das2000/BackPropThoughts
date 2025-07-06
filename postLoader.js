@@ -207,51 +207,29 @@ function initScrollToTop() {
     window.scrollY > 500 ? btn.classList.add("show") : btn.classList.remove("show"));
 }
 
-/* Mobile: place TOC after the first section’s initial content
-   ─────────────────────────────────────────────────────────── */
+/* Mobile: place TOC immediately after the <h1> (blog title) */
 function relocateMobileTOC() {
   try {
-    if (window.innerWidth > 768) return;            // desktop → leave sidebar
+    if (window.innerWidth > 768) return;      // desktop → keep sidebar
 
     const rightSlot = document.querySelector(".right-toc-slot");
     if (!rightSlot) return;
 
-    const firstH2 = contentDiv.querySelector("h2");
-    if (!firstH2) return;                           // no sections → skip
+    const h1 = contentDiv.querySelector("h1");
+    if (!h1) return;                          // safety check
 
-    /* Walk until the next <h2>.
-       While walking, remember the *first* block element after firstH2. */
-    let walker = firstH2.nextElementSibling;
-    let firstBlockAfterH2 = null;
-
-    const isBlock = el =>
-      el && ["P","DIV","UL","OL","TABLE","PRE","BLOCKQUOTE"].includes(el.tagName);
-
-    while (walker && walker.tagName.toLowerCase() !== "h2") {
-      if (!firstBlockAfterH2 && isBlock(walker)) firstBlockAfterH2 = walker;
-      walker = walker.nextElementSibling;
-    }
-
+    /* Wrap TOC so existing CSS still applies */
     const wrapper = document.createElement("div");
     wrapper.className = "mobile-toc-wrapper";
-    wrapper.appendChild(rightSlot);                 // move existing sidebar
+    wrapper.appendChild(rightSlot);           // move sidebar into wrapper
 
-    /* Priority 1: insert *before* the next <h2> if we found one. */
-    if (walker) {
-      walker.before(wrapper);
-    }
-    /* Priority 2: insert *after* the first block in this section. */
-    else if (firstBlockAfterH2) {
-      firstBlockAfterH2.after(wrapper);
-    }
-    /* Fallback: place right after the heading itself. */
-    else {
-      firstH2.after(wrapper);
-    }
+    /* Insert right after the H1 */
+    h1.after(wrapper);
   } catch (e) {
     console.warn("Mobile TOC placement failed:", e);
   }
 }
+
 
 
 
