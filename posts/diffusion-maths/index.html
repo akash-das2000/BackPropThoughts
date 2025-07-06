@@ -121,6 +121,24 @@ pre code{background:none;padding:0}
 @media(max-width:600px){
   .code-card pre{font-size:.82rem}
 }
+  
+/* === let wide tables side-scroll on narrow screens === */
+@media (max-width: 600px){
+  table.tbl{
+    display:block;          /* makes it a scroll container   */
+    overflow-x:auto;        /* side-scroll if too wide        */
+    -webkit-overflow-scrolling: touch;
+  }
+  table.tbl thead,
+  table.tbl tbody{
+    display:table;          /* keeps header & body aligned    */
+    width:100%;
+  }
+  table.tbl th,
+  table.tbl td{
+    white-space:nowrap;     /* prevent ugly line wraps        */
+  }
+}
 
 </style>
 <section>
