@@ -131,36 +131,47 @@ table.tbl th, table.tbl td{
   color:#444;
 
   /* === python code === */
-/* ===== GitHub-style code card ===== */
+/* ===== Monochrome code card ===== */
 .code-card{
-  border: 1px solid #d0d7de;       /* GitHub light grey */
-  border-radius: 6px;
-  background: #f6f8fa;             /* subtle grey fill  */
-  overflow: hidden;                /* round the header too */
+  border-radius: 7px;
+  overflow: hidden;              /* rounds header + body together */
   margin: 1.4rem 0 2rem 0;
+  max-width: 100%;
 }
 
-.code-header{
-  background: #eaeef2;             /* slightly darker strip */
-  padding: .35rem .8rem;
-  border-bottom: 1px solid #d0d7de;
+/* neutral greys only */
+.code-card.mono{
+  background: #f5f5f5;           /* light grey panel */
+  border: 1px solid #c8c8c8;     /* mid-grey outline */
+}
+
+.code-card.mono .code-header{
+  background: #e5e5e5;           /* slightly darker strip */
+  color: #333;                   /* dark grey text */
   font-size: .75rem;
   font-family: system-ui, sans-serif;
-  color: #57606a;
+  padding: .45rem .9rem;
   text-transform: lowercase;
+  border-bottom: 1px solid #c8c8c8;
 }
 
-.code-card pre{
+.code-card.mono pre{
   margin: 0;
-  padding: .8rem .9rem;
-  overflow-x: auto;                /* side-scroll on phones */
-  white-space: pre;                /* keep indentation      */
+  padding: .9rem 1rem;
+  overflow-x: auto;              /* side-scroll on small screens */
+  white-space: pre;              /* preserve indentation */
   font-family: ui-monospace, "SF Mono", "Roboto Mono", monospace;
   font-size: .93rem;
   line-height: 1.45;
-  color: #24292f;                  /* GitHub code text      */
-  background: inherit;             /* same grey as card     */
+  color: #111;                   /* near-black code text */
+  background: inherit;           /* same light grey as card */
 }
+
+/* slightly smaller code font on very narrow screens */
+@media (max-width: 600px){
+  .code-card.mono pre{ font-size: .85rem; }
+}
+
 
 /* shrink font a hair on narrow screens */
 @media (max-width: 600px){
@@ -728,8 +739,8 @@ table.tbl th, table.tbl td{
   In PyTorch that reduces to the canonical&nbsp;one-liner:
 </p>
 
-<!-- GitHub-style boxed code snippet -->
-<div class="code-card">
+<!-- monochrome rounded code card -->
+<div class="code-card mono">
   <div class="code-header">python</div>
   <pre><code>
 loss = F.mse_loss(pred_eps, eps)   # identical objective
