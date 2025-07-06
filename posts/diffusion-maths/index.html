@@ -1226,3 +1226,80 @@ trace_est = (Hv * v).sum()              # vᵀ H v ≈ tr(H)
       only reason diffusion models scale to megapixel images.</li>
 </ul>
 
+  <!-- =====================================================
+     8. Connecting Every Math Block to Plain PyTorch Code
+     ===================================================== -->
+<h2 id="pytorch-map">8.&nbsp;Connecting&nbsp;Every&nbsp;Block&nbsp;to&nbsp;PyTorch&nbsp;Code</h2>
+
+<table class="tbl">
+  <thead>
+    <tr><th>Math block</th><th style="min-width:320px">2&nbsp;&ndash;&nbsp;3&nbsp;lines of PyTorch</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Forward kernel (Eq.&nbsp;1.2)</td>
+      <td><code>x_t = sqrt_alphas_cumprod[t] * x0</code><br>
+          <code>     + sqrt_one_minus_alphas_cumprod[t] * torch.randn_like(x0)</code></td>
+    </tr>
+
+    <tr>
+      <td>Label \(y_t\) (Eq.&nbsp;2.2)</td>
+      <td><code>label = -eps / sigma_t</code></td>
+    </tr>
+
+    <tr>
+      <td>Loss (Eq.&nbsp;3.3)</td>
+      <td><code>loss = F.mse_loss(model(x_t, t_emb), label)</code></td>
+    </tr>
+
+    <tr>
+      <td>Optimiser step</td>
+      <td><code>loss.backward(); optimizer.step(); optimizer.zero_grad()</code></td>
+    </tr>
+
+    <tr>
+      <td>Sampling loop</td>
+      <td>Euler, DDIM, or DPM-Solver integrates the<br>
+          reverse SDE/ODE using <code>model</code> as the drift.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p class="bridge">
+  Those five snippets <em>are</em> the entire research pipeline:
+  anything else in a diffusion repo &mdash; gradient clipping, EMA,
+  mixed-precision &mdash; is engineering garnish.
+</p>
+
+
+<!-- =====================================================
+     9. What We Have Achieved
+     ===================================================== -->
+<h2 id="wrap-up">9.&nbsp;What&nbsp;We&nbsp;Have&nbsp;Achieved</h2>
+
+<h3>9.1&nbsp;Mathematical bedrock</h3>
+<ul>
+  <li><strong>Forward kernel</strong> ⇒ analytic conditional score.</li>
+  <li><strong>Three-line Bayes</strong> ⇒ unbiased per-timestep labels.</li>
+  <li><strong>Hyvärinen proof</strong> ⇒ partition function disappears.</li>
+  <li><strong>Vincent limit</strong> ⇒ denoising ≡ score matching.</li>
+</ul>
+
+<h3>9.2&nbsp;Numerical tools</h3>
+<ul>
+  <li><strong>Hutchinson trace</strong> makes high-dim Laplacians feasible.<br>
+      (Rarely needed in diffusion, golden in generic score matching.)</li>
+</ul>
+
+<h3>9.3&nbsp;Practical recipe</h3>
+<p class="explain">
+  A U-Net + an MSE loss = state-of-the-art image generation,
+  <em>because</em> that MSE is secretly the Fisher divergence integrated
+  over a continuum of noise levels.
+</p>
+
+<p class="lead" style="text-align:center">
+  <strong>From first principles&nbsp;&rarr;&nbsp;to 4 lines of code&nbsp;&rarr;&nbsp;to photorealistic images.</strong><br>
+  That’s the power of diffusion.
+</p>
+
