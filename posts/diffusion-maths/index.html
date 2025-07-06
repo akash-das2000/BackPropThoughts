@@ -704,6 +704,191 @@ pre code{background:none;padding:0}
 </div>
 
 
+<!-- =====================================================
+     6. Hyvärinen Score Matching — Full Integration-by-Parts Walk-Through
+     ===================================================== -->
+<h2 id="hyvarinen">6.&nbsp;Hyvärinen&nbsp;Score&nbsp;Matching &mdash; Integration-by-Parts Walk-Through</h2>
+
+<p class="lead">
+  Fisher divergence lets us compare two probability densities without
+  ever touching their normalising constants.
+  That’s perfect for energy-based models, whose partition
+  functions are hopeless in image dimensions.
+  The catch?  Fisher divergence still contains the unknown
+  <em>data&nbsp;score</em>
+  \( \nabla_x\log p_{\text{data}} \).
+  Hyvärinen’s 2005 trick uses a single integration-by-parts move
+  to <strong>eliminate</strong> that data-score,
+  leaving a loss we can evaluate with automatic differentiation alone.
+</p>
+
+<!-- 6.1 why we need it -->
+<h3 id="hyvarinen-why">6.1&nbsp;Why we need it</h3>
+<p>
+  We want a discrepancy measure
+  \( D_F(p_{\text{data}}\Vert p_\theta) \)
+  that:
+</p>
+<ul>
+  <li>does <em>not</em> require the unknown
+      \( p_{\text{data}} \) in closed form, and</li>
+  <li>does <em>not</em> require the
+      partition function \( Z_\theta \) of the model.</li>
+</ul>
+
+<div class="eq-scroll">\[
+  D_F(p_{\text{data}}\Vert p_\theta)
+  \;=\;
+  \tfrac12
+  \int p_{\text{data}}(x)\,
+       \bigl\|
+         \nabla_x \log p_\theta(x)
+         - \nabla_x \log p_{\text{data}}(x)
+       \bigr\|^{2}\,dx .
+\]</div>
+
+<p class="bridge">
+  Fisher divergence solves the
+  <em>partition-function</em> problem
+  (because derivatives kill constants),
+  but it still contains the inaccessible
+  data-score
+  \( \nabla_x\log p_{\text{data}} \).
+  Hyvärinen’s idea:
+  convert that term into a <em>Laplacian</em>
+  of the model’s log-density, using the divergence theorem.
+</p>
+
+<!-- 6.1 step-by-step derivation -->
+<h3 id="hyvarinen-derivation">6.2&nbsp;Step-by-step derivation</h3>
+
+<!-- (a) expand the square -->
+<p><strong>Step&nbsp;1 &mdash; expand the squared norm</strong></p>
+<div class="eq-scroll">\[
+  \|a-b\|^2
+  =\|a\|^2+\|b\|^2-2\,a\!\cdot\!b .
+\]</div>
+
+<p>
+  Let
+  \( a=\nabla_x\log p_\theta \),
+  \( b=\nabla_x\log p_{\text{data}} \).
+  Plugging into the divergence gives
+</p>
+
+<div class="eq-scroll">\[
+  J(\theta)
+  =\tfrac12\!
+     \int p_{\text{data}}\|a\|^2dx
+  -\!\!
+     \int p_{\text{data}}\,a\!\cdot\!b\,dx
+  +\text{const}.
+  \tag{6.1}
+\]</div>
+
+<p class="explain">
+  The const term (from
+  \( \|b\|^2 \))
+  has no&nbsp;\( \theta \); drop it for optimisation.
+</p>
+
+<!-- (b) rewrite the cross-term -->
+<p><strong>Step&nbsp;2 &mdash; rewrite the cross-term</strong></p>
+<p>
+  Because
+  \( b=\nabla_x\log p_{\text{data}} \),
+  we have
+  \( p_{\text{data}}\,b = \nabla_x p_{\text{data}} \).
+  Thus
+</p>
+
+<div class="eq-scroll">\[
+  C(\theta)
+  :=\int p_{\text{data}}\,a\!\cdot\!b\,dx
+  =\int \nabla_x p_{\text{data}}\,\cdot\,a\,dx .
+  \tag{6.2}
+\]</div>
+
+<!-- (c) integration by parts -->
+<p><strong>Step&nbsp;3 &mdash; integration-by-parts in
+  \( \mathbb R^{d} \)</strong></p>
+<p>
+  For a smooth vector field \(g\) that decays faster than
+  \(1/\|x\|^{d+1}\),
+</p>
+
+<div class="eq-scroll">\[
+  \int_{\mathbb R^{d}}\!\nabla_x\!\cdot g(x)\,dx = 0 .
+\]</div>
+
+<p>
+  Choose
+  \( g(x)=p_{\text{data}}(x)\,a(x) \).
+  Compute its divergence:
+</p>
+
+<div class="eq-scroll">\[
+  \nabla_x\!\cdot g
+  = \nabla_x p_{\text{data}}\!\cdot a
+    + p_{\text{data}}\,
+      \underbrace{\nabla_x\!\cdot a}_{=\nabla_x^{2}\log p_\theta}.
+\]</div>
+
+<p>
+  Because the integral of the divergence is zero, rearrange:
+</p>
+
+<div class="eq-scroll">\[
+  \int \nabla_x p_{\text{data}}\!\cdot a\,dx
+  = -\int p_{\text{data}}\,
+           \nabla_x^{2}\!\log p_\theta\,dx .
+  \tag{6.3}
+\]</div>
+
+<!-- (d) plug back -->
+<p><strong>Step&nbsp;4 &mdash; plug (6.3) into&nbsp;(6.1)</strong></p>
+
+<div class="eq-scroll">\[
+  \boxed{
+  J(\theta)=
+  \int p_{\text{data}}
+  \Bigl[
+    \tfrac12
+      \bigl\|\nabla_x\log p_\theta\bigr\|^2
+    \;+\;
+      \nabla_x^{2}\log p_\theta
+  \Bigr]dx
+  +\text{const}.
+  }
+  \tag{6.4}
+\]</div>
+
+<p class="explain">
+  Every term now depends <em>only</em> on the model
+  \( p_\theta \).
+  Because
+  \( p_\theta(x) = e^{-E_\theta(x)}/Z_\theta \),
+  derivatives of \( \log p_\theta \)
+  involve <strong>no partition function</strong>:
+  \( \nabla_x\log p_\theta = -\nabla_xE_\theta \).
+  Minimising \( J(\theta) \) is therefore equivalent to minimising the
+  original Fisher divergence, but <em>computable</em> with autograd.
+</p>
+
+<!-- summary takeaway -->
+<h3 id="hyvarinen-takeaway">6.3&nbsp;What to remember</h3>
+<ul>
+  <li>The data-score term was replaced by a Laplacian of
+      \( \log p_\theta \) via a single divergence-theorem step.</li>
+  <li>No normalising constant \( Z_\theta \) survives; score matching
+      avoids the partition-function bottleneck entirely.</li>
+  <li>Implementations often estimate the Laplacian with the Hutchinson
+      trick (covered next), but diffusion training with a
+      <em>Gaussian label</em> cleverly sidesteps even that.</li>
+</ul>
+
+
+
 
 
 
