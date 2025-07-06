@@ -891,21 +891,22 @@ pre code{background:none;padding:0}
 <!-- =====================================================
      5. Denoising Auto-Encoder ⇒ Fisher Divergence (Vincent 2011)
      ===================================================== -->
-<h2 id="vincent">5.&nbsp;Denoising&nbsp;Auto-Encoder&nbsp;⇒ Fisher&nbsp;Divergence&nbsp;(Vincent&nbsp;2011)</h2>
+<h2 id="vincent">5.&nbsp;Denoising&nbsp;Auto-Encoder&nbsp;⇒ Fisher&nbsp;Divergence&nbsp;(Vincent 2011)</h2>
 
 <p class="lead">
-  Vincent (2011) showed that training a denoising auto-encoder (DAE) on
-  tiny Gaussian noise is, to second order, <em>exactly</em> score
-  matching.  This bridges classical representation learning and modern
-  diffusion: each diffusion timestep is essentially one finite-σ Vincent
-  objective, with a single network shared across all noise levels.
+  Before diffusion took off, Vincent (2011) proved that a denoising
+  auto-encoder (DAE) trained on <em>tiny</em> Gaussian noise is—up to
+  second order—identical to score matching.  Diffusion models keep the
+  same mathematics but swap “tiny noise” for a full <strong>noise
+  schedule</strong>.  Each timestep is one finite-σ DAE loss;
+  the U-Net is shared (amortised) across all timesteps.
 </p>
 
 <!-- 5.1 set-up -->
 <h3 id="dae-setup">5.1&nbsp;Set-up</h3>
 <p>
-  Corrupt a clean sample&nbsp;<code>x</code> with small Gaussian noise
-  \( \varepsilon \sim \mathcal N(0,\sigma^2 I) \):
+  Corrupt a clean sample <code>x</code> with Gaussian noise
+  \( \varepsilon\sim\mathcal N(0,\sigma^{2}I) \):
 </p>
 
 <div class="eq-scroll">\[
@@ -915,24 +916,25 @@ pre code{background:none;padding:0}
 \]</div>
 
 <p>
-  Train a decoder network \( f_\theta \) to reconstruct \(x\) from
-  \(x'\) using the scaled MSE loss
+  Train a decoder \( f_\theta \) to predict the clean signal under the
+  scaled MSE objective
 </p>
 
 <div class="eq-scroll">\[
   L_{\sigma}(\theta)
   = \frac{1}{\sigma^{2}}\,
-    \mathbb E\bigl\|
-       x - f_\theta(x')
-    \bigr\|^{2}.
+    \mathbb E_{p_{\text{data}},\varepsilon}
+      \bigl\|
+        x - f_\theta(x')
+      \bigr\|^{2}.
   \tag{5.1}
 \]</div>
 
 <!-- 5.2 optimal decoder -->
 <h3 id="dae-optimal">5.2&nbsp;Optimal decoder</h3>
 <p>
-  For a fixed noisy input \(x'\), the inner MSE is a quadratic in
-  \(f(x')\).  Setting its gradient to zero yields the conditional mean
+  For a fixed noisy input \(x'\) the quadratic (5.1) is minimised by the
+  conditional mean&mdash;exactly the Bayesian MMSE estimator:
 </p>
 
 <div class="eq-scroll">\[
@@ -942,14 +944,14 @@ pre code{background:none;padding:0}
 \]</div>
 
 <p class="explain">
-  (Differentiate w.r.t.&nbsp;<code>f</code>, set to zero, and solve.)
+  Take the derivative with respect to \(f(x')\), set to zero, solve.
 </p>
 
-<!-- 5.3 small-sigma Taylor -->
+<!-- 5.3 small-σ Taylor -->
 <h3 id="dae-taylor">5.3&nbsp;Small-σ Taylor expansion</h3>
 <p>
-  Taylor-expand \( f^{\star} \) around \( \sigma=0 \)
-  (details in Vincent&nbsp;2011, Prop.&nbsp;1):
+  Perform a second-order Taylor expansion of
+  \( f^{\star}(x') \) w.r.t.&nbsp;\( \sigma \) (Vincent 2011, Prop.&nbsp;1):
 </p>
 
 <div class="eq-scroll">\[
@@ -962,14 +964,14 @@ pre code{background:none;padding:0}
 \]</div>
 
 <p>
-  Insert (5.3) into the loss (5.1) and keep terms up to
+  Substitute (5.3) back into the loss (5.1) and keep terms up to
   \( O(\sigma^{2}) \):
 </p>
 
 <div class="eq-scroll">\[
   L_{\sigma}(\theta)
   = \text{const}
-    + \sigma^{2}\,
+    + \sigma^{2}\!
       \mathbb E_{p_{\text{data}}}
         \bigl\|
           \nabla\log p_\theta
@@ -980,25 +982,59 @@ pre code{background:none;padding:0}
 \]</div>
 
 <p class="explain">
-  Divide away the common&nbsp;\( \sigma^{2} \) factor and let
-  \( \sigma\to0 \): the leading term is precisely
+  Divide by \( \sigma^{2} \) and let \( \sigma \to 0 \):
+  the leading term is precisely
   the Fisher divergence
   \( D_F(p_{\text{data}}\Vert p_\theta) \).
-  Therefore <strong>minimising the denoising loss
-  approaches score matching</strong>.
+  <strong>Conclusion:</strong>
+  minimising the DAE loss as \( \sigma \) vanishes
+  converges to score matching.
 </p>
 
-<!-- 5.4 diffusion insight -->
-<h3 id="dae-diffusion-insight">5.4&nbsp;Diffusion&nbsp;insight</h3>
+<!-- 5.4 zoom-out to diffusion -->
+<h3 id="dae-diffusion-insight">5.4&nbsp;How this becomes diffusion training</h3>
+
+<table class="tbl">
+  <thead><tr><th>Finite-σ DAE ingredient</th><th>Diffusion analogue</th></tr></thead>
+  <tbody>
+    <tr><td>One fixed noise level \( \sigma \)</td>
+        <td>A timetable \( \{\sigma_t\}_{t=1}^{T} \) (<code>β</code>-schedule)</td></tr>
+
+    <tr><td>Decoder \( f_\theta(x') \)</td>
+        <td>U-Net score head \( s_\theta(x_t,t) \)  
+            <br>(or ε-prediction \( \hat\varepsilon_\theta \))</td></tr>
+
+    <tr><td>Loss \( \|x - f_\theta(x')\|^{2}/\sigma^{2} \)</td>
+        <td>Loss \( \bigl\|s_\theta(x_t,t)+\varepsilon/\sigma_t\bigr\|^{2} \)  
+            (<em>one</em> such term per timestep)</td></tr>
+
+    <tr><td>Separate network per σ (if you changed σ)</td>
+        <td><strong>Shared</strong> network; timestep embedded as an input</td></tr>
+  </tbody>
+</table>
+
+<p class="bridge">
+  Training therefore amounts to <em>stacking Vincent DAEs</em> across a
+  ladder of noise levels, with a single U-Net that
+  learns to denoise <em>all</em> of them simultaneously.
+</p>
+
 <ul>
-  <li>Diffusion models do <em>not</em> send
-      \( \sigma\to0 \).  
-      Instead they train on a
-      <strong>schedule of finite σ<sub>t</sub></strong>
-      (<code>β</code>-schedule).</li>
-  <li>Every timestep’s MSE loss is a finite-σ
-      Vincent objective &mdash; the model
-      “stacks” hundreds of them and shares one U-Net across the stack.</li>
-  <li>Hence score matching, denoising auto-encoders, and diffusion
-      models all rest on the same mathematical foundation.</li>
+  <li>Large σ<sub>t</sub> timesteps teach the network about global
+      structure (big gradients, low-detail context).</li>
+  <li>Small σ<sub>t</sub> timesteps refine fine textures and
+      edges &mdash; they approximate the
+      \(\sigma\!\to\!0\) Fisher-divergence regime.</li>
+  <li>The aggregate loss
+      \( \sum_{t=1}^{T}\mathcal L_t(\theta) \)
+      is a weighted sum of Vincent objectives,
+      giving a <strong>multi-scale</strong> estimator of the
+      true score field.</li>
 </ul>
+
+<p class="explain">
+  In short: <em>every</em> diffusion timestep is a Vincent DAE with its
+  own σ<sub>t</sub>; sharing parameters across those DAEs and sweeping σ
+  from large → small is what lets diffusion models learn an accurate
+  score field for the entire data manifold.
+</p>
