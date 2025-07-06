@@ -1074,3 +1074,88 @@ pre code{background:none;padding:0}
   from large → small is what lets diffusion models learn an accurate
   score field for the entire data manifold.
 </p>
+
+
+<!-- =====================================================
+     6. Hutchinson Trace Trick — Computing the Laplacian Cheaply
+     ===================================================== -->
+<h2 id="hutchinson">6.&nbsp;Hutchinson&nbsp;Trace&nbsp;Trick&nbsp;&mdash;&nbsp;Computing the Laplacian Cheaply</h2>
+
+<p class="lead">
+  Hyvärinen’s objective contains a <em>Laplacian term</em>
+  \( \operatorname{tr}\!\bigl[\nabla_x^{2}\log p_\theta(x)\bigr] \).
+  For images the dimensionality is enormous
+  (\(d \!\gt\! 10^{5}\)),
+  so a full Hessian is infeasible
+  (\(O(d^{\,2})\) memory and time).
+  The Hutchinson trick replaces that trace with two reverse-mode gradients
+  &mdash; dropping the cost to \(O(d)\).
+</p>
+
+<!-- 6.1 key identity -->
+<h3 id="hutchinson-identity">6.1&nbsp;Key identity</h3>
+
+<p>
+  For any matrix&nbsp;<code>H</code> and any random vector&nbsp;<code>v</code>
+  satisfying
+  \( \mathbb E\bigl[vv^{\!\top}\bigr]=I \)
+  (Gaussian \( \mathcal N(0,I) \) or Rademacher ±1),
+</p>
+
+<div class="eq-scroll">\[
+  \boxed{%
+  \operatorname{tr}(H)
+  \;=\;
+  \mathbb E_{v}\bigl[v^{\!\top} H\,v\bigr].
+  }
+  \tag{6.1}
+\]</div>
+
+<p class="explain">
+  Proof: \( \mathbb E[v_i v_j] = \delta_{ij} \) so only the diagonal
+  elements of&nbsp;H survive the expectation.
+</p>
+
+<!-- 6.2 autograd recipe -->
+<h3 id="hutchinson-autograd">6.2&nbsp;Autograd recipe&nbsp;(PyTorch)</h3>
+
+<div class="code-card">
+  <div class="code-header">python</div>
+  <pre><code>v  = torch.randn_like(x)                # Gaussian probe  (ℝᵈ)
+g  = torch.autograd.grad(
+        logp, x, create_graph=True)[0]  # ∇ₓ log pθ        (ℝᵈ)
+dot = (g * v).sum()                     # vᵀ g            (scalar)
+Hv  = torch.autograd.grad(
+        dot, x, create_graph=True)[0]   # Hessian·v        (ℝᵈ)
+trace_est = (Hv * v).sum()              # vᵀ H v ≈ tr(H)
+</code></pre>
+</div>
+
+<ul>
+  <li>Two reverse-mode grads ⇒ <strong>O(d)</strong> memory/time.</li>
+  <li>Single probe is unbiased; use 2–4 probes to lower variance if
+      you have GPU headroom.</li>
+</ul>
+
+<!-- 6.3 when diffusion skips it -->
+<h3 id="hutchinson-diffusion">6.3&nbsp;Why diffusion rarely needs it</h3>
+<p>
+  In the Gaussian-label loss
+  \( \bigl\|s_\theta(x_t,t)+\varepsilon/\sigma_t\bigr\|^{2} \)
+  (Section&nbsp;3),
+  the Laplacian term from Hyvärinen’s objective
+  <em>cancelled out</em>.
+  That’s why most diffusion repos never call Hutchinson.
+  However, if you explore
+  plain score-matching energies, or
+  contrastive score estimation,
+  Hutchinson is indispensable.
+</p>
+
+<p class="bridge">
+  <strong>Take-away.</strong>&nbsp;
+  The trace trick lets you scale second-order score-matching objectives
+  to megapixel images with only two autograd passes,
+  keeping the computational footprint on par with ordinary back-prop.
+</p>
+
