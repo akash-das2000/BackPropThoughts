@@ -1273,33 +1273,39 @@ trace_est = (Hv * v).sum()              # vᵀ H v ≈ tr(H)
 
 
 <!-- =====================================================
-     9. What We Have Achieved
+     9. Conclusion
      ===================================================== -->
-<h2 id="wrap-up">9.&nbsp;What&nbsp;We&nbsp;Have&nbsp;Achieved</h2>
+<h2 id="conclusion">9.&nbsp;Conclusion</h2>
 
-<h3>9.1&nbsp;Mathematical bedrock</h3>
-<ul>
-  <li><strong>Forward kernel</strong> ⇒ analytic conditional score.</li>
-  <li><strong>Three-line Bayes</strong> ⇒ unbiased per-timestep labels.</li>
-  <li><strong>Hyvärinen proof</strong> ⇒ partition function disappears.</li>
-  <li><strong>Vincent limit</strong> ⇒ denoising ≡ score matching.</li>
-</ul>
-
-<h3>9.2&nbsp;Numerical tools</h3>
-<ul>
-  <li><strong>Hutchinson trace</strong> makes high-dim Laplacians feasible.<br>
-      (Rarely needed in diffusion, golden in generic score matching.)</li>
-</ul>
-
-<h3>9.3&nbsp;Practical recipe</h3>
-<p class="explain">
-  A U-Net + an MSE loss = state-of-the-art image generation,
-  <em>because</em> that MSE is secretly the Fisher divergence integrated
-  over a continuum of noise levels.
+<p>
+  We began with the simplest act of “adding Gaussian snow” to an image and
+  uncovered a chain of results whose elegance belies their impact.  A
+  closed-form forward kernel let us write the conditional score in a single
+  line; Bayes’ rule then turned that score into an <em>unbiased label</em>
+  available for every noisy sample.  Hyvärinen’s integration-by-parts step
+  removed the intractable partition function, while Vincent’s small-σ
+  analysis showed that denoising and score matching are merely two views of
+  the same statistic.  Together these pieces form the mathematical spine of
+  modern diffusion models.
 </p>
 
-<p class="lead" style="text-align:center">
-  <strong>From first principles&nbsp;&rarr;&nbsp;to 4 lines of code&nbsp;&rarr;&nbsp;to photorealistic images.</strong><br>
-  That’s the power of diffusion.
+<p>
+  On the numerical side, the Hutchinson trace trick demonstrated how a
+  second-order quantity that seems doomed to an <code>O(d²)</code>
+  explosion can be estimated with two reverse-mode gradients and
+  <code>O(d)</code> memory.  Although the Laplacian vanishes from the
+  Gaussian-label diffusion loss, Hutchinson remains indispensable for
+  researchers who venture beyond the comfort of analytic kernels.
 </p>
+
+<p>
+  What finally matters for practitioners is that this entire theoretical
+  scaffold collapses into four terse lines of PyTorch: build a U-Net,
+  corrupt data with the forward kernel, fabricate the label
+  <code>-ε/σ<sub>t</sub></code>, and drive an MSE loss.  Everything else—
+  schedules, EMA, or GPU wizardry—merely polishes those four lines.  In that
+  sense the journey from probability calculus to photorealistic images is
+  short: a direct footpath paved by careful mathematics.
+</p>
+
 
