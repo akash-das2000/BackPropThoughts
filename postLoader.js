@@ -1,220 +1,251 @@
-const params = new URLSearchParams(window.location.search);
-const postId = params.get("postId");
+/* ---------------------------------------------------------------
+   postLoader.js
+   ---------------------------------------------------------------
+   Expects:
+     ├─ posts/{postId}/index.html   (the article body)
+     ├─ posts/{postId}/meta.json    (optional – supplies title)
+     └─ data/index.json             (array with { slug, date })
+   ------------------------------------------------------------- */
+
+const params  = new URLSearchParams(window.location.search);
+const postId  = params.get("postId");                 // ?postId=some-slug
+const contentDiv = document.getElementById("post-content");
 
 if (!postId) {
-  document.getElementById("post-content").innerHTML = "<p>Post not found.</p>";
+  contentDiv.innerHTML = "<p>Post not found.</p>";
 } else {
-  fetch(`posts/${postId}/index.html`)
-    .then(res => {
-      if (!res.ok) throw new Error("Post not found");
-      return res.text();
-    })
-    .then(html => {
-      const contentDiv = document.getElementById("post-content");
-      contentDiv.innerHTML = html;
+  loadPost().catch(err => {
+    console.error(err);
+    contentDiv.innerHTML = "<p>Post not found.</p>";
+  });
+}
 
-      // === Trigger MathJax ===
-      requestAnimationFrame(() => {
-        if (window.MathJax?.typesetPromise) {
-          MathJax.typesetPromise([contentDiv]).catch(err =>
-            console.error("MathJax typeset failed:", err)
-          );
-        }
-      });
+/* ==========================  MAIN  =========================== */
+async function loadPost() {
+  /* 1️⃣  Grab publication date from data/index.json (if available) */
+  let pubDate = "";
+  try {
+    const idxRes = await fetch("data/index.json");
+    if (idxRes.ok) {
+      const idxJson = await idxRes.json();
+      const rec = idxJson.find(p => p.slug === postId);
+      pubDate = rec?.date || "";
+    }
+  } catch (e) { console.warn("index.json not found:", e); }
 
-      // === Reading Time + Icons (PDF, Share, Email, Clock) ===
-      const wordsPerMinute = 200;
-      const text = contentDiv.innerText || contentDiv.textContent || "";
-      const wordCount = text.trim().split(/\s+/).length;
-      const minutes = Math.max(1, Math.ceil(wordCount / wordsPerMinute));
+  /* 2️⃣  Fetch the article HTML */
+  const htmlRes = await fetch(`posts/${postId}/index.html`);
+  if (!htmlRes.ok) throw new Error("Post HTML not found");
+  const html = await htmlRes.text();
+  contentDiv.innerHTML = html;
 
-      const readingTimeDiv = document.createElement("div");
-      readingTimeDiv.className = "reading-time-display";
+  /* 3️⃣  Fire MathJax */
+  requestAnimationFrame(() => {
+    window.MathJax?.typesetPromise?.([contentDiv])
+      .catch(err => console.error("MathJax typeset failed:", err));
+  });
 
-      // PDF Download Icon
-      const pdfIcon = document.createElement("i");
-      pdfIcon.className = "fa-solid fa-download";
-      pdfIcon.title = "Download as PDF";
-      pdfIcon.style.cursor = "pointer";
-      pdfIcon.addEventListener("click", () => {
-        const element = document.getElementById("post-content");
-        const opt = {
-          margin: 0.5,
-          filename: `${document.title || "post"}.pdf`,
-          image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2 },
-          jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-        };
-        html2pdf().from(element).set(opt).save();
-      });
+  /* 4️⃣  Build meta bar (date | icons + reading-time) */
+  buildMetaBar(pubDate);
 
-      // Link Share Icon
-      const linkIcon = document.createElement("i");
-      linkIcon.className = "fa-solid fa-link";
-      linkIcon.title = "Copy Link";
-      linkIcon.style.cursor = "pointer";
-      linkIcon.addEventListener("click", () => {
-        navigator.clipboard.writeText(window.location.href)
-          .then(() => alert("Link copied to clipboard"))
-          .catch(() => alert("Failed to copy link"));
-      });
+  /* 5️⃣  Build TOC, scroll-to-top button, etc. */
+  buildTOC();
+  initScrollToTop();
+  relocateMobileTOC();
+  loadTitleFromMeta();
+}
 
-      // Email Share Icon
-      const emailIcon = document.createElement("i");
-      emailIcon.className = "fa-solid fa-envelope";
-      emailIcon.title = "Share via Email";
-      emailIcon.style.cursor = "pointer";
-      emailIcon.addEventListener("click", () => {
-        const subject = encodeURIComponent(document.title);
-        const body = encodeURIComponent(`Check out this post: ${window.location.href}`);
-        window.location.href = `mailto:?subject=${subject}&body=${body}`;
-      });
+/* -------------------------------------------------------------
+   Meta bar
+   ------------------------------------------------------------- */
+function buildMetaBar(pubDateISO) {
+  /* Reading-time estimate */
+  const wpm      = 200;
+  const text     = contentDiv.innerText || contentDiv.textContent || "";
+  const words    = text.trim().split(/\s+/).length;
+  const minutes  = Math.max(1, Math.ceil(words / wpm));
 
-      // Clock + Reading time
-      const clockIcon = document.createElement("i");
-      clockIcon.className = "fa-solid fa-clock";
-      clockIcon.title = "Estimated reading time";
-      clockIcon.style.marginLeft = "4px";
+  const bar = document.createElement("div");
+  bar.className = "reading-time-display";
 
-      const timeText = document.createElement("span");
-      timeText.textContent = `${minutes} min`;
-      timeText.style.marginLeft = "2px"; 
+  /* Left – publication date */
+  const dateSpan = document.createElement("span");
+  dateSpan.className = "post-date";
+  if (pubDateISO) {
+    dateSpan.innerHTML =
+      `<i class="fa-regular fa-calendar"></i> ${formatDate(pubDateISO)}`;
+  }
+  bar.appendChild(dateSpan);
 
-      // Append in desired order
-      readingTimeDiv.appendChild(pdfIcon);
-      readingTimeDiv.appendChild(linkIcon);
-      readingTimeDiv.appendChild(emailIcon);
-      readingTimeDiv.appendChild(clockIcon);
-      readingTimeDiv.appendChild(timeText);
+  /* Right – icons + “xx min” */
+  const iconsWrap = document.createElement("div");
+  iconsWrap.className = "meta-icons";
 
-      const firstH1 = contentDiv.querySelector("h1");
-      if (firstH1) {
-        firstH1.insertAdjacentElement("afterend", readingTimeDiv);
-      } else {
-        contentDiv.prepend(readingTimeDiv);
+  /* PDF download */
+  const pdfIcon = document.createElement("i");
+  pdfIcon.className = "fa-solid fa-download";
+  pdfIcon.title = "Download as PDF";
+  pdfIcon.addEventListener("click", () => {
+    const opt = {
+      margin: 0.5,
+      filename: `${document.title || "post"}.pdf`,
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: "in", format: "letter", orientation: "portrait" }
+    };
+    html2pdf().from(contentDiv).set(opt).save();
+  });
+
+  /* Copy link */
+  const linkIcon = document.createElement("i");
+  linkIcon.className = "fa-solid fa-link";
+  linkIcon.title = "Copy link";
+  linkIcon.addEventListener("click", () => {
+    navigator.clipboard.writeText(window.location.href)
+      .then(() => alert("Link copied to clipboard"))
+      .catch(()  => alert("Failed to copy link"));
+  });
+
+  /* Email share */
+  const emailIcon = document.createElement("i");
+  emailIcon.className = "fa-solid fa-envelope";
+  emailIcon.title = "Share via Email";
+  emailIcon.addEventListener("click", () => {
+    const subj = encodeURIComponent(document.title);
+    const body = encodeURIComponent(`Check out this post: ${window.location.href}`);
+    window.location.href = `mailto:?subject=${subj}&body=${body}`;
+  });
+
+  /* Clock + text */
+  const clockIcon = document.createElement("i");
+  clockIcon.className = "fa-solid fa-clock";
+  const timeText = document.createElement("span");
+  timeText.textContent = ` ${minutes} min`;
+
+  iconsWrap.append(pdfIcon, linkIcon, emailIcon, clockIcon, timeText);
+  bar.appendChild(iconsWrap);
+
+  /* Insert bar right after the first <h1> (fallback: prepend) */
+  const firstH1 = contentDiv.querySelector("h1");
+  firstH1 ? firstH1.insertAdjacentElement("afterend", bar)
+          : contentDiv.prepend(bar);
+}
+
+/* Helper: YYYY-MM-DD → “6 Jul 2025” */
+function formatDate(iso) {
+  const [y, m, d] = iso.split("-");
+  const months = ["Jan","Feb","Mar","Apr","May","Jun",
+                  "Jul","Aug","Sep","Oct","Nov","Dec"];
+  return `${parseInt(d, 10)} ${months[+m - 1]} ${y}`;
+}
+
+/* -------------------------------------------------------------
+   Table of Contents and related features
+   ------------------------------------------------------------- */
+function buildTOC() {
+  const tocList  = document.getElementById("toc-list");
+  tocList.innerHTML = "";
+  const headings = contentDiv.querySelectorAll("h2[id], h3[id]");
+
+  headings.forEach(h => {
+    const li = document.createElement("li");
+    li.innerHTML = `<a href="#${h.id}">${h.textContent}</a>`;
+    if (h.tagName.toLowerCase() === "h3") li.classList.add("subsection");
+    tocList.appendChild(li);
+  });
+
+  /* Active-link highlight */
+  const links = tocList.querySelectorAll("a");
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      const link = tocList.querySelector(`a[href="#${e.target.id}"]`);
+      if (link && e.isIntersecting) {
+        links.forEach(a => a.classList.remove("active"));
+        link.classList.add("active");
       }
-
-      // === TOC Generation ===
-      const tocList = document.getElementById("toc-list");
-      tocList.innerHTML = "";
-      const headings = contentDiv.querySelectorAll("h2[id], h3[id]");
-
-      headings.forEach(h => {
-        const li = document.createElement("li");
-        li.innerHTML = `<a href="#${h.id}">${h.textContent}</a>`;
-        if (h.tagName.toLowerCase() === "h3") {
-          li.classList.add("subsection");
-        }
-        tocList.appendChild(li);
-      });
-
-      // === Highlight Active TOC Link ===
-      const tocLinks = tocList.querySelectorAll("a");
-      const observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-          const id = entry.target.id;
-          const link = tocList.querySelector(`a[href="#${id}"]`);
-          if (link && entry.isIntersecting) {
-            tocLinks.forEach(a => a.classList.remove("active"));
-            link.classList.add("active");
-          }
-        });
-      }, { rootMargin: "-40% 0px -50% 0px", threshold: 0 });
-
-      headings.forEach(h => observer.observe(h));
-
-      // === TOC Collapse Toggle ===
-      const tocBox = document.querySelector(".toc-box");
-      const tocHeader = document.createElement("div");
-      tocHeader.className = "toc-header";
-      tocHeader.innerHTML = `
-        <span>Table of Contents</span>
-        <span class="toggle-icon" id="toc-toggle-icon">▲</span>
-      `;
-      tocBox.prepend(tocHeader);
-
-      const toggleIcon = tocHeader.querySelector("#toc-toggle-icon");
-      tocHeader.addEventListener("click", () => {
-        tocBox.classList.toggle("collapsed");
-        toggleIcon.textContent = tocBox.classList.contains("collapsed") ? "▼" : "▲";
-      });
-
-      // === Mobile TOC Placement After Introduction
-      try {
-        if (window.innerWidth <= 768) {
-          const rightTocSlot = document.querySelector(".right-toc-slot");
-          const h2s = Array.from(contentDiv.querySelectorAll("h2"));
-          const introHeading = h2s.find(h =>
-            h.textContent.trim().toLowerCase().includes("introduction")
-          );
-
-          if (introHeading && rightTocSlot) {
-            let walker = introHeading.nextElementSibling;
-            while (walker && walker.tagName.toLowerCase() !== "h2") {
-              walker = walker.nextElementSibling;
-            }
-
-            const wrapper = document.createElement("div");
-            wrapper.className = "mobile-toc-wrapper";
-            wrapper.appendChild(rightTocSlot);
-
-            if (walker) {
-              walker.insertAdjacentElement("beforebegin", wrapper);
-            } else {
-              contentDiv.appendChild(wrapper);
-            }
-          }
-        }
-      } catch (e) {
-        console.warn("Mobile TOC logic failed:", e);
-      }
-
-      // === Scroll to Top Button ===
-      const scrollBtn = document.createElement("button");
-      scrollBtn.id = "scrollToTopBtn";
-      scrollBtn.textContent = "▴";
-      document.body.appendChild(scrollBtn);
-
-      scrollBtn.addEventListener("click", () => {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      });
-
-      window.addEventListener("scroll", () => {
-        if (window.scrollY > 500) {
-          scrollBtn.classList.add("show");
-        } else {
-          scrollBtn.classList.remove("show");
-        }
-      });
-
-      // === Smooth Scroll for TOC links ===
-      tocList.addEventListener("click", e => {
-        const link = e.target.closest("a[href^='#']");
-        if (link) {
-          e.preventDefault();
-          const target = document.querySelector(link.getAttribute("href"));
-          if (target) {
-            target.scrollIntoView({ behavior: "smooth" });
-            history.pushState(null, null, link.getAttribute("href"));
-          }
-        }
-      });
-    })
-    .catch(err => {
-      document.getElementById("post-content").innerHTML = "<p>Post not found.</p>";
-      console.error(err);
     });
+  }, { rootMargin: "-40% 0px -50% 0px", threshold: 0 });
+  headings.forEach(h => obs.observe(h));
 
-  // === Load blog metadata ===
+  /* Collapse toggle */
+  const tocBox = document.querySelector(".toc-box");
+  const header = document.createElement("div");
+  header.className = "toc-header";
+  header.innerHTML = `
+      <span>Table of Contents</span>
+      <span class="toggle-icon" id="toc-toggle-icon">▲</span>`;
+  tocBox.prepend(header);
+
+  header.addEventListener("click", () => {
+    tocBox.classList.toggle("collapsed");
+    header.querySelector("#toc-toggle-icon").textContent =
+      tocBox.classList.contains("collapsed") ? "▼" : "▲";
+  });
+
+  /* Smooth-scroll on click */
+  tocList.addEventListener("click", e => {
+    const link = e.target.closest("a[href^='#']");
+    if (link) {
+      e.preventDefault();
+      document.querySelector(link.hash)?.scrollIntoView({ behavior: "smooth" });
+      history.pushState(null, null, link.hash);
+    }
+  });
+}
+
+/* ------------------------------------------------------------- */
+function initScrollToTop() {
+  const btn = document.createElement("button");
+  btn.id = "scrollToTopBtn";
+  btn.textContent = "▴";
+  document.body.appendChild(btn);
+
+  btn.addEventListener("click", () =>
+    window.scrollTo({ top: 0, behavior: "smooth" }));
+
+  window.addEventListener("scroll", () =>
+    window.scrollY > 500 ? btn.classList.add("show") : btn.classList.remove("show"));
+}
+
+/* Mobile: place TOC after the *entire* first section (h2 + its content) */
+function relocateMobileTOC() {
+  try {
+    if (window.innerWidth > 768) return;      // desktop → keep sidebar
+
+    const rightSlot = document.querySelector(".right-toc-slot");
+    if (!rightSlot) return;
+
+    /* first section heading = first <h2> that appears in content */
+    const firstH2 = contentDiv.querySelector("h2");
+    if (!firstH2) return;
+
+    /* walk forward until the next <h2> (or end) */
+    let insertPoint = firstH2.nextElementSibling;
+    while (insertPoint && insertPoint.tagName.toLowerCase() !== "h2") {
+      insertPoint = insertPoint.nextElementSibling;
+    }
+
+    /* wrap TOC box so CSS still works */
+    const wrapper = document.createElement("div");
+    wrapper.className = "mobile-toc-wrapper";
+    wrapper.appendChild(rightSlot);           // move the existing sidebar
+
+    /* insert before the next section or at end if no more <h2> */
+    if (insertPoint) {
+      insertPoint.before(wrapper);
+    } else {
+      contentDiv.appendChild(wrapper);
+    }
+  } catch (e) {
+    console.warn("Mobile TOC placement failed:", e);
+  }
+}
+
+
+/* Meta title (optional posts/{slug}/meta.json) */
+function loadTitleFromMeta() {
   fetch(`posts/${postId}/meta.json`)
-    .then(res => {
-      if (!res.ok) throw new Error("Meta not found");
-      return res.json();
-    })
-    .then(meta => {
-      document.title = meta.title || postId;
-    })
-    .catch(err => {
-      console.warn("Could not load blog metadata:", err);
-    });
+    .then(r => r.ok ? r.json() : {})
+    .then(m => { if (m.title) document.title = m.title; })
+    .catch(() => {});
 }
