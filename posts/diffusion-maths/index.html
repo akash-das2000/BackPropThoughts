@@ -935,9 +935,13 @@ pre code{background:none;padding:0}
 
 <p>
   Fix one noisy input \(x'\) and treat
-  \(f(x') \in \mathbb R^{d}\) as an unknown vector.  
-  The inner part of the loss (5.1) becomes the quadratic
+  \(f(x') \in \mathbb R^{d}\) as an unknown vector. 
+  <em>(We write&nbsp;\(f^{\star}\) for the decoder that minimises the
+  inner loss—think of it as the “oracle” decoder, in contrast to the real
+  network&nbsp;\(f_\theta\).)</em>
+  The inner loss (5.1) becomes the quadratic
 </p>
+
 
 <div class="eq-scroll">\[
   R_{x'}(f)
