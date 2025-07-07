@@ -1,1 +1,335 @@
+<style>
+  /* Put your styles here */
+  /* ----------  TL;DR call-out ---------- */
+/* ----------  TL;DR call-out (greyscale theme) ---------- */
+.tldr {
+  border: 1px solid #c0c0c0;      /* soft grey border */
+  border-radius: 0.5rem;
+  padding: 1rem 1.25rem;
+  background: #f5f5f5;            /* very light grey background */
+  color: #333;                    /* dark grey text for readability */
+}
+
+.tldr h2 {
+  margin: 0 0 0.5rem 0;
+  color: #111;                    /* nearly black for the heading */
+}
+
+.tldr ol {
+  margin-left: 1.3rem;
+}
+
+.tldr li strong {
+  color: #000;                    /* highlight keywords in pure black */
+}
+
+/* ----------  Ensure TL;DR inline math and text wrap on mobile  ---------- */
+.tldr,
+.tldr p,
+.tldr ol,
+.tldr li {
+  /* allow words, symbols, and math to break anywhere if needed */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+  white-space: normal;
+}
+
+/* target KaTeX/MathJax inline spans if you’re using them */
+.tldr .katex,
+.tldr .MathJax,
+.tldr span {
+  display: inline-block;
+  max-width: 100%;
+  white-space: normal;
+}
+
+/* shrink font slightly for extra safety on very small screens */
+@media (max-width: 400px) {
+  .tldr {
+    font-size: 0.90rem;
+  }
+}
+
+
+/* ----------  table styling ---------- */
+table.tbl{
+  width:100%;
+  border-collapse:collapse;
+  margin:2rem 0 2.5rem 0;
+  font-size:.95rem;
+}
+table.tbl caption{
+  caption-side:top;
+  font-weight:600;
+  margin-bottom:.4rem;
+}
+table.tbl th,
+table.tbl td{
+  border:1px solid #d0d0d0;
+  padding:.45rem .65rem;
+  text-align:left;
+  vertical-align:top;
+}
+table.tbl thead{background:#f5f7ff;}
+.tbl .shape{
+  font-family:"Roboto Mono",ui-monospace,monospace;
+  white-space:nowrap;
+}
+.fact-table th{
+  background:#f5f5f5;
+  width:160px;
+}
+
+/* ----------  lead paragraph ---------- */
+.lead{
+  font-size:1.05rem;
+  line-height:1.6;
+  margin:1.2rem 0 2rem 0;
+  color:#333;
+}
+.lead ul{margin:.6rem 0 .6rem 1.4rem}
+
+/* ----------  bridge note ---------- */
+.bridge{
+  font-size:.95rem;
+  margin:.8rem 0 1.1rem 0;
+  color:#444;
+}            /* <— THIS was the missing brace */
+
+/* ----------  display equations ---------- */
+.eq-scroll{
+  display:block;
+  overflow-x:auto;
+  white-space:nowrap;
+  text-align:center;
+  margin:1.2rem auto;
+  font-size:1.02rem;
+}
+@media(max-width:600px){
+  .eq-scroll{font-size:.9rem}
+  table.tbl{font-size:.9rem}
+}
+
+/* ----------  inline & block code ---------- */
+code,pre{
+  font-family:"Fira Code","SFMono-Regular",ui-monospace,monospace;
+  font-size:.92rem;
+}
+code{
+  background:#f3f4f6;
+  color:#1a1a1a;
+  padding:0 .25em;
+  border-radius:4px;
+}
+pre{
+  background:#f8f9fb;
+  border:1px solid #cfd2d7;
+  border-radius:6px;
+  padding:.9rem 1rem;
+  line-height:1.45;
+  overflow-x:auto;
+  margin:1.6rem 0;
+}
+pre code{background:none;padding:0}
+@media(max-width:600px){
+  pre{font-size:.82rem}
+  code{font-size:.86rem}
+}
+
+/* ----------  GitHub-style code card ---------- */
+.code-card{
+  background:#f6f8fa;
+  border:1px solid #d0d7de;
+  border-radius:6px;
+  overflow:hidden;
+  margin:1.6rem 0;
+}
+.code-card .code-header{
+  background:#eaeef2;
+  border-bottom:1px solid #d0d7de;
+  font:.75rem/1 system-ui,sans-serif;
+  color:#24292f;
+  padding:.45rem .9rem;
+  text-transform:lowercase;
+}
+.code-card pre{
+  margin:0;
+  padding:.8rem 1rem;
+  background:inherit;
+  font-size:.92rem;
+  white-space:pre;
+}
+@media(max-width:600px){
+  .code-card pre{font-size:.82rem}
+}
+  
+/* === let wide tables side-scroll on narrow screens === */
+@media (max-width: 600px){
+  table.tbl{
+    display:block;          /* makes it a scroll container   */
+    overflow-x:auto;        /* side-scroll if too wide        */
+    -webkit-overflow-scrolling: touch;
+  }
+  table.tbl thead,
+  table.tbl tbody{
+    display:table;          /* keeps header & body aligned    */
+    width:100%;
+  }
+  table.tbl th,
+  table.tbl td{
+    white-space:nowrap;     /* prevent ugly line wraps        */
+  }
+}
+
+/* ----------  Responsive heading wraps & scaling ---------- */
+
+/* Allow long words in headings to break */
+h1, h2, h3, h4, h5, h6 {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  hyphens: auto;
+  white-space: normal;       /* override any no-wrap */
+}
+
+/* Shrink heading text on narrow viewports */
+@media (max-width: 600px) {
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.3rem; }
+  h3 { font-size: 1.15rem; }
+  /* you can add h4, h5 as needed */
+}
+
+/* Optional: make the entire page text flow better on mobile */
+body {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Override scroll-to-top button on mobile so it never hangs off-screen */
+#scrollTopBtn {
+  /* default for desktop */
+  bottom: 2rem;
+  right: 2rem;
+}
+
+/* on small viewports, reduce the offsets & size */
+@media (max-width: 600px) {
+  #scrollTopBtn {
+    bottom: 1rem !important;
+    right: 1rem !important;
+    padding: 0.4rem 0.6rem !important;
+    font-size: 1rem !important;
+    max-width: 2.5rem;    /* ensure it stays compact */
+    max-height: 2.5rem;
+  }
+}
+
+
+
+</style>
+
+
+<section>
+  <h1 id="diffusion-maths-week3-4">
+    From Brownian Motion to Discrete Diffusion: The Mathematical Foundations of DDPM
+  </h1>
+
+  <!-- =======================  TL;DR box ======================= -->
+  <aside class="tldr">
+    <h2 id="TL;DR">TL;DR</h2>
+    <p>
+      This post traces the mathematical spine of diffusion models, building a clear path from stochastic calculus to practical algorithms:
+    </p>
+    <ol>
+      <li>
+        <strong>Brownian motion &amp; Itô calculus.</strong>
+        Derive how stochastic processes evolve and prove key identities like \\((dB_t)^2=dt\\).
+      </li>
+      <li>
+        <strong>Fokker–Planck PDE.</strong>
+        Show how an SDE induces a PDE over densities \\(p(x,t)\\).
+      </li>
+      <li>
+        <strong>Reverse-time SDE.</strong>
+        Step-by-step proof of the reverse drift \\(\\tilde\\mu(x,t)\\) via Anderson (1982) → Song et al. (2020).
+      </li>
+      <li>
+        <strong>Discrete DDPM formulation.</strong>
+        Discretize the SDE, derive the forward noising schedule \\(q(x_t\\mid x_0)\\) and posterior \\(q(x_0\\mid x_t)\\).
+      </li>
+      <li>
+        <strong>ELBO and toy DDPM.</strong>
+        From variational inference to a minimal Python implementation that visualizes forward/reverse diffusion.
+      </li>
+    </ol>
+    <p>
+      By the end, you'll understand every formula in Ho et al. (2020) as a direct descendant of stochastic calculus.
+    </p>
+  </aside>
+</section>
+
+<section>
+  <h1 id="diffusion-maths-week3-4">
+    From Brownian Motion to Discrete Diffusion: The Mathematical Foundations of DDPM
+  </h1>
+
+  <!-- =======================  TL;DR box ======================= -->
+  <aside class="tldr">
+    <h2 id="TL;DR">TL;DR</h2>
+    <p>
+      This post traces the mathematical spine of diffusion models, building a clear path from stochastic calculus to practical algorithms:
+    </p>
+    <ol>
+      <li>
+        <strong>Brownian motion &amp; Itô calculus.</strong>
+        Derive how stochastic processes evolve and prove key identities like \\((dB_t)^2=dt\\).
+      </li>
+      <li>
+        <strong>Fokker–Planck PDE.</strong>
+        Show how an SDE induces a PDE over densities \\(p(x,t)\\).
+      </li>
+      <li>
+        <strong>Reverse-time SDE.</strong>
+        Step-by-step proof of the reverse drift \\(\\tilde\\mu(x,t)\\) via Anderson (1982) → Song et al. (2020).
+      </li>
+      <li>
+        <strong>Discrete DDPM formulation.</strong>
+        Discretize the SDE, derive the forward noising schedule \\(q(x_t\\mid x_0)\\) and posterior \\(q(x_0\\mid x_t)\\).
+      </li>
+      <li>
+        <strong>ELBO and toy DDPM.</strong>
+        From variational inference to a minimal Python implementation that visualizes forward/reverse diffusion.
+      </li>
+    </ol>
+    <p>
+      By the end, you'll understand every formula in Ho et al. (2020) as a direct descendant of stochastic calculus.
+    </p>
+  </aside>
+</section>
+
+<h2 id="introduction">Introduction</h2>
+<p class="lead">
+  Diffusion models, like those powering state-of-the-art image generation, are built on a deceptively simple idea:
+  <em>progressively corrupt data with Gaussian noise, then learn to reverse that process</em>.
+  But under the hood lies a rich interplay of stochastic calculus, partial differential equations, and variational inference.
+</p>
+
+<p>
+  This blog post continues our journey from the <a href="https://backpropthoughts.netlify.app/post?postId=diffusion-maths" target="_blank">previous blog on score matching</a>. We now dive deep into the
+  mathematical underpinnings of diffusion models:
+</p>
+<ul>
+  <li>We start with <strong>Brownian motion</strong> and show why \\((dB_t)^2=dt\\) is the cornerstone of stochastic integrals.</li>
+  <li>We derive the <strong>Fokker–Planck equation</strong> from an SDE, revealing how densities \\(p(x,t)\\) evolve over time.</li>
+  <li>We prove the celebrated <strong>reverse-time SDE formula</strong> that enables denoising in diffusion models.</li>
+  <li>Finally, we bridge to the discrete DDPM formulation, derive its ELBO, and implement a minimal 1D toy model.</li>
+</ul>
+
+<p class="bridge">
+  Throughout, we provide rigorous proofs, plain-English intuition, and code snippets where applicable, ensuring
+  both theoretical and practical mastery.
+</p>
+
 
