@@ -233,11 +233,11 @@ body {
 
 <section>
   
-  <h1 id="diffusion-maths-week3-4">
+  <h1 id="heading">
     From Brownian Motion to Discrete Diffusion: The Mathematical Foundations of DDPM
   </h1>
 
-  <aside class="tldr">
+<aside class="tldr">
   <h2 id="TL;DR">TL;DR</h2>
   <p>
     This post traces the mathematical spine of diffusion models, building a clear path from stochastic calculus to practical algorithms:
@@ -245,19 +245,19 @@ body {
   <ol>
     <li>
       <strong>Brownian motion &amp; Itô calculus.</strong>
-      Derive how stochastic processes evolve and prove key identities like \\((dB_t)^2=dt\\).
+      Derive how stochastic processes evolve and prove key identities like (dBₜ)² = dt.
     </li>
     <li>
       <strong>Fokker–Planck PDE.</strong>
-      Show how an SDE induces a PDE over densities \\(p(x,t)\\).
+      Show how an SDE induces a PDE over densities p(x, t).
     </li>
     <li>
       <strong>Reverse-time SDE.</strong>
-      Step-by-step proof of the reverse drift \\(\\tilde\\mu(x,t)\\) via Anderson (1982) → Song et al. (2020).
+      Step-by-step proof of the reverse drift tilde-μ(x, t) via Anderson (1982) → Song et al. (2020).
     </li>
     <li>
       <strong>Discrete DDPM formulation.</strong>
-      Discretize the SDE, derive the forward noising schedule \\(q(x_t\\mid x_0)\\) and posterior \\(q(x_0\\mid x_t)\\).
+      Discretize the SDE, derive the forward noising schedule q(xₜ | x₀) and posterior q(x₀ | xₜ).
     </li>
     <li>
       <strong>ELBO and toy DDPM.</strong>
@@ -268,6 +268,7 @@ body {
     By the end, you'll understand every formula in Ho et al. (2020) as a direct descendant of stochastic calculus.
   </p>
 </aside>
+
 
 
 
