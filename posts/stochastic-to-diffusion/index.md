@@ -268,9 +268,9 @@ body {
       By the end, you'll understand every formula in Ho et al. (2020) as a direct descendant of stochastic calculus.
     </p>
   </aside>
-</section>
 
-<section>
+
+
   <h1 id="diffusion-maths-week3-4">
     From Brownian Motion to Discrete Diffusion: The Mathematical Foundations of DDPM
   </h1>
@@ -307,7 +307,7 @@ body {
       By the end, you'll understand every formula in Ho et al. (2020) as a direct descendant of stochastic calculus.
     </p>
   </aside>
-</section>
+
 
 <h2 id="introduction">Introduction</h2>
 <p class="lead">
