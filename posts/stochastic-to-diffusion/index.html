@@ -401,13 +401,13 @@ body {
 </p>
 
 <p>
-  We begin with a general stochastic differential equation (SDE):
+  Starting with a general SDE:
 </p>
 
 <div class="eq-scroll">
   \[
     dx_t = \mu(x_t, t)\,dt + \sigma(t)\,dB_t,
-  \tag{8}
+  \tag{4}
   \]
 </div>
 
@@ -415,220 +415,191 @@ body {
   where:
 </p>
 <ul>
-  <li>\(\mu(x, t)\): drift vector field, representing deterministic dynamics.</li>
-  <li>\(\sigma(t)\): scalar diffusion coefficient (assuming isotropic noise).</li>
-  <li>\(dB_t\): infinitesimal Brownian increment.</li>
+  <li>\(\mu(x, t)\): drift vector field (deterministic dynamics)</li>
+  <li>\(\sigma(t)\): diffusion coefficient (strength of noise)</li>
+  <li>\(dB_t\): Brownian increment</li>
 </ul>
 
 <p class="bridge">
-  Our goal is to derive the PDE that governs \(p(x,t)\), the probability density of \(x_t\). This involves applying Itô’s lemma to a test function \(f(x,t)\) and then using expectation.
+  We derive the PDE governing \(p(x,t)\) by applying Itô’s lemma and using the expectation operator.
 </p>
 
 <!-- ----- 3.1 Itô’s Lemma Expanded ----- -->
 <h3 id="ito-lemma">3.1 Itô’s Lemma (Expanded)</h3>
-
 <p class="lead">
-  For a twice-differentiable scalar function \(f(x,t)\), Itô’s lemma gives the differential:
+  For a twice-differentiable test function \(f(x,t)\), Itô’s lemma gives:
 </p>
 
 <div class="eq-scroll">
   \[
   df(x_t, t) = \partial_t f\,dt + \nabla_x f^\top dx_t + \tfrac12\,dx_t^\top \nabla_x^2 f\,dx_t.
-  \tag{9}
+  \tag{5}
   \]
 </div>
 
-<p>
-  Substituting \(dx_t = \mu\,dt + \sigma\,dB_t\):
-</p>
-
-<div class="eq-scroll">
+<details>
+  <summary><strong>Step-by-step derivation of Eq. (5)</strong></summary>
+  <p>
+    Expanding \(df(x_t, t)\) via Taylor’s theorem (to second order):
+  </p>
+  <div class="eq-scroll">
   \[
-  \begin{aligned}
-  df(x_t, t) ={} & \partial_t f\,dt + \nabla_x f^\top (\mu\,dt + \sigma\,dB_t) \\
-  & + \tfrac12 (\mu\,dt + \sigma\,dB_t)^\top \nabla_x^2 f (\mu\,dt + \sigma\,dB_t).
-  \end{aligned}
-  \tag{10}
+  df = \partial_t f\,dt + \nabla_x f^\top dx + \tfrac12 dx^\top \nabla_x^2 f\,dx + o(dt).
   \]
-</div>
+  </div>
 
-<p>
-  Expanding the quadratic term and applying \((dB_t)^2 = dt\):
-</p>
-
-<ul>
-  <li>Cross terms like \(dt\,dB_t\) are negligible (\(O(dt^{3/2})\)).</li>
-  <li>The only surviving second-order term is \(\tfrac12 \sigma^2 \Delta_x f\,dt\), where \(\Delta_x f = \text{tr}(\nabla_x^2 f)\).</li>
-</ul>
-
-<p class="bridge">
-  Simplifying, we get:
-</p>
-
-<div class="eq-scroll">
+  <p>
+    Substituting \(dx = \mu dt + \sigma dB_t\):
+  </p>
+  <div class="eq-scroll">
   \[
-  df(x_t, t) = \big[\partial_t f + \mu^\top\nabla_x f + \tfrac12\sigma^2\Delta_x f\big]\,dt
-  + \sigma\,\nabla_x f^\top\,dB_t.
-  \tag{11}
+  df = \partial_t f\,dt + \nabla_x f^\top (\mu dt + \sigma dB_t) + \tfrac12(\mu dt + \sigma dB_t)^\top \nabla_x^2 f(\mu dt + \sigma dB_t).
   \]
-</div>
+  </div>
 
-<p class="note">
-  The second-order term \(\tfrac12\sigma^2\Delta_x f\) arises from Brownian quadratic variation (\((dB_t)^2 = dt\)).
-</p>
+  <p>
+    Quadratic terms like \((dt)^2\) vanish. The only surviving second-order term comes from \((\sigma dB_t)^\top \nabla_x^2 f(\sigma dB_t)\):
+  </p>
+  <div class="eq-scroll">
+  \[
+  \tfrac12 \sigma^2 \Delta_x f\,dt.
+  \]
+  </div>
+
+  <p>
+    Resulting in:
+  </p>
+  <div class="eq-scroll">
+  \[
+  df = \big[\partial_t f + \mu^\top\nabla_x f + \tfrac12\sigma^2\Delta_x f\big]dt + \sigma\nabla_x f^\top dB_t.
+  \]
+  </div>
+</details>
 
 <!-- ----- 3.2 Expectation and Time Evolution ----- -->
 <h3 id="expectation-evolution">3.2 Expectation and Time Evolution</h3>
-
 <p>
-  Taking expectations of both sides and using \(\mathbb{E}[dB_t] = 0\), the stochastic term drops:
+  Taking expectations and using \(\mathbb{E}[dB_t] = 0\) removes the stochastic term:
 </p>
 
 <div class="eq-scroll">
   \[
   \frac{d}{dt}\,\mathbb{E}[f(x_t, t)] =
   \mathbb{E}\left[\partial_t f + \mu^\top\nabla_x f + \tfrac12\sigma^2\Delta_x f\right].
-  \tag{12}
+  \tag{6}
   \]
 </div>
 
+<details>
+  <summary><strong>Step-by-step derivation of Eq. (6)</strong></summary>
+  <p>
+    \(\mathbb{E}[df] = \mathbb{E}[...]\,dt\), and the stochastic integral’s expectation vanishes because \(\mathbb{E}[dB_t] = 0\).
+  </p>
+  <p>
+    So:
+  </p>
+  <div class="eq-scroll">
+  \[
+  \frac{d}{dt}\mathbb{E}[f(x_t, t)] = \mathbb{E}\left[\partial_t f + \mu^\top\nabla_x f + \tfrac12\sigma^2\Delta_x f\right].
+  \]
+  </div>
+</details>
+
+<!-- ----- 3.3 From Expectations to PDE ----- -->
+<h3 id="expectation-pde">3.3 From Expectations to PDE</h3>
 <p>
-  Since \(\mathbb{E}[f(x_t, t)] = \int f(x,t)\,p(x,t)\,dx\), differentiating under the integral gives:
+  Since \(\mathbb{E}[f(x,t)] = \int f(x)p(x,t)dx\), differentiating under the integral:
 </p>
 
 <div class="eq-scroll">
   \[
-  \frac{d}{dt}\,\mathbb{E}[f(x,t)] =
-  \int_{\mathbb{R}^d} f(x,t)\,\partial_t p(x,t)\,dx + \int_{\mathbb{R}^d} \partial_t f(x,t)\,p(x,t)\,dx.
-  \tag{13}
+  \frac{d}{dt}\mathbb{E}[f] = \int f(x)\,\partial_t p(x,t)\,dx + \int \partial_t f(x,t)\,p(x,t)\,dx.
+  \tag{7}
   \]
 </div>
+
+<details>
+  <summary><strong>Step-by-step derivation of Eq. (7)</strong></summary>
+  <p>
+    Differentiate:
+  </p>
+  <div class="eq-scroll">
+  \[
+  \frac{d}{dt}\int f(x,t)p(x,t)dx
+  \]
+  </div>
+
+  <p>
+    Chain rule splits it into two terms—one from \(\partial_t f\), one from \(\partial_t p\).
+  </p>
+</details>
 
 <p class="bridge">
-  Equating both expressions for \(\tfrac{d}{dt}\mathbb{E}[f]\):
+  Equating both expressions for \(\frac{d}{dt}\mathbb{E}[f]\) gives:
 </p>
 
 <div class="eq-scroll">
   \[
-  \int f\,\partial_t p\,dx + \int \partial_t f\,p\,dx
-  = \int \big(\partial_t f + \mu^\top\nabla_x f + \tfrac12\sigma^2\Delta_x f\big)\,p\,dx.
-  \tag{14}
+  \int f(x)\,\partial_t p(x,t)\,dx
+  = \int \big[\mu^\top\nabla_x f + \tfrac12\sigma^2\Delta_x f\big]\,p(x,t)\,dx.
+  \tag{8}
   \]
 </div>
 
+<!-- ----- 3.4 Integration by Parts ----- -->
+<h3 id="integration-parts">3.4 Integration by Parts</h3>
 <p>
-  Cancelling \(\int \partial_t f\,p\,dx\) yields:
+  Using integration by parts and divergence theorem to transfer derivatives from \(f\) to \(p\):
 </p>
 
 <div class="eq-scroll">
   \[
-  \int f\,\partial_t p\,dx
-  = \int \big(\mu^\top\nabla_x f + \tfrac12\sigma^2\Delta_x f\big)\,p\,dx.
-  \tag{15}
-  \]
-</div>
-
-<!-- ----- 3.3 Integration by Parts ----- -->
-<h3 id="integration-parts">3.3 Integration by Parts</h3>
-
-<p>
-  Using divergence theorem and integration by parts, transfer derivatives from \(f\) to \(p\):
-</p>
-
-<div class="eq-scroll">
-  \[
-  \int \mu^\top\nabla_x f\,p\,dx
-  = -\int f\,\nabla_x^\top(\mu p)\,dx,
-  \tag{16}
+  \int \mu^\top\nabla_x f\,p\,dx = -\int f\,\nabla_x^\top(\mu p)\,dx,
+  \tag{9}
   \]
 </div>
 
 <div class="eq-scroll">
   \[
-  \int \tfrac12\sigma^2\Delta_x f\,p\,dx
-  = -\int f\,\nabla_x^\top\left(\tfrac12\sigma^2\nabla_x p\right)\,dx.
-  \tag{17}
+  \int \tfrac12\sigma^2\Delta_x f\,p\,dx = -\int f\,\nabla_x^\top\left(\tfrac12\sigma^2\nabla_x p\right)\,dx.
+  \tag{10}
   \]
 </div>
 
 <p class="note">
-  Boundary terms vanish because \(p(x,t)\) decays to zero at infinity.
+  Boundary terms vanish as \(p(x,t)\) decays at infinity.
 </p>
 
-<!-- ----- 3.4 Final PDE ----- -->
-<h3 id="fokker-planck-final">3.4 The Fokker–Planck PDE</h3>
+<details>
+  <summary><strong>Why boundary terms vanish</strong></summary>
+  <p>
+    Since \(p(x,t)\) represents a probability density, it goes to zero sufficiently fast as \(|x| \to \infty\).
+  </p>
+</details>
 
+<!-- ----- 3.5 Final PDE ----- -->
+<h3 id="fokker-planck-final">3.5 The Fokker–Planck PDE</h3>
 <p>
-  Substitute results into Eq. (15):
+  Substituting back yields:
 </p>
 
 <div class="eq-scroll">
   \[
-  \int f\,\partial_t p\,dx
-  = -\int f\,\nabla_x^\top(\mu p)\,dx
-    -\int f\,\nabla_x^\top\left(\tfrac12\sigma^2\nabla_x p\right)\,dx.
-  \tag{18}
-  \]
-</div>
-
-<p>
-  Since \(f(x,t)\) is arbitrary:
-</p>
-
-<div class="eq-scroll">
-  \[
-  \partial_t p(x,t)
-  = -\nabla_x^\top[\mu(x,t)p(x,t)]
-    + \nabla_x^\top\left(\tfrac12\sigma^2(t)\nabla_x p(x,t)\right).
-  \tag{19}
+  \partial_t p(x,t) = -\nabla_x^\top[\mu(x,t)p(x,t)] + \nabla_x^\top\left(\tfrac12\sigma^2(t)\nabla_x p(x,t)\right).
+  \tag{11}
   \]
 </div>
 
 <p class="explain">
-  This is the <strong>Fokker–Planck equation</strong>(also called the forward Kolmogorov equation).
+  This is the <strong>Fokker–Planck equation</strong> (a.k.a. forward Kolmogorov equation).
 </p>
 
-<!-- ----- 3.5 Visual Explanation Placeholder ----- -->
 <figure>
   <img src="posts/stochastic-to-diffusion/assets/figure1.png" alt="Drift and Diffusion of probability density">
   <figcaption>
-    Figure 1: Evolution of probability density showing drift (left) and diffusion (right). Drift compresses or shifts densities, while diffusion spreads them out.
+    <strong>Figure 1:</strong> Evolution of probability density showing drift (left) and diffusion (right). Drift compresses or shifts densities; diffusion spreads them out.
   </figcaption>
 </figure>
-
-
-<!-- ----- 3.6 Simplified Form ----- -->
-<h3 id="fokker-planck-scalar">3.5 Simplified (Scalar Diffusion)</h3>
-<p>
-  For constant scalar \(\sigma(t)=\sigma\):
-</p>
-
-<div class="eq-scroll">
-  \[
-  \partial_t p
-  = -\nabla_x\cdot(\mu p) + \tfrac12\sigma^2\Delta_x p.
-  \tag{20}
-  \]
-</div>
-
-<p class="note">
-  Here, \(\nabla_x\cdot(\mu p)\) represents drift (advection), and \(\tfrac12\sigma^2\Delta_x p\) represents diffusion (smoothing).
-</p>
-
-<!-- ----- 3.7 Connection to Diffusion Models ----- -->
-<h3 id="fokker-planck-why">3.6 Connection to Diffusion Models</h3>
-<p class="lead">
-  In diffusion models:
-</p>
-<ul>
-  <li>The forward process is a discretization of this PDE.</li>
-  <li>\(-\nabla_x\cdot(\mu p)\): Drift towards a prior (e.g., zero mean Gaussian).</li>
-  <li>\(\tfrac12\sigma^2\Delta_x p\): Noise spreading probability mass over \(\mathbb{R}^d\).</li>
-</ul>
-
-<p class="bridge">
-  This PDE underpins the forward noising process. Reversing it (Section 4) leads to the reverse-time SDE—the foundation of DDPMs.
-</p>
 
 <!-- ========== Section 4: Reverse-Time SDE ========== -->
 <h2 id="reverse-sde">4. Deriving the Reverse-Time SDE</h2>
