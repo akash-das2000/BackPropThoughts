@@ -826,3 +826,110 @@ body {
 <p class="note">
   <strong>Key Takeaway:</strong> Continuous-time diffusion models unify stochastic calculus and score-based learning under a single elegant loss function.
 </p>
+
+
+<!-- ========== Section: Continuous-Time Loss Interpretation ========== -->
+<h2 id="continuous-time-loss">Continuous-Time Loss Interpretation</h2>
+
+<p class="lead">
+  The continuous-time training objective we derived earlier integrates a time-weighted error across all noise levels \(t \in [0, T]\). Understanding how this loss distributes over time is crucial for designing effective noise schedules \(\beta(t)\) and sampling strategies.
+</p>
+
+<p>
+  Recall the continuous-time objective:
+</p>
+
+<div class="eq-scroll">
+  \[
+    L(\theta) = \int_0^T g(t)^2\, \mathbb{E}_{p_t(x)}\left[\|s_\theta(x, t) - \nabla_x \log p_t(x)\|^2\right]\, dt
+  \]
+</div>
+
+<p>
+  Here, the weighting term \(g(t)^2\) arises from the diffusion process and controls how much each time \(t\) contributes to the total loss.
+</p>
+
+
+<!-- ----- 6.1 Time-Weighted Loss Density ----- -->
+<h3 id="time-weighted-loss">6.1 Time-Weighted Loss Density</h3>
+<p class="lead">
+  Let’s define the instantaneous loss density \(\ell(t)\) as:
+</p>
+
+<div class="eq-scroll">
+  \[
+    \ell(t) = g(t)^2\, \mathbb{E}_{p_t(x)}\left[\|s_\theta(x, t) - \nabla_x \log p_t(x)\|^2\right]
+  \]
+</div>
+
+<p>
+  Then the total loss integrates \(\ell(t)\) over the interval \([0, T]\):
+</p>
+
+<div class="eq-scroll">
+  \[
+    L(\theta) = \int_0^T \ell(t)\, dt
+  \]
+</div>
+
+<p>
+  The function \(\ell(t)\) captures how much error arises at each point in time. Different noise schedules \(\beta(t)\) directly affect \(g(t)\) and hence redistribute loss density across the interval.
+</p>
+
+<!-- ----- 6.2 Early vs. Late Time Contributions ----- -->
+<h3 id="early-late-time">6.2 Early vs. Late Time Contributions</h3>
+<p class="lead">
+  Consider two common noise schedules:
+</p>
+<ul>
+  <li><strong>Linear schedule:</strong> \(\beta(t)\) grows linearly over time.</li>
+  <li><strong>Cosine schedule:</strong> \(\beta(t)\) follows a cosine-shaped curve, emphasizing earlier timesteps.</li>
+</ul>
+
+<p>
+  In a linear schedule, late times (high noise levels) dominate \(\ell(t)\) because \(g(t)^2\) is larger. Conversely, a cosine schedule redistributes weight towards early times, ensuring the model focuses more on denoising in low-noise regions where data structure remains.
+</p>
+
+<details>
+  <summary><strong>Why does \(g(t)^2\) weight later times more heavily?</strong></summary>
+  <p>
+    Recall that \(g(t)\) reflects the diffusion strength. In linear schedules, \(g(t)\) increases with \(t\), so \(g(t)^2\) scales quadratically with time.
+  </p>
+  <p>
+    As a result, errors at high noise levels (late times) contribute disproportionately to \(L(\theta)\).
+  </p>
+</details>
+
+<p class="note">
+  <strong>Insight:</strong> The choice of \(\beta(t)\) indirectly shapes which regions in time the model prioritizes during training.
+</p>
+
+<!-- ----- 6.3 Fisher Information Perspective ----- -->
+<h3 id="fisher-perspective">6.3 Fisher Information Perspective</h3>
+<p class="lead">
+  The loss can also be viewed through the lens of Fisher information. Recall from score matching:
+</p>
+
+<div class="eq-scroll">
+  \[
+    \mathcal{I}(t) = \mathbb{E}_{p_t(x)}\left[\|\nabla_x \log p_t(x)\|^2\right]
+  \]
+</div>
+
+<p>
+  This measures the sensitivity of the data distribution at time \(t\). The model’s objective is to approximate \(\nabla_x \log p_t(x)\) with \(s_\theta(x, t)\) across all \(t\).
+</p>
+
+<p class="bridge">
+  Viewing \(\ell(t)\) as a “time-local Fisher information error” highlights why uniform weighting across \(t\) (as in some schedules) can lead to suboptimal performance: some time regions are inherently more informative for learning.
+</p>
+
+<!-- ----- 6.4 Summary ----- -->
+<h3 id="loss-summary">6.4 Summary</h3>
+<p class="lead">
+  The continuous-time loss distributes error contributions unevenly across the diffusion trajectory. Understanding and visualizing \(\ell(t)\) helps design better noise schedules and samplers that align training emphasis with regions of high information content.
+</p>
+
+<p class="note">
+  <strong>Key Takeaway:</strong> The instantaneous loss density \(\ell(t)\) explains how noise schedules influence model focus. Cosine schedules, for example, encourage learning in lower-noise regimes where data structure is richer.
+</p>
