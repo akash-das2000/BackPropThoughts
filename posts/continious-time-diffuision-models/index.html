@@ -344,7 +344,9 @@ body {
 </p>
 
 <div class="eq-scroll">
-  dx_t = f(x, t) dt + g(t) dB_t
+  \[
+    dx_t = f(x, t)\,dt + g(t)\,dB_t
+  \]
 </div>
 
 <p>
@@ -352,7 +354,9 @@ body {
 </p>
 
 <div class="eq-scroll">
-  f(x, t) = -½ β(t) x
+  \[
+    f(x, t) = -\tfrac{1}{2}\,\beta(t)\,x
+  \]
 </div>
 
 <p>
@@ -360,7 +364,9 @@ body {
 </p>
 
 <div class="eq-scroll">
-  g(t) = √β(t)
+  \[
+    g(t) = \sqrt{\beta(t)}
+  \]
 </div>
 
 <p class="bridge">
@@ -372,11 +378,13 @@ body {
 <!-- ----- 3.1 From Discrete to Continuous ----- -->
 <h3 id="discrete-to-continuous">3.1 From Discrete to Continuous</h3>
 <p class="lead">
-  In DDPM, the forward process is:
+  In DDPM, the forward process is defined as:
 </p>
 
 <div class="eq-scroll">
-  x_t = √(1 - β_t) x_{t-1} + √β_t ε_t, ε_t ~ N(0, I)
+  \[
+    x_t = \sqrt{1 - \beta_t}\,x_{t-1} + \sqrt{\beta_t}\,\epsilon_t,\quad \epsilon_t \sim \mathcal{N}(0, I)
+  \]
 </div>
 
 <p>
@@ -384,23 +392,29 @@ body {
 </p>
 
 <div class="eq-scroll">
-  √(1 - β_t) ≈ 1 - ½ β_t
+  \[
+    \sqrt{1 - \beta_t} \approx 1 - \tfrac{1}{2}\,\beta_t
+  \]
 </div>
 
 <p>
-  This gives:
+  Substituting back, we get:
 </p>
 
 <div class="eq-scroll">
-  x_t - x_{t-1} ≈ -½ β_t x_{t-1} + √β_t ε_t
+  \[
+    x_t - x_{t-1} \approx -\tfrac{1}{2}\,\beta_t\,x_{t-1} + \sqrt{\beta_t}\,\epsilon_t
+  \]
 </div>
 
 <p>
-  Dividing both sides by Δt (where Δt = 1/T, the timestep size) and taking the limit Δt → 0, we obtain the forward SDE:
+  Dividing both sides by \(\Delta t\) (where \(\Delta t = 1/T\), the timestep size) and taking the limit \(\Delta t \to 0\), we obtain the continuous-time forward SDE:
 </p>
 
 <div class="eq-scroll">
-  dx_t = -½ β(t) x_t dt + √β(t) dB_t
+  \[
+    dx_t = -\tfrac{1}{2}\,\beta(t)\,x_t\,dt + \sqrt{\beta(t)}\,dB_t
+  \]
 </div>
 
 <details>
@@ -410,31 +424,39 @@ body {
   </p>
 
   <div class="eq-scroll">
-    x_t = √(1 - β_t) x_{t-1} + √β_t ε_t
+    \[
+      x_t = \sqrt{1 - \beta_t}\,x_{t-1} + \sqrt{\beta_t}\,\epsilon_t
+    \]
   </div>
 
   <p>
-    Approximate √(1 - β_t) ≈ 1 - ½ β_t:
+    Approximate \(\sqrt{1 - \beta_t} \approx 1 - \tfrac{1}{2}\,\beta_t\):
   </p>
 
   <div class="eq-scroll">
-    x_t ≈ (1 - ½ β_t) x_{t-1} + √β_t ε_t
+    \[
+      x_t \approx (1 - \tfrac{1}{2}\,\beta_t)\,x_{t-1} + \sqrt{\beta_t}\,\epsilon_t
+    \]
   </div>
 
   <p>
-    Rewrite:
+    Simplify:
   </p>
 
   <div class="eq-scroll">
-    x_t - x_{t-1} ≈ -½ β_t x_{t-1} + √β_t ε_t
+    \[
+      x_t - x_{t-1} \approx -\tfrac{1}{2}\,\beta_t\,x_{t-1} + \sqrt{\beta_t}\,\epsilon_t
+    \]
   </div>
 
   <p>
-    Divide both sides by Δt and recognize:
+    Divide by \(\Delta t\) and recognize the limits:
   </p>
 
   <div class="eq-scroll">
-    (x_t - x_{t-1}) / Δt → dx_t / dt, √β_t / √Δt → √β(t)
+    \[
+      \frac{x_t - x_{t-1}}{\Delta t} \to \frac{dx_t}{dt},\quad \frac{\sqrt{\beta_t}}{\sqrt{\Delta t}} \to \sqrt{\beta(t)}
+    \]
   </div>
 
   <p>
@@ -442,12 +464,14 @@ body {
   </p>
 
   <div class="eq-scroll">
-    dx_t = -½ β(t) x_t dt + √β(t) dB_t
+    \[
+      dx_t = -\tfrac{1}{2}\,\beta(t)\,x_t\,dt + \sqrt{\beta(t)}\,dB_t
+    \]
   </div>
 </details>
 
 <p class="note">
-  <strong>Key Insight:</strong> The drift term \(-½ β(t) x_t\) pulls samples towards zero, while \(\sqrt{β(t)}\) controls the diffusion (noise injection).
+  <strong>Key Insight:</strong> The drift term \(-\tfrac{1}{2}\,\beta(t)\,x_t\) pulls samples toward the origin, while the diffusion term \(\sqrt{\beta(t)}\) injects Gaussian noise.
 </p>
 
 ---
@@ -455,27 +479,26 @@ body {
 <!-- ----- 3.2 Common Noise Schedules ----- -->
 <h3 id="common-schedules">3.2 Common Noise Schedules</h3>
 <p class="lead">
-  The choice of \(\beta(t)\) profoundly affects training stability and sampling quality. Common schedules include:
+  The choice of \(\beta(t)\) profoundly affects training stability and sample quality. Common schedules include:
 </p>
 
 <ul>
-  <li><strong>Linear:</strong> β(t) increases linearly from β₀ to β₁</li>
-  <li><strong>Cosine:</strong> β(t) follows a cosine curve for smoother noise accumulation (Nichol & Dhariwal, 2021)</li>
-  <li><strong>Exponential:</strong> β(t) = β₀ exp(λt)</li>
+  <li><strong>Linear:</strong> \(\beta(t)\) increases linearly from \(\beta_0\) to \(\beta_1\).</li>
+  <li><strong>Cosine:</strong> \(\beta(t)\) follows a cosine curve for smoother noise accumulation (Nichol & Dhariwal, 2021).</li>
+  <li><strong>Exponential:</strong> \(\beta(t) = \beta_0\,e^{\lambda t}\)</li>
 </ul>
 
 <p>
-  Visualizing \(\beta(t)\) and the resulting diffusion coefficient \(g(t) = √β(t)\) helps in understanding their behavior.
+  Visualizing \(\beta(t)\) and the resulting diffusion coefficient \(g(t) = \sqrt{\beta(t)}\) helps understand their impact.
 </p>
 
 <figure>
   <img src="posts/continuous-diffusion/assets/beta_schedules.png" alt="Examples of noise schedules β(t)">
   <figcaption>
-    <strong>Figure 1:</strong> Common noise schedules used in continuous-time diffusion models. Linear schedules steadily increase noise, while cosine schedules emphasize early stages.
+    <strong>Figure 1:</strong> Common noise schedules used in continuous-time diffusion models. Linear schedules steadily increase noise, while cosine schedules emphasize early timesteps.
   </figcaption>
 </figure>
 
 <p class="note">
-  Choosing an appropriate \(\beta(t)\) is critical: too fast, and samples are corrupted prematurely; too slow, and training becomes inefficient.
+  <strong>Takeaway:</strong> Carefully designing \(\beta(t)\) balances noise injection across time, crucial for stable training.
 </p>
-
