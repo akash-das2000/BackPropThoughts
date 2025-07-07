@@ -96,7 +96,21 @@ table.tbl thead{background:#f5f7ff;}
   font-size:.95rem;
   margin:.8rem 0 1.1rem 0;
   color:#444;
-}            /* <— THIS was the missing brace */
+}          
+
+/* ----------  note paragraph ---------- */
+.note {
+  border-left: 3px solid #888;     /* subtle grey accent */
+  padding: 0.6rem 1rem;
+  margin: 1rem 0;
+  background: #f9f9f9;             /* very light grey background */
+  color: #333;                     /* dark text for readability */
+  font-size: 0.97rem;
+  line-height: 1.5;
+}
+.note strong {
+  color: #000;                     /* bold keywords in pure black */
+}
 
 /* ----------  display equations ---------- */
 .eq-scroll{
@@ -378,4 +392,217 @@ body {
   <p class="note">
     <strong>Key Takeaway:</strong> \((dB_t)^2=dt\) bridges random fluctuations to smooth density evolution, enabling Gaussian marginals.
   </p>
-</section>
+
+  <!-- ========== Section 3: Fokker–Planck PDE ========== -->
+<h2 id="fokker-planck">3. Deriving the Fokker–Planck Equation</h2>
+
+<p class="lead">
+  The Fokker–Planck equation describes how the probability density \(p(x, t)\) of a stochastic process evolves over time.
+  For diffusion models, it formalizes the forward noising process as a PDE on \(p(x,t)\).
+</p>
+
+<p>
+  Starting from a stochastic differential equation (SDE):
+</p>
+
+<div class="eq-scroll">
+  \[
+    dx_t = \mu(x_t, t)\,dt + \sigma(t)\,dB_t,
+  \tag{8}
+  \]
+</div>
+
+<p>
+  where:
+</p>
+<ul>
+  <li>\(\mu(x,t)\): drift vector field, guiding the deterministic part.</li>
+  <li>\(\sigma(t)\): scalar diffusion coefficient (for simplicity, assumed isotropic).</li>
+  <li>\(dB_t\): infinitesimal Brownian increment.</li>
+</ul>
+
+<p class="bridge">
+  Our goal is to derive the PDE satisfied by \(p(x,t)\), the probability density of \(x_t\). This requires applying Itô’s lemma to a test function \(f(x,t)\) and taking expectations.
+</p>
+
+<!-- ----- 3.1 Itô’s Lemma ----- -->
+<h3 id="ito-lemma">3.1 Itô’s Lemma Recap</h3>
+
+<p class="lead">
+  For a twice-differentiable function \(f(x,t)\), Itô’s lemma gives:
+</p>
+
+<div class="eq-scroll">
+  \[
+    df(x_t, t) = \left(\partial_t f + \mu^\top\nabla_x f + \tfrac12\sigma^2\Delta_x f\right)\,dt + \sigma\nabla_x f^\top dB_t,
+  \tag{9}
+  \]
+</div>
+
+<p>
+  where:
+</p>
+<ul>
+  <li>\(\nabla_x f\): gradient of \(f\) w.r.t. \(x\).</li>
+  <li>\(\Delta_x f = \nabla_x^\top\nabla_x f\): Laplacian (sum of second derivatives).</li>
+</ul>
+
+<p class="bridge">
+  The term \(\tfrac12\sigma^2\Delta_x f\) arises because \((dB_t)^2 = dt\) from quadratic variation (see Eq. (2)).
+</p>
+
+<!-- ----- 3.2 Time evolution of expectations ----- -->
+<h3 id="expectation-evolution">3.2 Time Evolution of Expectations</h3>
+
+<p>
+  Take expectations on both sides. Since \(\mathbb{E}[dB_t] = 0\), the stochastic term drops out:
+</p>
+
+<div class="eq-scroll">
+  \[
+    \frac{d}{dt}\,\mathbb{E}[f(x_t, t)] = \mathbb{E}\left[\partial_t f + \mu^\top\nabla_x f + \tfrac12\sigma^2\Delta_x f\right].
+  \tag{10}
+  \]
+</div>
+
+<p>
+  But \(\mathbb{E}[f(x_t,t)]\) can also be written using \(p(x,t)\):
+</p>
+
+<div class="eq-scroll">
+  \[
+    \mathbb{E}[f(x,t)] = \int_{\mathbb{R}^d} f(x,t)\,p(x,t)\,dx.
+  \tag{11}
+  \]
+</div>
+
+<p class="bridge">
+  Differentiating under the integral sign gives:
+</p>
+
+<div class="eq-scroll">
+  \[
+    \frac{d}{dt}\,\mathbb{E}[f(x,t)] = \int_{\mathbb{R}^d} f(x,t)\,\partial_t p(x,t)\,dx + \int_{\mathbb{R}^d} \partial_t f(x,t)\,p(x,t)\,dx.
+  \tag{12}
+  \]
+</div>
+
+<!-- ----- 3.3 Equating both expressions ----- -->
+<h3 id="equate">3.3 Equating and Rearranging</h3>
+
+<p>
+  Equate the two expressions for \(\tfrac{d}{dt}\,\mathbb{E}[f]\) from Eq. (10) and Eq. (12):
+</p>
+
+<div class="eq-scroll">
+  \[
+    \int f\,\partial_t p\,dx + \int \partial_t f\,p\,dx = \int \left(\partial_t f + \mu^\top\nabla_x f + \tfrac12\sigma^2\Delta_x f\right)p\,dx.
+  \tag{13}
+  \]
+</div>
+
+<p class="bridge">
+  Cancel \(\int \partial_t f\,p\,dx\) from both sides:
+</p>
+
+<div class="eq-scroll">
+  \[
+    \int f\,\partial_t p\,dx = \int \left(\mu^\top\nabla_x f + \tfrac12\sigma^2\Delta_x f\right)p\,dx.
+  \tag{14}
+  \]
+</div>
+
+<!-- ----- 3.4 Integration by parts ----- -->
+<h3 id="integration-parts">3.4 Integration by Parts</h3>
+
+<p>
+  Use integration by parts to move derivatives from \(f\) onto \(p\):
+</p>
+
+<div class="eq-scroll">
+  \[
+    \int \mu^\top\nabla_x f\,p\,dx = -\int f\,\nabla_x^\top(\mu p)\,dx,
+  \tag{15}
+  \]
+</div>
+
+<div class="eq-scroll">
+  \[
+    \int \tfrac12\sigma^2\Delta_x f\,p\,dx = -\int f\,\nabla_x^\top\left(\tfrac12\sigma^2\nabla_x p\right)\,dx.
+  \tag{16}
+  \]
+</div>
+
+<p class="note">
+  Here, boundary terms vanish assuming \(p(x,t)\) decays fast enough at infinity.
+</p>
+
+<!-- ----- 3.5 Final PDE ----- -->
+<h3 id="fokker-planck-final">3.5 The Fokker–Planck PDE</h3>
+
+<p class="bridge">
+  Substitute Eq. (15) and (16) back into Eq. (14):
+</p>
+
+<div class="eq-scroll">
+  \[
+    \int f\,\partial_t p\,dx
+    = -\int f\,\nabla_x^\top(\mu p)\,dx
+      -\int f\,\nabla_x^\top\left(\tfrac12\sigma^2\nabla_x p\right)\,dx.
+  \tag{17}
+  \]
+</div>
+
+<p>
+  Since \(f(x,t)\) is arbitrary, the integrands must be equal:
+</p>
+
+<div class="eq-scroll">
+  \[
+    \partial_t p(x,t)
+    = -\nabla_x^\top[\mu(x,t)p(x,t)]
+      + \nabla_x^\top\left(\tfrac12\sigma^2(t)\nabla_x p(x,t)\right).
+  \tag{18}
+  \]
+</div>
+
+<p class="explain">
+  This is the **Fokker–Planck equation** (also known as the forward Kolmogorov equation).
+</p>
+
+<!-- ----- 3.6 Simplified scalar diffusion case ----- -->
+<h3 id="fokker-planck-scalar">3.6 Simplified (scalar diffusion)</h3>
+<p>
+  For constant scalar \(\sigma(t) = \sigma\):
+</p>
+
+<div class="eq-scroll">
+  \[
+    \partial_t p
+    = -\nabla_x\cdot(\mu p)
+      + \tfrac12\sigma^2\Delta_x p.
+  \tag{19}
+  \]
+</div>
+
+<p class="note">
+  \(\nabla_x\cdot(\mu p)\): Drift-induced probability flow.  
+  \(\tfrac12\sigma^2\Delta_x p\): Diffusion smoothing the density.
+</p>
+
+<!-- ----- 3.7 Why this matters for diffusion models ----- -->
+<h3 id="fokker-planck-why">3.7 Connection to Diffusion Models</h3>
+<p class="lead">
+  In diffusion models:
+</p>
+<ul>
+  <li>The forward noising process is a discretization of the Fokker–Planck PDE.</li>
+  <li>\(\nabla_x\cdot(\mu p)\) captures how data points drift towards zero.</li>
+  <li>\(\tfrac12\sigma^2\Delta_x p\) explains how Gaussian noise spreads out the density.</li>
+</ul>
+
+<p class="bridge">
+  Later, reversing this PDE leads to the reverse-time SDE (Section 4), the core of denoising diffusion.
+</p>
+
+
