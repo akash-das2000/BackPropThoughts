@@ -790,6 +790,15 @@ body {
   Each step in the learned reverse process approximates sampling from the true posterior \(p(x_{t-1}|x_t)\).
 </p>
 
+<!-- ----- 4.4 Visual Explanation Placeholder ----- -->
+<figure>
+  <img src="posts/stochastic-to-diffusion/assets/figure2.png" alt="Forward and reverse-time SDE illustration">
+  <figcaption>
+    Figure 2: Visual representation of the forward SDE \(dx_t = \mu(x,t)\,dt + \sigma(t)\,dB_t\) (left) and the reverse-time SDE \(dx_t = [\mu(x,t) - \sigma^2(t)\nabla_x\log p(x,t)]dt + \sigma(t)dB_t\) (right).
+  </figcaption>
+</figure>
+
+
 <!-- ----- 4.5 Summary ----- -->
 <h3 id="reverse-sde-summary">4.5 Summary</h3>
 <p class="lead">
