@@ -289,109 +289,108 @@ body {
   </p>
 
   <!-- ========== Section 2: Brownian Motion & Quadratic Variation ========== -->
-  <h2 id="brownian-motion">2. Brownian Motion &amp; Quadratic Variation</h2>
+<h2 id="brownian-motion">2. Brownian Motion &amp; Quadratic Variation</h2>
 
-  <!-- ----- 2.1 Intuition ----- -->
-  <h3 id="brownian-intuition">2.1 Intuition: Brownian Motion and Quadratic Variation</h3>
-  <p class="lead">
-    Brownian motion, or Wiener process, is the cornerstone of stochastic calculus.
-    It describes a continuous-time random walk with independent Gaussian increments:
+<!-- ----- 2.1 Intuition ----- -->
+<h3 id="brownian-intuition">2.1 Intuition: Brownian Motion and Quadratic Variation</h3>
+<p class="lead">
+  Brownian motion, or Wiener process, is the cornerstone of stochastic calculus.
+  It describes a continuous-time random walk with independent Gaussian increments:
+</p>
+<div class="eq-scroll">
+  \[
+    B_{t+s} - B_t \sim \mathcal{N}(0, s),
+    \quad \text{for all } s \geq 0.
+  \tag{1}
+  \]
+</div>
+
+<ul>
+  <li><strong>Independent increments:</strong> Each step is independent of the past.</li>
+  <li><strong>Variance scaling:</strong> \(\mathrm{Var}[B_t] = t\).</li>
+</ul>
+
+<p class="bridge">
+  Crucially, Brownian paths are nowhere differentiable but have a well-defined quadratic variation:
+</p>
+<div class="eq-scroll">
+  \[
+    (dB_t)^2 = dt.
+  \tag{2}
+  \]
+</div>
+
+<details>
+  <summary><strong>Step-by-step derivation of \((dB_t)^2 = dt\)</strong></summary>
+  <p>
+    Consider partitioning \([0, t]\) into \(n\) subintervals of width \(\Delta t = t/n\). Define increments:
   </p>
   <div class="eq-scroll">
-    \[
-      B_{t+s} - B_t \sim \mathcal{N}(0, s),
-      \quad \text{for all } s \geq 0.
-    \tag{1}
-    \]
-  </div>
-  <ul>
-    <li><strong>Independent increments:</strong> Each step is independent of the past.</li>
-    <li><strong>Variance scaling:</strong> \(\mathrm{Var}[B_t] = t\).</li>
-  </ul>
-  <p class="bridge">
-    Crucially, Brownian paths are nowhere differentiable but have a well-defined quadratic variation:
-  </p>
-  <div class="eq-scroll">
-    \[
-      (dB_t)^2 = dt.
-    \tag{2}
-    \]
+  \[
+    \Delta B_i = B_{t_i} - B_{t_{i-1}} \sim \mathcal{N}(0, \Delta t).
+  \]
   </div>
 
-  <!-- ----- 2.2 Proof ----- -->
-  <h3 id="brownian-proof">2.2 Proof: Why \((dB_t)^2 = dt\)</h3>
-  <p class="lead">
-    Let’s rigorously show how quadratic variation leads to this key identity.
-  </p>
   <p>
-    Partition \([0, t]\) into \(n\) intervals of width \(\Delta t = t/n\). The increments:
+    The quadratic variation is defined as:
   </p>
   <div class="eq-scroll">
-    \[
-      \Delta B_i = B_{t_i} - B_{t_{i-1}} \sim \mathcal{N}(0, \Delta t).
-    \tag{3}
-    \]
+  \[
+    [B]_t = \lim_{n \to \infty} \sum_{i=1}^n (\Delta B_i)^2.
+  \]
   </div>
-  <p>
-    The quadratic variation of \(B_t\) is:
-  </p>
-  <div class="eq-scroll">
-    \[
-      [B]_t = \lim_{n \to \infty} \sum_{i=1}^n (\Delta B_i)^2.
-    \tag{4}
-    \]
-  </div>
-  <p>
-    Since \(\mathbb{E}[(\Delta B_i)^2] = \Delta t\), the expected sum:
-  </p>
-  <div class="eq-scroll">
-    \[
-      \mathbb{E}\left[\sum_{i=1}^n (\Delta B_i)^2\right] = n\Delta t = t.
-    \tag{5}
-    \]
-  </div>
-  <p class="bridge">
-    As \(n \to \infty\), this converges in probability:
-  </p>
-  <div class="eq-scroll">
-    \[
-      [B]_t = t.
-    \tag{6}
-    \]
-  </div>
-  <p class="explain">
-    In differential form, \((dB_t)^2 = dt\) becomes the cornerstone of Itô calculus.
-  </p>
 
-  <!-- ----- 2.3 Connection to Diffusion Models ----- -->
-  <h3 id="brownian-connection">2.3 Connection to Diffusion Models</h3>
-  <p class="lead">
-    The identity \((dB_t)^2 = dt\) is not just an abstract feature of Brownian motion; it is the
-    linchpin in the mathematics of diffusion models.
-  </p>
   <p>
-    Consider a stochastic differential equation (SDE):
+    Since each increment satisfies \(\mathbb{E}[(\Delta B_i)^2] = \Delta t\), the expected sum is:
   </p>
   <div class="eq-scroll">
-    \[
-      dx_t = \mu(x_t, t)\,dt + \sigma(t)\,dB_t.
-    \tag{7}
-    \]
+  \[
+    \mathbb{E}\left[\sum_{i=1}^n (\Delta B_i)^2\right] = n\Delta t = t.
+  \]
   </div>
+
   <p>
-    Here \(\mu(x_t, t)\) is the drift and \(\sigma(t)\) the diffusion coefficient. When applying Itô’s lemma:
+    Using variance bounds and convergence in probability (law of large numbers for martingales), the quadratic variation converges:
   </p>
-  <ul>
-    <li><strong>\(dB_t\):</strong> contributes random noise.</li>
-    <li><strong>\((dB_t)^2\):</strong> contributes deterministic drift correction via \(dt\).</li>
-  </ul>
-  <p class="bridge">
-    Without \((dB_t)^2=dt\), the derivation of the <strong>Fokker–Planck PDE</strong> (Section 3) and the
-    <strong>reverse-time SDE</strong> (Section 4) would break down.
+  <div class="eq-scroll">
+  \[
+    [B]_t = t \quad \text{almost surely}.
+  \]
+  </div>
+
+  <p>
+    In differential notation, this leads directly to:
   </p>
-  <p class="note">
-    <strong>Key Takeaway:</strong> \((dB_t)^2=dt\) bridges random fluctuations to smooth density evolution, enabling Gaussian marginals.
-  </p>
+  <div class="eq-scroll">
+  \[
+    (dB_t)^2 = dt.
+  \]
+  </div>
+</details>
+
+<!-- ----- 2.2 Connection to Diffusion Models ----- -->
+<h3 id="brownian-connection">2.2 Connection to Diffusion Models</h3>
+<p class="lead">
+  The identity \((dB_t)^2 = dt\) is not just an abstract feature of Brownian motion; it is the
+  linchpin in the mathematics of diffusion models.
+</p>
+<p>
+  Consider a stochastic differential equation (SDE):
+</p>
+<div class="eq-scroll">
+  \[
+    dx_t = \mu(x_t, t)\,dt + \sigma(t)\,dB_t.
+  \tag{3}
+  \]
+</div>
+
+<p>
+  When applying Itô’s lemma to a function \(f(x,t)\), quadratic variation contributes second-order terms that are critical for deriving the Fokker–Planck equation (see Section 3).
+</p>
+
+<p class="note">
+  <strong>Key Takeaway:</strong> Without \((dB_t)^2=dt\), the stochastic calculus foundation of diffusion models would collapse.
+</p>
 
 <!-- ========== Section 3: Fokker–Planck PDE ========== -->
 <h2 id="fokker-planck">3. Deriving the Fokker–Planck Equation</h2>
