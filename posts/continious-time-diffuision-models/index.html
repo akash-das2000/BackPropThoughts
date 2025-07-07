@@ -502,3 +502,179 @@ body {
 <p class="note">
   <strong>Takeaway:</strong> Carefully designing \(\beta(t)\) balances noise injection across time, crucial for stable training.
 </p>
+
+<!-- ========== Section: Training Objective in Continuous Time ========== -->
+<h2 id="training-objective">Training Objective in Continuous Time</h2>
+
+<p class="lead">
+  In discrete diffusion models, we derived the variational lower bound (ELBO) using KL divergences between Gaussian distributions at each timestep. In continuous-time diffusion models, the derivation requires more advanced tools from stochastic calculus—specifically <strong>Girsanov’s theorem</strong>—to handle the change of measure between the forward and reverse SDEs.
+</p>
+
+<p>
+  Recall the forward SDE:
+</p>
+
+<div class="eq-scroll">
+  \[
+    dx_t = f(x, t)\,dt + g(t)\,dB_t
+  \]
+</div>
+
+<p>
+  and the reverse SDE:
+</p>
+
+<div class="eq-scroll">
+  \[
+    dx_t = \big[f(x, t) - g(t)^2 \nabla_x \log p_t(x)\big]\,dt + g(t)\,d\bar{B}_t
+  \]
+</div>
+
+<p class="bridge">
+  Our goal is to find a tractable objective for training a neural network \(s_\theta(x, t) \approx \nabla_x \log p_t(x)\) that approximates the score function.
+</p>
+
+---
+
+<!-- ----- 4.1 Girsanov’s Theorem ----- -->
+<h3 id="girsanov-theorem">4.1 Girsanov’s Theorem</h3>
+<p class="lead">
+  Girsanov’s theorem provides the Radon–Nikodym derivative (likelihood ratio) between two probability measures induced by different SDEs.
+</p>
+
+<p>
+  Consider two SDEs with the same diffusion coefficient \(g(t)\):
+</p>
+
+<div class="eq-scroll">
+  \[
+    dx_t = f(x, t)\,dt + g(t)\,dB_t
+  \]
+</div>
+
+<p>
+  and
+</p>
+
+<div class="eq-scroll">
+  \[
+    dx_t = \tilde{f}(x, t)\,dt + g(t)\,d\tilde{B}_t
+  \]
+</div>
+
+<p>
+  Girsanov’s theorem tells us:
+</p>
+
+<div class="eq-scroll">
+  \[
+    \frac{d\mathbb{Q}}{d\mathbb{P}} = \exp\left(
+      \int_0^T \frac{\tilde{f}(x, t) - f(x, t)}{g(t)}\,dB_t
+      - \frac{1}{2} \int_0^T \left\|\frac{\tilde{f}(x, t) - f(x, t)}{g(t)}\right\|^2 dt
+    \right)
+  \]
+</div>
+
+<details>
+  <summary><strong>Step-by-step derivation of likelihood ratio</strong></summary>
+  <p>
+    Starting from the two SDEs, we write their increments:
+  </p>
+
+  <div class="eq-scroll">
+    \[
+      dx_t = f(x, t)\,dt + g(t)\,dB_t,\quad
+      dx_t = \tilde{f}(x, t)\,dt + g(t)\,d\tilde{B}_t
+    \]
+  </div>
+
+  <p>
+    Since \(g(t)\) is the same, the difference in drift can be expressed as:
+  </p>
+
+  <div class="eq-scroll">
+    \[
+      \delta(x, t) = \frac{\tilde{f}(x, t) - f(x, t)}{g(t)}
+    \]
+  </div>
+
+  <p>
+    Girsanov’s theorem then gives:
+  </p>
+
+  <div class="eq-scroll">
+    \[
+      \frac{d\mathbb{Q}}{d\mathbb{P}} = \exp\left(\int_0^T \delta(x, t)\,dB_t - \tfrac{1}{2}\int_0^T \|\delta(x, t)\|^2 dt\right)
+    \]
+  </div>
+</details>
+
+<p class="note">
+  <strong>Key Insight:</strong> This change-of-measure forms the backbone of continuous-time variational objectives.
+</p>
+
+---
+
+<!-- ----- 4.2 ELBO Derivation ----- -->
+<h3 id="elbo-derivation">4.2 ELBO Derivation</h3>
+<p class="lead">
+  To train the reverse model, we seek to minimize the KL divergence between the true forward process \(q\) and the parameterized reverse process \(p_\theta\):
+</p>
+
+<div class="eq-scroll">
+  \[
+    \mathrm{KL}(q \| p_\theta) = \mathbb{E}_{q}\left[\log\frac{q(x_{0:T})}{p_\theta(x_{0:T})}\right]
+  \]
+</div>
+
+<p>
+  Using Girsanov’s theorem, we express this as:
+</p>
+
+<div class="eq-scroll">
+  \[
+    \mathrm{KL}(q \| p_\theta) = \mathbb{E}_{q}\left[\tfrac{1}{2}\int_0^T \left\|s_\theta(x, t) - \nabla_x \log p_t(x)\right\|^2 g(t)^2 dt\right] + \mathrm{const.}
+  \]
+</div>
+
+<p class="bridge">
+  This term measures how well the neural network \(s_\theta(x, t)\) approximates the score function \(\nabla_x \log p_t(x)\).
+</p>
+
+---
+
+<!-- ----- 4.3 Fisher Information Integral ----- -->
+<h3 id="fisher-information">4.3 Fisher Information Integral</h3>
+<p class="lead">
+  Notice the appearance of the Fisher information:
+</p>
+
+<div class="eq-scroll">
+  \[
+    \int_0^T g(t)^2 \mathbb{E}_{p_t(x)}\left[\left\|s_\theta(x, t) - \nabla_x \log p_t(x)\right\|^2\right] dt
+  \]
+</div>
+
+<p>
+  This integral captures the expected squared error between the predicted and true scores, weighted by the diffusion strength \(g(t)^2\).
+</p>
+
+<p class="note">
+  <strong>Key Takeaway:</strong> Minimizing this term is equivalent to matching the score function at all times, leading to effective denoising.
+</p>
+
+---
+
+<!-- ----- 4.4 Summary ----- -->
+<h3 id="objective-summary">4.4 Summary</h3>
+<p class="lead">
+  The continuous-time training objective elegantly unifies stochastic calculus and variational inference. Using Girsanov’s theorem, we arrive at a loss function that encourages the neural network to predict the score function \(\nabla_x \log p_t(x)\) across all timesteps.
+</p>
+
+<figure>
+  <img src="posts/continuous-diffusion/assets/figure2.png" alt="Continuous-time ELBO schematic">
+  <figcaption>
+    <strong>Figure 2:</strong> Schematic of the continuous-time ELBO derived via Girsanov’s theorem.
+  </figcaption>
+</figure>
+
