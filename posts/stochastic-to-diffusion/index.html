@@ -798,7 +798,7 @@ body {
 <div class="eq-scroll">
   \[
     q(x_t|x_{t-1}) = \mathcal{N}\big(x_t; \sqrt{1-\beta_t}\,x_{t-1},\,\beta_t I\big),
-  \tag{28}
+  \tag{17}
   \]
 </div>
 
@@ -815,7 +815,7 @@ body {
 <div class="eq-scroll">
   \[
     x_t = \sqrt{1-\beta_t}\,x_{t-1} + \sqrt{\beta_t}\,\epsilon_t,\quad \epsilon_t \sim \mathcal{N}(0,I).
-  \tag{29}
+  \tag{18}
   \]
 </div>
 
@@ -826,18 +826,18 @@ body {
 <!-- ----- 5.2 Marginal Distribution Derivation ----- -->
 <h3 id="marginal-q">5.2 Marginal \(q(x_t|x_0)\)</h3>
 <p class="lead">
-  Repeated application of Eq. (29) leads to:
+  Repeated application of Eq. (18) leads to:
 </p>
 
 <div class="eq-scroll">
   \[
     q(x_t|x_0) = \mathcal{N}\big(x_t; \sqrt{\bar{\alpha}_t}\,x_0,\,(1-\bar{\alpha}_t)I\big),
-  \tag{30}
+  \tag{19}
   \]
 </div>
 
 <details>
-  <summary><strong>Step-by-step derivation of Eq. (30)</strong></summary>
+  <summary><strong>Step-by-step derivation of Eq. (19)</strong></summary>
   <div class="eq-scroll">
   \[
   \begin{aligned}
@@ -871,12 +871,12 @@ body {
 <div class="eq-scroll">
   \[
     q(x_{t-1}|x_t, x_0) = \mathcal{N}\big(x_{t-1};\,\tilde{\mu}_t(x_t, x_0),\,\tilde{\beta}_t I\big),
-  \tag{33}
+  \tag{20}
   \]
 </div>
 
 <details>
-  <summary><strong>Step-by-step derivation of Eq. (34) and Eq. (35)</strong></summary>
+  <summary><strong>Step-by-step derivation of Eq. (20)</strong></summary>
   <p>
     From the joint distribution:
   </p>
@@ -914,7 +914,7 @@ body {
 <div class="eq-scroll">
   \[
     p_\theta(x_{t-1}|x_t) = \mathcal{N}\big(x_{t-1};\,\mu_\theta(x_t,t),\,\Sigma_\theta(x_t,t)\big).
-  \tag{36}
+  \tag{21}
   \]
 </div>
 
@@ -922,7 +922,6 @@ body {
   \(\mu_\theta(x_t,t)\) and \(\Sigma_\theta(x_t,t)\) are predicted by a neural network trained to approximate the true reverse posterior.
 </p>
 
-<!-- ----- 5.5 Visual Explanation ----- -->
 <figure>
   <img src="posts/stochastic-to-diffusion/assets/figure3.png" alt="Forward and reverse discrete diffusion steps">
   <figcaption>
@@ -930,13 +929,14 @@ body {
   </figcaption>
 </figure>
 
-<!-- ----- 5.6 Summary ----- -->
+<!-- ----- 5.5 Summary ----- -->
 <h3 id="ddpm-summary">5.5 Summary</h3>
 <p class="lead">
   The discrete DDPM formulation is the bridge from theory to practical implementation. It allows efficient training via variational objectives and sampling by iterating reverse transitions.
 </p>
 
-    <!-- ========== Section 6: ELBO and Training Objective ========== -->
+
+<!-- ========== Section 6: ELBO and Variational Objective ========== -->
 <h2 id="elbo-training">6. ELBO and Variational Objective</h2>
 
 <p class="lead">
@@ -951,7 +951,7 @@ body {
 <div class="eq-scroll">
   \[
     p_\theta(x_{0:T}) = p(x_T)\prod_{t=1}^T p_\theta(x_{t-1}|x_t),
-  \tag{37}
+  \tag{22}
   \]
 </div>
 
@@ -966,7 +966,7 @@ body {
 <div class="eq-scroll">
   \[
     \log p_\theta(x_0) \geq \mathbb{E}_{q(x_{1:T}|x_0)}\left[\log\frac{p_\theta(x_{0:T})}{q(x_{1:T}|x_0)}\right].
-  \tag{38}
+  \tag{23}
   \]
 </div>
 
@@ -987,12 +987,12 @@ body {
   \log p(x_T) + \sum_{t=1}^T \log p_\theta(x_{t-1}|x_t) \\
   & - \sum_{t=1}^T \log q(x_t|x_{t-1})\bigg].
   \end{aligned}
-  \tag{39}
+  \tag{24}
   \]
 </div>
 
 <details>
-  <summary><strong>Derivation of Eq. (39)</strong></summary>
+  <summary><strong>Derivation of Eq. (24)</strong></summary>
   <p>
     Start from the ELBO:
   </p>
@@ -1024,12 +1024,12 @@ body {
   D_\mathrm{KL}\big(q(x_{t-1}|x_t, x_0)\,\|\,p_\theta(x_{t-1}|x_t)\big)
   \big] - \mathbb{E}_q[\log p(x_T)].
   \end{aligned}
-  \tag{40}
+  \tag{25}
   \]
 </div>
 
 <details>
-  <summary><strong>Step-by-step derivation of Eq. (40)</strong></summary>
+  <summary><strong>Step-by-step derivation of Eq. (25)</strong></summary>
   <p>
     Use Bayes’ rule: \(q(x_{t-1}|x_t,x_0)\) appears naturally from \(q(x_{1:T}|x_0)\).
   </p>
@@ -1065,12 +1065,12 @@ body {
   L_{\text{simple}} = \mathbb{E}_{t,x_0,\epsilon}\bigg[
   \|\epsilon - \epsilon_\theta(x_t, t)\|^2
   \bigg].
-  \tag{41}
+  \tag{26}
   \]
 </div>
 
 <details>
-  <summary><strong>Derivation of Eq. (41)</strong></summary>
+  <summary><strong>Derivation of Eq. (26)</strong></summary>
   <p>
     Substitute \(\mu_\theta(x_t,t)\) in terms of \(\epsilon_\theta(x_t,t)\) and simplify the KL.
   </p>
@@ -1161,7 +1161,7 @@ plt.show()</code></pre>
 <div class="eq-scroll">
 \[
   x_t = \sqrt{\bar{\alpha}_t}x_0 + \sqrt{1-\bar{\alpha}_t}\,\epsilon,\quad \epsilon \sim \mathcal{N}(0, I).
-\tag{42}
+\tag{27}
 \]
 </div>
 
