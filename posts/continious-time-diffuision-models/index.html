@@ -282,3 +282,52 @@ body {
   In this post, we build on the foundations laid earlier and dive into the continuous-time perspective. We will derive forward and reverse SDEs, map noise schedules β(t) to drift and diffusion coefficients, and show how Girsanov’s theorem leads naturally to a continuous-time ELBO. Along the way, we will see how the Fisher information emerges in this setting and why score-based generative models are a natural generalization of DDPMs.
 </p>
 
+<!-- ========== Section: Forward and Reverse SDEs ========== -->
+<h2 id="forward-reverse-sdes">Forward and Reverse SDEs</h2>
+
+<p class="lead">
+  In the <a href="https://backpropthoughts.netlify.app/post?postId=stochastic-to-diffusion" target="_blank">previous post</a>, we derived both the forward and reverse stochastic differential equations (SDEs) that form the backbone of diffusion models. Let’s briefly revisit these results to set the stage for continuous-time formulations.
+</p>
+
+<!-- ----- Forward SDE ----- -->
+<h3 id="forward-sde">Forward SDE</h3>
+<p>
+  The forward diffusion process incrementally perturbs a clean data sample \(x_0\) by adding Gaussian noise at each timestep. In the continuous-time limit, this is modeled by the SDE:
+</p>
+
+<div class="eq-scroll">
+  dx_t = f(x, t) dt + g(t) dB_t
+</div>
+
+<p>
+  Here:
+</p>
+<ul>
+  <li><strong>f(x, t):</strong> Drift function, capturing deterministic dynamics.</li>
+  <li><strong>g(t):</strong> Diffusion coefficient, controlling the noise level.</li>
+  <li><strong>dB_t:</strong> Brownian motion increment.</li>
+</ul>
+
+<p class="bridge">
+  For a step-by-step derivation of this SDE from discrete Gaussian perturbations, see Section 2 of the <a href="https://backpropthoughts.netlify.app/post?postId=stochastic-to-diffusion" target="_blank">previous blog</a>.
+</p>
+
+---
+
+<!-- ----- Reverse SDE ----- -->
+<h3 id="reverse-sde">Reverse SDE</h3>
+<p>
+  To reverse the corruption process, we derived the reverse-time SDE (Anderson, 1982):
+</p>
+
+<div class="eq-scroll">
+  dx_t = [f(x, t) - g(t)^2 ∇_x log p_t(x)] dt + g(t) dB̄_t
+</div>
+
+<p>
+  The key insight is the additional drift term \(-g(t)^2 ∇_x log p_t(x)\), which steers noisy samples back toward high-density regions of the data distribution. In practice, we approximate \(\nabla_x \log p_t(x)\) with a neural network \(s_θ(x, t)\) trained via score matching.
+</p>
+
+<p class="note">
+  For the full derivation of this reverse SDE using the Fokker–Planck PDE and Itô calculus, refer to Section 4 in the <a href="https://backpropthoughts.netlify.app/post?postId=stochastic-to-diffusion" target="_blank">previous post</a>.
+</p>
