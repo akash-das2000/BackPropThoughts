@@ -271,16 +271,22 @@ body {
 <!-- ========== Introduction Section ========== -->
 <h2 id="introduction">Introduction</h2>
 <p class="lead">
-  In our <a href="https://backpropthoughts.netlify.app/post?postId=stochastic-to-diffusion" target="_blank">previous post</a>, we traced the mathematical spine of diffusion models, from Brownian motion and Itô calculus to the discrete Denoising Diffusion Probabilistic Models (DDPM) framework. We derived the forward and reverse stochastic differential equations (SDEs), explored their connection to the Fokker–Planck PDE, and built up to the variational ELBO that makes DDPMs trainable in practice.
+  In our <a href="https://backpropthoughts.netlify.app/post?postId=stochastic-to-diffusion" target="_blank">previous post</a>, we traced the mathematical spine of diffusion models—from Brownian motion and Itô calculus to the discrete Denoising Diffusion Probabilistic Models (DDPM) framework. We derived the forward and reverse stochastic differential equations (SDEs), explored their connection to the Fokker–Planck PDE, and built up to the variational ELBO that makes DDPMs trainable in practice.
 </p>
 
 <p>
-  While discrete diffusion models like DDPM are powerful, their reliance on fixed timesteps can be limiting. This motivates the transition to <strong>continuous-time diffusion models</strong>, where stochastic processes evolve in an unbroken time interval and neural networks learn to approximate the score function across all t ∈ [0, T].
+  To fully appreciate these ideas, it helps to recall our earlier post on 
+  <a href="https://backpropthoughts.netlify.app/post?postId=diffusion-maths" target="_blank">denoising score matching</a>, where we examined how noise prediction relates to estimating the gradient of the data log-density. These insights form the foundation for the continuous-time perspective.
+</p>
+
+<p>
+  While discrete diffusion models like DDPM are powerful, their reliance on fixed timesteps can be limiting. This motivates the transition to <strong>continuous-time diffusion models</strong>, where stochastic processes evolve in an unbroken time interval and neural networks learn to approximate the score function across all \(t \in [0, T]\).
 </p>
 
 <p class="bridge">
-  In this post, we build on the foundations laid earlier and dive into the continuous-time perspective. We will derive forward and reverse SDEs, map noise schedules β(t) to drift and diffusion coefficients, and show how Girsanov’s theorem leads naturally to a continuous-time ELBO. Along the way, we will see how the Fisher information emerges in this setting and why score-based generative models are a natural generalization of DDPMs.
+  In this post, we build on these foundations and dive into the continuous-time formulation. We will derive forward and reverse SDEs, map noise schedules \(\beta(t)\) to drift and diffusion coefficients, and show how Girsanov’s theorem leads naturally to a continuous-time ELBO. Along the way, we’ll see how the Fisher information emerges in this setting and why score-based generative models are a natural generalization of DDPMs.
 </p>
+
 
 <!-- ========== Section: Forward and Reverse SDEs ========== -->
 <h2 id="forward-reverse-sdes">Forward and Reverse SDEs</h2>
