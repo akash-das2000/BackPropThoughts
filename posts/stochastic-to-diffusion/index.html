@@ -1294,3 +1294,83 @@ plt.show()</code></pre>
 <p class="lead">
   This minimal 2D diffusion demo highlights the essence of DDPMs: iterative noise addition and learned denoising. In practice, \(\epsilon_\theta(x_t, t)\) is trained to approximate the score function.
 </p>
+
+<!-- ========== Section 8: Beyond DDPM: Improvements and Variants ========== -->
+<h2 id="beyond-ddpm">8. Beyond DDPM: Improvements and Variants</h2>
+
+<p class="lead">
+  While DDPMs established a new paradigm for generative modeling, their vanilla formulation is not without drawbacks. Over the past few years, a wave of innovations has emerged to overcome these limitations and push diffusion models to state-of-the-art performance.
+</p>
+
+<!-- ----- 8.1 Limitations of Vanilla DDPM ----- -->
+<h3 id="ddpm-limitations">8.1 Limitations of Vanilla DDPM</h3>
+<ul>
+  <li><strong>Slow Sampling:</strong> Original DDPM requires hundreds to thousands of denoising steps to generate a single sample, leading to impractical runtimes.</li>
+  <li><strong>High Memory and Compute:</strong> Operating directly in pixel space makes training and sampling expensive on high-resolution data.</li>
+  <li><strong>Fixed Noise Schedule:</strong> Predefined \(\beta_t\) schedules can restrict flexibility and may not be optimal for all datasets.</li>
+  <li><strong>Training Instability:</strong> Sensitive to learning rates, schedules, and architecture choices.</li>
+</ul>
+
+<p class="note">
+  These challenges motivated a series of refinements and alternative formulations.
+</p>
+
+<!-- ----- 8.2 Major Improvements in Diffusion Models ----- -->
+<h3 id="ddpm-improvements">8.2 Major Improvements in Diffusion Models</h3>
+<p class="lead">
+  Let’s briefly highlight some of the most impactful advancements building on the original DDPM framework.
+</p>
+
+<!-- ---- 8.2.a DDIM ---- -->
+<h4 id="ddim">8.2.a Denoising Diffusion Implicit Models (DDIM)</h4>
+<p>
+  Proposed by Song et al. (2021), DDIM introduces non-Markovian deterministic sampling. It allows for:
+</p>
+<ul>
+  <li>Fast sampling with as few as 50 steps (compared to 1000 in DDPM).</li>
+  <li>Interpolation in latent space for smooth transitions between samples.</li>
+  <li>Preservation of the original DDPM training objective while modifying the sampling process.</li>
+</ul>
+
+<!-- ---- 8.2.b Score-Based Generative Models ---- -->
+<h4 id="sgm">8.2.b Score-Based Generative Models (SGMs)</h4>
+<p>
+  Song et al. generalized diffusion models as stochastic differential equations (SDEs). This viewpoint enables:
+</p>
+<ul>
+  <li>Advanced sampling techniques like probability flow ODEs.</li>
+  <li>Unification of score-based and diffusion models under a common framework.</li>
+  <li>Foundations for modern large-scale diffusion systems.</li>
+</ul>
+
+<!-- ---- 8.2.c Latent Diffusion Models ---- -->
+<h4 id="ldm">8.2.c Latent Diffusion Models (LDM)</h4>
+<p>
+  Rombach et al. (2022) proposed performing diffusion in a compressed latent space using autoencoders:
+</p>
+<ul>
+  <li>Reduces computational cost by orders of magnitude.</li>
+  <li>Enables training on high-resolution images (e.g., 512×512, 1024×1024).</li>
+  <li>Forms the core of <strong>Stable Diffusion</strong> and similar models.</li>
+</ul>
+
+<!-- ---- 8.2.d Classifier-Free Guidance ---- -->
+<h4 id="cfg">8.2.d Classifier-Free Guidance</h4>
+<p>
+  Proposed by Ho and Salimans (2022), this method allows conditional generation without needing a separate classifier:
+</p>
+<ul>
+  <li>Combines conditional and unconditional models to guide generation.</li>
+  <li>Crucial for text-to-image systems like **Stable Diffusion** and **Imagen**.</li>
+</ul>
+
+<!-- ----- 8.3 Summary ----- -->
+<h3 id="ddpm-summary">8.3 Summary</h3>
+<p class="lead">
+  These advancements have transformed DDPMs from a theoretical curiosity into a practical tool powering cutting-edge generative systems. Today’s diffusion models are faster, more memory-efficient, and capable of stunning image synthesis at scale.
+</p>
+
+<p class="note">
+  <strong>Key Takeaway:</strong> DDPM was only the beginning. Its successors—DDIM, SGMs, LDMs, and classifier-free guidance—define the current state of generative modeling.
+</p>
+
