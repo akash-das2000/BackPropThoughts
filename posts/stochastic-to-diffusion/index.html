@@ -960,3 +960,163 @@ body {
 <p class="lead">
   The discrete DDPM formulation is the bridge from theory to practical implementation. It allows efficient training via variational objectives and sampling by iterating reverse transitions.
 </p>
+
+    <!-- ========== Section 6: ELBO and Training Objective ========== -->
+<h2 id="elbo-training">6. ELBO and Variational Objective</h2>
+
+<p class="lead">
+  To train diffusion models, we maximize a variational lower bound on the log-likelihood of the data.
+  This section derives the Evidence Lower Bound (ELBO) step by step.
+</p>
+
+<p>
+  Recall the reverse model:
+</p>
+
+<div class="eq-scroll">
+  \[
+    p_\theta(x_{0:T}) = p(x_T)\prod_{t=1}^T p_\theta(x_{t-1}|x_t),
+  \tag{37}
+  \]
+</div>
+
+<p>
+  where \(p(x_T) = \mathcal{N}(x_T; 0, I)\) is the prior and \(p_\theta(x_{t-1}|x_t)\) is learned.
+</p>
+
+<p>
+  The goal is to maximize \(\log p_\theta(x_0)\). Using variational inference:
+</p>
+
+<div class="eq-scroll">
+  \[
+    \log p_\theta(x_0) \geq \mathbb{E}_{q(x_{1:T}|x_0)}\left[\log\frac{p_\theta(x_{0:T})}{q(x_{1:T}|x_0)}\right].
+  \tag{38}
+  \]
+</div>
+
+<p>
+  The RHS is the ELBO, which we expand below.
+</p>
+
+<!-- ----- 6.1 Expanding the ELBO ----- -->
+<h3 id="elbo-expansion">6.1 Expanding the ELBO</h3>
+<p class="lead">
+  Using the factorized forms of \(p_\theta\) and \(q\), the ELBO becomes:
+</p>
+
+<div class="eq-scroll">
+  \[
+  \begin{aligned}
+  \text{ELBO} = \mathbb{E}_{q}\bigg[&
+  \log p(x_T) + \sum_{t=1}^T \log p_\theta(x_{t-1}|x_t) \\
+  & - \sum_{t=1}^T \log q(x_t|x_{t-1})\bigg].
+  \end{aligned}
+  \tag{39}
+  \]
+</div>
+
+<details>
+  <summary><strong>Derivation of Eq. (39)</strong></summary>
+  <p>
+    Start from the ELBO:
+  </p>
+  <div class="eq-scroll">
+  \[
+    \mathbb{E}_q\left[\log\frac{p(x_T)\prod_{t}p_\theta(x_{t-1}|x_t)}{\prod_t q(x_t|x_{t-1})}\right].
+  \]
+  </div>
+  <p>
+    Expand the products:
+  </p>
+  <div class="eq-scroll">
+  \[
+    = \mathbb{E}_q\left[\log p(x_T) + \sum_t \log p_\theta(x_{t-1}|x_t) - \sum_t \log q(x_t|x_{t-1})\right].
+  \]
+  </div>
+</details>
+
+<!-- ----- 6.2 Grouping KL Terms ----- -->
+<h3 id="elbo-kl-terms">6.2 Grouping KL Terms</h3>
+<p>
+  Rearranging gives a sum of KL divergences and an expected negative log-likelihood:
+</p>
+
+<div class="eq-scroll">
+  \[
+  \begin{aligned}
+  \text{ELBO} = -\sum_{t=1}^T\mathbb{E}_q\big[
+  D_\mathrm{KL}\big(q(x_{t-1}|x_t, x_0)\,\|\,p_\theta(x_{t-1}|x_t)\big)
+  \big] - \mathbb{E}_q[\log p(x_T)].
+  \end{aligned}
+  \tag{40}
+  \]
+</div>
+
+<details>
+  <summary><strong>Step-by-step derivation of Eq. (40)</strong></summary>
+  <p>
+    Use Bayes’ rule: \(q(x_{t-1}|x_t,x_0)\) appears naturally from \(q(x_{1:T}|x_0)\).
+  </p>
+  <p>
+    Rewrite:
+  </p>
+  <div class="eq-scroll">
+  \[
+  D_\mathrm{KL}\big(q(x_{t-1}|x_t, x_0)\,\|\,p_\theta(x_{t-1}|x_t)\big)
+  \]
+  </div>
+  <p>
+    This KL measures how close the true posterior is to the model prediction.
+  </p>
+</details>
+
+<!-- ----- 6.3 Simplified Training Objective ----- -->
+<h3 id="simplified-elbo">6.3 Simplified Training Objective</h3>
+<p class="lead">
+  Ho et al. (2020) make two simplifications:
+</p>
+<ul>
+  <li>Fix \(\Sigma_\theta(x_t,t)\) to known \(\tilde{\beta}_t I\).</li>
+  <li>Parametrize \(\mu_\theta(x_t,t)\) to predict the noise \(\epsilon_\theta(x_t,t)\).</li>
+</ul>
+
+<p>
+  The simplified loss is:
+</p>
+
+<div class="eq-scroll">
+  \[
+  L_{\text{simple}} = \mathbb{E}_{t,x_0,\epsilon}\bigg[
+  \|\epsilon - \epsilon_\theta(x_t, t)\|^2
+  \bigg].
+  \tag{41}
+  \]
+</div>
+
+<details>
+  <summary><strong>Derivation of Eq. (41)</strong></summary>
+  <p>
+    Substitute \(\mu_\theta(x_t,t)\) in terms of \(\epsilon_\theta(x_t,t)\) and simplify the KL.
+  </p>
+  <p>
+    Results in a denoising score-matching objective.
+  </p>
+</details>
+
+<p class="note">
+  \(L_{\text{simple}}\) means the model learns to predict the noise added at each step.
+</p>
+
+<!-- ----- 6.4 Summary ----- -->
+<h3 id="elbo-summary">6.4 Summary</h3>
+<p class="lead">
+  The ELBO connects probabilistic modeling to a tractable loss function. This elegant derivation reduces the complex variational problem to a simple denoising objective.
+</p>
+
+<figure>
+  <img src="posts/stochastic-to-diffusion/assets/figure4.png" alt="ELBO and training objective schematic">
+  <figcaption>
+    <strong>Figure 4:</strong> Schematic of the ELBO decomposition into KL terms and simplified loss for DDPM training.
+  </figcaption>
+</figure>
