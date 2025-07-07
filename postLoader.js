@@ -94,17 +94,21 @@ function buildMetaBar(pubDateISO) {
       // Force MathJax to fully typeset again
       await window.MathJax?.typesetPromise?.([contentDiv]);
 
-      // Small delay to ensure all layout finishes
+      // Move TOC after <h1> for printing
+      const h1 = contentDiv.querySelector("h1");
+      const tocBox = document.querySelector(".toc-box");
+      if (h1 && tocBox) h1.after(tocBox);
+
+      // Small delay for layout stabilization
       await new Promise(resolve => setTimeout(resolve, 500));
 
       // Trigger browser print dialog
       window.print();
     } catch (err) {
-      console.error("Print/PDF generation failed:", err);
-      alert("Failed to prepare print-friendly version. Please try again.");
+      console.error("Print preparation failed:", err);
+      alert("Failed to prepare print-friendly version.");
     } finally {
-      // Collapse all <details> back after print
-      const details = contentDiv.querySelectorAll("details");
+      // Collapse all <details> back
       details.forEach(d => d.open = false);
     }
   });
