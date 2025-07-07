@@ -91,24 +91,27 @@ function buildMetaBar(pubDateISO) {
       const details = contentDiv.querySelectorAll("details");
       details.forEach(d => d.open = true);
 
-      // Wait for MathJax to fully typeset
+      // Force MathJax to fully typeset again
       await window.MathJax?.typesetPromise?.([contentDiv]);
+
+      // Wait for MathJax render stabilization
+      await new Promise(resolve => setTimeout(resolve, 800));
+
+      // Scale images properly
+      contentDiv.querySelectorAll("img").forEach(img => {
+        img.style.maxWidth = "100%";
+        img.style.height = "auto";
+        img.style.display = "block";
+      });
 
       // Configure options for html2pdf
       const opt = {
         margin: 0.5,
         filename: `${document.title || "post"}.pdf`,
         image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
+        html2canvas: { scale: 3, useCORS: true },
         jsPDF: { unit: "in", format: "letter", orientation: "portrait" }
       };
-
-      // Scale images properly for PDF
-      contentDiv.querySelectorAll("img").forEach(img => {
-        img.style.maxWidth = "100%";
-        img.style.height = "auto";
-        img.style.display = "block";
-      });
 
       // Generate PDF
       await html2pdf().from(contentDiv).set(opt).save();
@@ -117,7 +120,6 @@ function buildMetaBar(pubDateISO) {
       alert("Failed to generate PDF. Please try again.");
     } finally {
       // Collapse all <details> back
-      const details = contentDiv.querySelectorAll("details");
       details.forEach(d => d.open = false);
     }
   });
