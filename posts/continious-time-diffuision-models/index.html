@@ -1225,3 +1225,90 @@ body {
 <p class="lead">
   Predictor–Corrector samplers combine deterministic and stochastic updates to navigate the reverse diffusion process effectively. This hybrid approach produces diverse, high-quality samples in continuous-time diffusion models.
 </p>
+
+
+<!-- ========== 9. Outlook: Beyond Continuous-Time Diffusion ========== -->
+<h2 id="outlook">9. Outlook: Beyond Continuous-Time Diffusion</h2>
+
+<p class="lead">
+  Continuous-time diffusion models unify stochastic processes, variational inference, and score-based learning under one elegant mathematical framework. But this is far from the end of the story. Let’s briefly survey where these ideas lead next.
+</p>
+
+<!-- ----- 9.1 Deterministic Sampling with DDIM ----- -->
+<h3 id="ddim">9.1 Deterministic Sampling with DDIM</h3>
+<p class="lead">
+  In discrete models, Ho et al. (2020) introduced Denoising Diffusion Implicit Models (DDIM) as a deterministic alternative to stochastic DDPM sampling.
+</p>
+
+<p>
+  DDIM can be viewed as a non-stochastic discretization of the probability flow ODE derived in Section 7:
+</p>
+
+<div class="eq-scroll">
+  \[
+    \frac{dx}{dt} = f(x, t) - \tfrac{1}{2}g(t)^2 s_\theta(x, t)
+  \]
+</div>
+
+<p>
+  By dropping the stochastic term \(g(t)dB_t\), DDIM produces deterministic trajectories that still approximate the data distribution. This enables faster sampling with fewer steps, though at the cost of sample diversity.
+</p>
+
+<p class="note">
+  <strong>Key Insight:</strong> DDIM is effectively an ODE solver applied to the probability flow field.
+</p>
+
+<!-- ----- 9.2 Advanced Samplers: Consistency Models and Beyond ----- -->
+<h3 id="consistency-models">9.2 Advanced Samplers: Consistency Models and Beyond</h3>
+<p class="lead">
+  Recent work explores even faster samplers and training paradigms. <strong>Consistency models</strong> (Song et al., 2023) train a neural network to predict denoised samples directly at arbitrary noise levels.
+</p>
+
+<p>
+  The idea is to approximate the solution map of the probability flow ODE:
+</p>
+
+<div class="eq-scroll">
+  \[
+    \Phi_{t_0 \to t_1}(x_{t_0}) \approx x_{t_1}
+  \]
+</div>
+
+<p>
+  This avoids the need for iterative sampling entirely, enabling one-shot generation of high-quality samples.
+</p>
+
+<p class="note">
+  <strong>Takeaway:</strong> Consistency models leverage the continuous-time view to create efficient, plug-and-play samplers.
+</p>
+
+<!-- ----- 9.3 Connections to Other Generative Models ----- -->
+<h3 id="connections">9.3 Connections to Other Generative Models</h3>
+<p class="lead">
+  Continuous-time diffusion models also connect to other generative frameworks:
+</p>
+<ul>
+  <li><strong>Normalizing Flows:</strong> The probability flow ODE defines a continuous flow of densities, akin to continuous normalizing flows.</li>
+  <li><strong>Energy-Based Models:</strong> Score-based learning estimates \(\nabla_x \log p(x)\), the same object optimized in EBMs.</li>
+  <li><strong>Generative Adversarial Networks (GANs):</strong> Both frameworks transport noise to data distributions, though GANs lack the explicit density modeling of diffusion processes.</li>
+</ul>
+
+<p class="bridge">
+  These connections suggest a broader unification of generative modeling under the lens of differential equations.
+</p>
+
+<!-- ----- 9.4 Summary and Future Directions ----- -->
+<h3 id="outlook-summary">9.4 Summary and Future Directions</h3>
+<p class="lead">
+  Continuous-time diffusion models open doors to faster sampling, novel training methods, and deep connections across generative modeling. As research advances, we anticipate:
+</p>
+<ul>
+  <li>Hybrid SDE-ODE solvers for adaptive sampling.</li>
+  <li>New parameterizations of score functions for stability.</li>
+  <li>Applications to domains beyond images, such as molecular modeling and speech synthesis.</li>
+</ul>
+
+<p class="note">
+  <strong>Essential Takeaway:</strong> The continuous-time perspective is not just a mathematical curiosity—it’s a foundation for the next generation of generative models.
+</p>
+
