@@ -809,3 +809,154 @@ body {
   <strong>Key Insight:</strong> The correction term \(-\sigma^2(t)\nabla_x\log p(x,t)\) guides noisy samples back to the data manifold.
 </p>
 
+<!-- ========== Section 5: Discrete DDPM Formulation ========== -->
+<h2 id="ddpm-formulation">5. Discrete DDPM Formulation</h2>
+
+<p class="lead">
+  With the continuous-time SDEs established, we now discretize time into \(T\) steps to arrive at the discrete formulation of denoising diffusion probabilistic models (DDPMs) introduced by Ho et al. (2020).
+</p>
+
+<p>
+  The forward process starts with a clean data point \(x_0 \sim q(x_0)\) and progressively corrupts it over \(T\) steps by adding Gaussian noise:
+</p>
+
+<div class="eq-scroll">
+  \[
+    q(x_t|x_{t-1}) = \mathcal{N}\big(x_t; \sqrt{1-\beta_t}\,x_{t-1},\,\beta_t I\big),
+  \tag{28}
+  \]
+</div>
+
+<p>
+  Here \(\beta_t\) is a variance schedule (\(0 < \beta_t < 1\)) that determines how much noise is added at each step.
+</p>
+
+<!-- ----- 5.1 Forward Noising Process ----- -->
+<h3 id="forward-noising">5.1 Forward Noising Process</h3>
+<p class="lead">
+  At each timestep \(t\), \(x_{t-1}\) is scaled and perturbed with Gaussian noise:
+</p>
+
+<div class="eq-scroll">
+  \[
+    x_t = \sqrt{1-\beta_t}\,x_{t-1} + \sqrt{\beta_t}\,\epsilon_t,\quad \epsilon_t \sim \mathcal{N}(0,I).
+  \tag{29}
+  \]
+</div>
+
+<p>
+  This recursion propagates noise over multiple steps. To simplify sampling, Ho et al. derived a closed-form expression for the marginal distribution \(q(x_t|x_0)\).
+</p>
+
+<!-- ----- 5.2 Marginal Distribution Derivation ----- -->
+<h3 id="marginal-q">5.2 Marginal \(q(x_t|x_0)\)</h3>
+<p class="lead">
+  Repeated application of Eq. (29) leads to:
+</p>
+
+<div class="eq-scroll">
+  \[
+    q(x_t|x_0) = \mathcal{N}\big(x_t; \sqrt{\bar{\alpha}_t}\,x_0,\,(1-\bar{\alpha}_t)I\big),
+  \tag{30}
+  \]
+</div>
+
+<details>
+  <summary><strong>Step-by-step derivation of Eq. (30)</strong></summary>
+  <div class="eq-scroll">
+  \[
+  \begin{aligned}
+  x_t &= \sqrt{1-\beta_t}\,x_{t-1} + \sqrt{\beta_t}\,\epsilon_t \\
+      &= \sqrt{\alpha_t}\left(\sqrt{\alpha_{t-1}}x_{t-2} + \sqrt{1-\alpha_{t-1}}\,\epsilon_{t-1}\right) + \sqrt{1-\alpha_t}\,\epsilon_t \\
+      &\vdots \\
+      &= \sqrt{\prod_{s=1}^t\alpha_s}x_0 + \sum_{s=1}^t\sqrt{\beta_s}\left(\prod_{j=s+1}^t\sqrt{\alpha_j}\right)\epsilon_s
+  \end{aligned}
+  \]
+  </div>
+  <p>
+    Defining \(\bar{\alpha}_t = \prod_{s=1}^t \alpha_s\) gives:
+  </p>
+  <div class="eq-scroll">
+  \[
+    x_t = \sqrt{\bar{\alpha}_t}\,x_0 + \sqrt{1-\bar{\alpha}_t}\,\epsilon, \quad \epsilon \sim \mathcal{N}(0,I).
+  \]
+  </div>
+</details>
+
+<p class="note">
+  This closed-form means we can directly sample \(x_t\) at any step \(t\) from \(x_0\) without simulating all intermediate steps.
+</p>
+
+<!-- ----- 5.3 Posterior Distribution Derivation ----- -->
+<h3 id="posterior-q">5.3 Posterior \(q(x_{t-1}|x_t, x_0)\)</h3>
+<p class="lead">
+  For training, we also require the posterior \(q(x_{t-1}|x_t, x_0)\). Using Gaussian conditioning rules:
+</p>
+
+<div class="eq-scroll">
+  \[
+    q(x_{t-1}|x_t, x_0) = \mathcal{N}\big(x_{t-1};\,\tilde{\mu}_t(x_t, x_0),\,\tilde{\beta}_t I\big),
+  \tag{33}
+  \]
+</div>
+
+<details>
+  <summary><strong>Step-by-step derivation of Eq. (34) and Eq. (35)</strong></summary>
+  <p>
+    From the joint distribution:
+  </p>
+  <div class="eq-scroll">
+  \[
+    q(x_{t-1},x_t|x_0) = q(x_t|x_{t-1})q(x_{t-1}|x_0),
+  \]
+  </div>
+  <p>
+    both terms are Gaussian. Conditioning gives:
+  </p>
+  <div class="eq-scroll">
+  \[
+    \tilde{\mu}_t(x_t, x_0) = \frac{\sqrt{\bar{\alpha}_{t-1}}\beta_t}{1-\bar{\alpha}_t}x_0
+    + \frac{\sqrt{\alpha_t}(1-\bar{\alpha}_{t-1})}{1-\bar{\alpha}_t}x_t,
+  \]
+  </div>
+  <div class="eq-scroll">
+  \[
+    \tilde{\beta}_t = \frac{1-\bar{\alpha}_{t-1}}{1-\bar{\alpha}_t}\beta_t.
+  \]
+  </div>
+</details>
+
+<p class="note">
+  These posteriors are crucial for training objectives based on variational inference.
+</p>
+
+<!-- ----- 5.4 Reverse Process Approximation ----- -->
+<h3 id="reverse-process">5.4 Reverse Process Approximation</h3>
+<p class="lead">
+  In generation, we approximate the reverse process with a learned model:
+</p>
+
+<div class="eq-scroll">
+  \[
+    p_\theta(x_{t-1}|x_t) = \mathcal{N}\big(x_{t-1};\,\mu_\theta(x_t,t),\,\Sigma_\theta(x_t,t)\big).
+  \tag{36}
+  \]
+</div>
+
+<p>
+  \(\mu_\theta(x_t,t)\) and \(\Sigma_\theta(x_t,t)\) are predicted by a neural network trained to approximate the true reverse posterior.
+</p>
+
+<!-- ----- 5.5 Visual Explanation ----- -->
+<figure>
+  <img src="posts/stochastic-to-diffusion/assets/figure3.png" alt="Forward and reverse discrete diffusion steps">
+  <figcaption>
+    <strong>Figure 3:</strong> Forward process \(q(x_t|x_{t-1})\) adds Gaussian noise over \(T\) steps. The reverse process \(p_\theta(x_{t-1}|x_t)\) denoises step-by-step.
+  </figcaption>
+</figure>
+
+<!-- ----- 5.6 Summary ----- -->
+<h3 id="ddpm-summary">5.5 Summary</h3>
+<p class="lead">
+  The discrete DDPM formulation is the bridge from theory to practical implementation. It allows efficient training via variational objectives and sampling by iterating reverse transitions.
+</p>
