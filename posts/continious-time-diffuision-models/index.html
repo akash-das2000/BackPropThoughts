@@ -938,11 +938,11 @@ body {
 <h2 id="sde-ode-duality">SDE and ODE Duality: Probability Flow Perspective</h2>
 
 <p class="lead">
-  In the previous sections, we developed the continuous-time diffusion framework and derived the reverse SDE for sampling. But stochastic sampling is not the only possibility—Song et al. (2021) revealed a remarkable duality: there exists a deterministic ordinary differential equation (ODE) whose solutions yield the same marginal distributions \(p_t(x)\) as the SDE.
+  In the previous sections, we derived the reverse SDE and discussed its role in denoising. But stochastic sampling isn’t the only way to recover clean data. Remarkably, there exists a deterministic counterpart—the <strong>probability flow ODE</strong>—that transports probability mass in continuous time without randomness.
 </p>
 
 <p>
-  This probability flow ODE is central to continuous-time diffusion models. Let’s derive it step by step and understand its relationship to the SDE and the broader continuous-time formulation.
+  This duality between SDE and ODE is a cornerstone of continuous-time diffusion models. Let’s derive the probability flow ODE from first principles, step by step.
 </p>
 
 ---
@@ -950,7 +950,7 @@ body {
 <!-- ----- 7.1 The Reverse-Time SDE (Recap) ----- -->
 <h3 id="reverse-sde-recap">7.1 The Reverse-Time SDE (Recap)</h3>
 <p class="lead">
-  Recall the reverse-time SDE we obtained earlier:
+  Recall the reverse-time SDE:
 </p>
 
 <div class="eq-scroll">
@@ -960,7 +960,7 @@ body {
 </div>
 
 <p>
-  Here:
+  where:
 </p>
 <ul>
   <li>\(f(x, t)\): forward drift</li>
@@ -969,35 +969,82 @@ body {
 </ul>
 
 <p class="bridge">
-  Our goal is to construct a deterministic system that shares the same density evolution \(p_t(x)\) as this SDE.
+  To find a deterministic system, we need to examine how this SDE affects the evolution of \(p_t(x)\).
 </p>
 
 ---
 
-<!-- ----- 7.2 Derivation of the Probability Flow ODE ----- -->
-<h3 id="pf-ode-derivation">7.2 Derivation of the Probability Flow ODE</h3>
+<!-- ----- 7.2 Fokker–Planck PDE for the Reverse SDE ----- -->
+<h3 id="fp-reverse-sde">7.2 Fokker–Planck PDE for the Reverse SDE</h3>
 <p class="lead">
-  The Fokker–Planck equation for the reverse SDE governs the evolution of \(p_t(x)\):
+  The Fokker–Planck PDE describes how \(p_t(x)\) evolves under the reverse SDE:
 </p>
 
 <div class="eq-scroll">
   \[
-    \partial_t p_t(x) = -\nabla_x \cdot \big([f - g^2 \nabla_x \log p_t]p_t\big) + \tfrac{1}{2}g(t)^2 \Delta_x p_t(x)
+    \partial_t p_t(x) = -\nabla_x \cdot \left(\big[f(x, t) - g(t)^2 \nabla_x \log p_t(x)\big]p_t(x)\right) + \frac{1}{2}g(t)^2 \Delta_x p_t(x)
   \]
 </div>
 
-<p>
-  If we drop the stochastic term in the SDE, we propose the deterministic ODE:
+<details>
+  <summary><strong>Step-by-step derivation of the PDE</strong></summary>
+
+  <p>
+    Start from the reverse SDE:
+  </p>
+
+  <div class="eq-scroll">
+    \[
+      dx_t = \mu(x_t, t)\, dt + \sigma(t)\, d\bar{B}_t
+    \]
+  </div>
+  <p>
+    where:
+  </p>
+  <div class="eq-scroll">
+    \[
+      \mu(x, t) = f(x, t) - g(t)^2 \nabla_x \log p_t(x),\; \sigma(t) = g(t)
+    \]
+  </div>
+
+  <p>
+    The Fokker–Planck PDE is:
+  </p>
+  <div class="eq-scroll">
+    \[
+      \partial_t p_t(x) = -\nabla_x \cdot [\mu(x, t)p_t(x)] + \frac{1}{2}\sigma(t)^2\Delta_x p_t(x)
+    \]
+  </div>
+
+  <p>
+    Substituting \(\mu(x, t)\) and \(\sigma(t)\) gives the desired PDE.
+  </p>
+</details>
+
+<p class="note">
+  <strong>Key Point:</strong> The PDE has a drift term (transport) and a diffusion term (randomness).
+</p>
+
+---
+
+<!-- ----- 7.3 Towards a Deterministic Flow ----- -->
+<h3 id="deterministic-flow">7.3 Towards a Deterministic Flow</h3>
+<p class="lead">
+  If we eliminate stochasticity, we are left with a purely deterministic system:
 </p>
 
 <div class="eq-scroll">
   \[
-    \frac{dx}{dt} = f(x, t) - \tfrac{1}{2}g(t)^2 \nabla_x \log p_t(x)
+    \frac{dx}{dt} = v(x, t)
   \]
 </div>
 
 <p>
-  To verify its validity, we check the continuity equation for this flow:
+  where \(v(x, t)\) is a vector field transporting probability mass.
+</p>
+
+<p>
+  The continuity equation for deterministic flow is:
 </p>
 
 <div class="eq-scroll">
@@ -1006,28 +1053,36 @@ body {
   \]
 </div>
 
-<p>
-  where \(v(x, t) = f(x, t) - \tfrac{1}{2}g(t)^2 \nabla_x \log p_t(x)\).
+<p class="bridge">
+  To match the drift term in the Fokker–Planck PDE, set:
 </p>
 
+<div class="eq-scroll">
+  \[
+    v(x, t) = f(x, t) - \tfrac{1}{2}g(t)^2 \nabla_x \log p_t(x)
+  \]
+</div>
+
 <p>
-  Comparing this to the Fokker–Planck equation, we see that removing the diffusion term \(\tfrac{1}{2}g(t)^2 \Delta_x p_t(x)\) leaves us with the same divergence form as the deterministic system.
+  This yields the probability flow ODE:
 </p>
 
-<p class="note">
-  <strong>Result:</strong> The probability flow ODE preserves the marginal densities \(p_t(x)\) while eliminating randomness.
-</p>
+<div class="eq-scroll">
+  \[
+    \frac{dx}{dt} = f(x, t) - \tfrac{1}{2}g(t)^2 \nabla_x \log p_t(x)
+  \]
+</div>
 
 ---
 
-<!-- ----- 7.3 Continuous-Time Connection ----- -->
-<h3 id="continuous-time-connection">7.3 Continuous-Time Connection</h3>
+<!-- ----- 7.4 Continuous-Time Connection ----- -->
+<h3 id="continuous-time-connection">7.4 Continuous-Time Connection</h3>
 <p class="lead">
-  The probability flow ODE is deeply tied to the continuous-time diffusion perspective.
+  This ODE emerges naturally from the continuous-time framework.
 </p>
 
 <p>
-  In our continuous-time formulation, the SDE describes stochastic paths:
+  The SDE describes stochastic trajectories across \(t \in [0, T]\):
 </p>
 
 <div class="eq-scroll">
@@ -1037,7 +1092,7 @@ body {
 </div>
 
 <p>
-  This models the noisy forward process and, when reversed, the denoising process. The probability flow ODE instead traces the deterministic “mean paths” of this process:
+  Dropping \(g(t)\,dB_t\) leads to deterministic trajectories following the same density evolution \(p_t(x)\):
 </p>
 
 <div class="eq-scroll">
@@ -1046,30 +1101,8 @@ body {
   \]
 </div>
 
-<p>
-  where \(s_\theta(x, t)\) approximates \(\nabla_x \log p_t(x)\).
-</p>
-
-<p class="bridge">
-  Crucially, both the SDE and ODE describe the same family of densities \(p_t(x)\) evolving over the continuous interval \(t \in [0, T]\).
-</p>
-
 <p class="note">
-  <strong>Key Insight:</strong> The continuous-time framework provides a unified lens through which stochastic and deterministic sampling become two sides of the same coin.
-</p>
-
----
-
-<!-- ----- 7.4 Benefits of ODE Sampling ----- -->
-<h3 id="ode-benefits">7.4 Benefits of ODE Sampling</h3>
-<ul>
-  <li><strong>Deterministic Sampling:</strong> No stochasticity during generation.</li>
-  <li><strong>Adaptive Solvers:</strong> Allows larger, variable step sizes using ODE solvers like Runge–Kutta.</li>
-  <li><strong>Exact Likelihood Evaluation:</strong> Change of variables formula enables likelihood computation.</li>
-</ul>
-
-<p class="bridge">
-  These advantages make the probability flow ODE a practical alternative for generating high-quality samples.
+  <strong>Key Insight:</strong> The SDE and ODE are two sides of the same continuous-time generative process: one stochastic, one deterministic.
 </p>
 
 ---
@@ -1077,9 +1110,154 @@ body {
 <!-- ----- 7.5 Summary ----- -->
 <h3 id="pf-ode-summary">7.5 Summary</h3>
 <p class="lead">
-  The probability flow ODE offers a deterministic counterpart to the stochastic reverse SDE, preserving marginals and enabling efficient sampling in continuous-time diffusion models.
+  The probability flow ODE provides a deterministic alternative to stochastic sampling while preserving the marginal distributions \(p_t(x)\).
 </p>
 
 <p class="note">
-  <strong>Essential Takeaway:</strong> SDE and ODE duality is a cornerstone of modern score-based generative modeling.
+  <strong>Essential Takeaway:</strong> This duality is a hallmark of continuous-time diffusion models and underpins advanced sampling strategies.
+</p>
+
+
+
+<!-- ========== Section: Predictor–Corrector Samplers ========== -->
+<h2 id="pc-samplers">Predictor–Corrector Samplers</h2>
+
+<p class="lead">
+  While the probability flow ODE enables deterministic sampling, stochasticity is sometimes desirable—for diversity, robustness, and avoiding mode collapse. Song et al. (2021) proposed <strong>Predictor–Corrector (PC) samplers</strong> that combine deterministic and stochastic steps to balance accuracy and randomness.
+</p>
+
+<p>
+  PC samplers alternate between:
+</p>
+<ul>
+  <li><strong>Predictor steps:</strong> Advance samples using a discretized SDE (e.g., Euler–Maruyama).</li>
+  <li><strong>Corrector steps:</strong> Apply Langevin Dynamics to refine samples by perturbing them along score estimates.</li>
+</ul>
+
+<p class="bridge">
+  Together, these steps allow iterative refinement while preserving the underlying data distribution.
+</p>
+
+
+<!-- ----- 8.1 Predictor Step (SDE Update) ----- -->
+<h3 id="predictor-step">8.1 Predictor Step (SDE Update)</h3>
+<p class="lead">
+  The predictor step advances the sample along the reverse SDE trajectory using a numerical method like Euler–Maruyama:
+</p>
+
+<div class="eq-scroll">
+  \[
+    x_{t - \Delta t} = x_t + \left[f(x_t, t) - g(t)^2 s_\theta(x_t, t)\right]\Delta t + g(t)\sqrt{\Delta t}\, z
+  \]
+</div>
+
+<p>
+  where \(z \sim \mathcal{N}(0, I)\) is standard Gaussian noise.
+</p>
+
+<details>
+  <summary><strong>Step-by-step breakdown</strong></summary>
+  <p>
+    1️⃣ Compute the drift term:
+  </p>
+  <div class="eq-scroll">
+    \[
+      \mu(x_t, t) = f(x_t, t) - g(t)^2 s_\theta(x_t, t)
+    \]
+  </div>
+  <p>
+    2️⃣ Add stochasticity:
+  </p>
+  <div class="eq-scroll">
+    \[
+      \sigma(x_t, t) = g(t)\sqrt{\Delta t}
+    \]
+  </div>
+  <p>
+    3️⃣ Update:
+  </p>
+  <div class="eq-scroll">
+    \[
+      x_{t - \Delta t} = x_t + \mu(x_t, t)\Delta t + \sigma(x_t, t)z
+    \]
+  </div>
+</details>
+
+<p class="note">
+  <strong>Key Point:</strong> The predictor step alone corresponds to simulating the reverse SDE.
+</p>
+
+
+<!-- ----- 8.2 Corrector Step (Langevin Dynamics) ----- -->
+<h3 id="corrector-step">8.2 Corrector Step (Langevin Dynamics)</h3>
+<p class="lead">
+  The corrector step refines \(x_t\) using Langevin Dynamics. This reduces approximation errors and ensures samples remain on the data manifold:
+</p>
+
+<div class="eq-scroll">
+  \[
+    x_t^{(k+1)} = x_t^{(k)} + \epsilon s_\theta(x_t^{(k)}, t) + \sqrt{2\epsilon}\, z
+  \]
+</div>
+
+<p>
+  Here:
+</p>
+<ul>
+  <li>\(\epsilon\): Langevin step size</li>
+  <li>\(z \sim \mathcal{N}(0, I)\): Gaussian noise</li>
+</ul>
+
+<details>
+  <summary><strong>Why Langevin Dynamics?</strong></summary>
+  <p>
+    Langevin Dynamics performs score-based MCMC sampling:
+  </p>
+  <div class="eq-scroll">
+    \[
+      dx = s_\theta(x, t)\, dt + \sqrt{2}\, dB_t
+    \]
+  </div>
+  <p>
+    Discretizing this yields the update formula above.
+  </p>
+</details>
+
+<p class="note">
+  <strong>Key Point:</strong> The corrector step denoises while adding small stochastic perturbations to maintain diversity.
+</p>
+
+
+<!-- ----- 8.3 Combined Predictor–Corrector Algorithm ----- -->
+<h3 id="pc-algorithm">8.3 Combined Predictor–Corrector Algorithm</h3>
+<p class="lead">
+  The PC sampler alternates predictor and corrector steps from \(t = T\) down to \(t = 0\):
+</p>
+
+<ol>
+  <li>Initialize \(x_T \sim \mathcal{N}(0, I)\).</li>
+  <li>For each timestep \(t_i\) (from large to small):</li>
+  <ol>
+    <li>Perform one or more corrector steps (Langevin Dynamics).</li>
+    <li>Perform one predictor step (Euler–Maruyama).</li>
+  </ol>
+  <li>Return \(x_0\) as the generated sample.</li>
+</ol>
+
+<figure>
+  <img src="posts/continuous-diffusion/assets/figure2_pc_sampler.png" alt="Predictor–Corrector Sampler Diagram">
+  <figcaption>
+    <strong>Figure 2:</strong> Predictor–Corrector sampler alternates Langevin correction (dotted arrows) with SDE updates (solid arrows).
+  </figcaption>
+</figure>
+
+
+<!-- ----- 8.4 Summary ----- -->
+<h3 id="pc-summary">8.4 Summary</h3>
+<p class="lead">
+  Predictor–Corrector samplers provide a hybrid approach for sampling: deterministic SDE steps guide trajectories, while stochastic Langevin steps correct for approximation errors and maintain sample diversity.
+</p>
+
+<p class="note">
+  <strong>Essential Takeaway:</strong> PC samplers bridge stochastic and deterministic sampling, making them robust and effective for continuous-time diffusion models.
 </p>
