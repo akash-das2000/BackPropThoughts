@@ -1120,3 +1120,174 @@ body {
     <strong>Figure 4:</strong> Schematic of the ELBO decomposition into KL terms and simplified loss for DDPM training.
   </figcaption>
 </figure>
+
+
+<!-- ========== Section 7: Minimal 2D DDPM Implementation ========== -->
+<h2 id="toy-ddpm">7. Minimal 2D Diffusion Model</h2>
+
+<p class="lead">
+  To make the abstract mathematics tangible, we now implement a toy 2D diffusion model. This example visualizes the forward noising process and the reverse denoising process.
+</p>
+
+<figure>
+  <img src="posts/stochastic-to-diffusion/assets/figure5.png" alt="2D forward and reverse diffusion trajectories">
+  <figcaption>
+    <strong>Figure 5:</strong> Forward process (left) progressively corrupts a 2D Gaussian mixture to noise; reverse process (right) denoises step-by-step back to the data distribution.
+  </figcaption>
+</figure>
+
+<!-- ----- 7.1 Forward Process Implementation ----- -->
+<h3 id="toy-forward">7.1 Forward Process</h3>
+<p>
+  We start by defining a 2D Gaussian mixture as our data distribution \(q(x_0)\). The forward process adds Gaussian noise step by step using:
+</p>
+
+<div class="eq-scroll">
+\[
+  x_t = \sqrt{\bar{\alpha}_t}x_0 + \sqrt{1-\bar{\alpha}_t}\,\epsilon,\quad \epsilon \sim \mathcal{N}(0,I).
+\tag{42}
+\]
+</div>
+
+<details>
+  <summary><strong>Code: Forward Noising Process</strong></summary>
+  <div class="code-card">
+    <div class="code-header">forward_process.py</div>
+    <pre><code>import numpy as np
+import matplotlib.pyplot as plt
+
+# Hyperparameters
+T = 1000  # number of diffusion steps
+beta_start, beta_end = 1e-4, 0.02
+beta_schedule = np.linspace(beta_start, beta_end, T)
+alpha = 1.0 - beta_schedule
+alpha_bar = np.cumprod(alpha)
+
+# Data distribution: 2D Gaussian mixture
+def sample_data(n_samples=1000):
+    centers = [(-2, -2), (2, 2)]
+    data = np.vstack([
+        np.random.randn(n_samples//2, 2) + centers[0],
+        np.random.randn(n_samples//2, 2) + centers[1]
+    ])
+    return data
+
+# Forward process
+def q_sample(x0, t):
+    noise = np.random.randn(*x0.shape)
+    sqrt_alpha_bar = np.sqrt(alpha_bar[t])[:, None]
+    sqrt_one_minus_alpha_bar = np.sqrt(1 - alpha_bar[t])[:, None]
+    return sqrt_alpha_bar * x0 + sqrt_one_minus_alpha_bar * noise
+
+# Visualization
+x0 = sample_data(1000)
+plt.figure(figsize=(6, 6))
+for t in [0, T//4, T//2, T-1]:
+    xt = q_sample(x0, np.full(1000, t))
+    plt.scatter(xt[:, 0], xt[:, 1], alpha=0.4, label=f"t={t}")
+plt.legend()
+plt.title("Forward Diffusion (2D)")
+plt.show()</code></pre>
+  </div>
+</details>
+
+<!-- ----- 7.2 Reverse Process Approximation ----- -->
+<h3 id="toy-reverse">7.2 Reverse Process</h3>
+<p>
+  In the reverse process, we approximate the score function \(\nabla_x\log p(x_t)\) using a neural network. For simplicity, we use a basic MLP trained to predict added noise \(\epsilon\):
+</p>
+
+<div class="eq-scroll">
+\[
+  L_{\text{simple}} = \mathbb{E}_{t,x_0,\epsilon}\big[\|\epsilon - \epsilon_\theta(x_t, t)\|^2\big].
+\tag{43}
+\]
+</div>
+
+<details>
+  <summary><strong>Code: Reverse Denoising Process</strong></summary>
+  <div class="code-card">
+    <div class="code-header">reverse_process.py</div>
+    <pre><code>import torch
+import torch.nn as nn
+import torch.optim as optim
+
+# Simple MLP to approximate score function
+class Denoiser(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(2 + 1, 128),  # 2D input + timestep
+            nn.ReLU(),
+            nn.Linear(128, 128),
+            nn.ReLU(),
+            nn.Linear(128, 2)
+        )
+
+    def forward(self, x, t):
+        t_embed = t.unsqueeze(-1) / T
+        x_input = torch.cat([x, t_embed], dim=1)
+        return self.net(x_input)
+
+# Training loop
+model = Denoiser()
+optimizer = optim.Adam(model.parameters(), lr=1e-3)
+loss_fn = nn.MSELoss()
+
+x0 = torch.tensor(sample_data(1000), dtype=torch.float32)
+for epoch in range(1000):
+    t = torch.randint(0, T, (1000,))
+    xt = torch.tensor(q_sample(x0.numpy(), t.numpy()), dtype=torch.float32)
+    noise = torch.randn_like(xt)
+    noise_pred = model(xt, t.float())
+    loss = loss_fn(noise_pred, noise)
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+    if epoch % 100 == 0:
+        print(f"Epoch {epoch}, Loss: {loss.item():.4f}")
+
+# Reverse sampling
+def p_sample(xt, t):
+    beta_t = beta_schedule[t]
+    alpha_t = alpha[t]
+    alpha_bar_t = alpha_bar[t]
+    noise_pred = model(xt, torch.tensor([t], dtype=torch.float32).expand(xt.shape[0]))
+    mean = (xt - beta_t * noise_pred) / np.sqrt(alpha_t)
+    noise = np.random.randn(*xt.shape) if t > 0 else 0
+    return mean + np.sqrt(beta_t) * noise</code></pre>
+  </div>
+</details>
+
+<!-- ----- 7.3 Visualizing Results ----- -->
+<h3 id="toy-visualization">7.3 Visualizing Results</h3>
+<p class="lead">
+  After training, the reverse process denoises pure Gaussian noise back into the original 2D Gaussian mixture.
+</p>
+
+<details>
+  <summary><strong>Code: Visualization of Reverse Process</strong></summary>
+  <div class="code-card">
+    <div class="code-header">visualize_reverse.py</div>
+    <pre><code># Starting from pure noise
+xt = torch.randn(1000, 2)
+for t in reversed(range(T)):
+    xt = p_sample(xt, t)
+
+xt = xt.detach().numpy()
+plt.figure(figsize=(6, 6))
+plt.scatter(xt[:, 0], xt[:, 1], alpha=0.6)
+plt.title("Reverse Denoising (2D)")
+plt.show()</code></pre>
+  </div>
+</details>
+
+<p class="note">
+  <strong>Key Insight:</strong> Even a simple MLP can learn to denoise 2D Gaussian mixtures using the DDPM objective.
+</p>
+
+<!-- ----- 7.4 Summary ----- -->
+<h3 id="toy-summary">7.4 Summary</h3>
+<p class="lead">
+  This minimal 2D DDPM illustrates how diffusion models learn the score function and sample from complex distributions via reverse SDEs.
+</p>
