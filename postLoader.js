@@ -81,53 +81,33 @@ function buildMetaBar(pubDateISO) {
   const iconsWrap = document.createElement("div");
   iconsWrap.className = "meta-icons";
 
-  /* PDF download */
+  /* PDF download (Printer-friendly) */
   const pdfIcon = document.createElement("i");
   pdfIcon.className = "fa-solid fa-download";
-  pdfIcon.title = "Download as PDF";
+  pdfIcon.title = "Download Printer-friendly PDF";
   pdfIcon.addEventListener("click", async () => {
-  try {
-    // Expand all <details>
-    const details = contentDiv.querySelectorAll("details");
-    details.forEach(d => d.open = true);
+    try {
+      // Expand all <details>
+      const details = contentDiv.querySelectorAll("details");
+      details.forEach(d => d.open = true);
 
-    // Force MathJax to fully typeset again
-    await window.MathJax?.typesetPromise?.([contentDiv]);
+      // Force MathJax to fully typeset again
+      await window.MathJax?.typesetPromise?.([contentDiv]);
 
-    // Extra wait for MathJax render stabilization
-    await new Promise(resolve => setTimeout(resolve, 1000));
+      // Small delay to ensure all layout finishes
+      await new Promise(resolve => setTimeout(resolve, 500));
 
-    // Scale images properly
-    contentDiv.querySelectorAll("img").forEach(img => {
-      img.style.maxWidth = "100%";
-      img.style.height = "auto";
-      img.style.display = "block";
-    });
-
-    // Configure options for html2pdf
-    const opt = {
-      margin: 0.5,
-      filename: `${document.title || "post"}.pdf`,
-      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: {
-        scale: 2,
-        scrollY: 0,
-        useCORS: true
-      },
-      jsPDF: { unit: "in", format: "a4", orientation: "portrait" }
-    };
-
-    // Generate PDF
-    await html2pdf().from(contentDiv).set(opt).save();
-  } catch (err) {
-    console.error("PDF generation failed:", err);
-    alert("Failed to generate PDF. Please try again.");
-  } finally {
-    // Collapse all <details> back
-    details.forEach(d => d.open = false);
-  }
-});
+      // Trigger browser print dialog
+      window.print();
+    } catch (err) {
+      console.error("Print/PDF generation failed:", err);
+      alert("Failed to prepare print-friendly version. Please try again.");
+    } finally {
+      // Collapse all <details> back after print
+      const details = contentDiv.querySelectorAll("details");
+      details.forEach(d => d.open = false);
+    }
+  });
 
   /* Copy link */
   const linkIcon = document.createElement("i");
