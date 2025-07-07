@@ -250,17 +250,17 @@ body {
   Continuous-Time Diffusion Models: SDE Formulations and Variational Objectives
 </h1>
 
-<!-- ========== TL;DR Summary (no math here) ========== -->
+<!-- ========== TL;DR Summary (plain inline equations) ========== -->
 <aside class="tldr">
   <h2 id="TL;DR">TL;DR</h2>
   <p>
     This post extends our mathematical journey into diffusion models, moving beyond discrete timesteps to a continuous-time framework:
   </p>
   <ol>
-    <li><strong>Continuous SDEs:</strong> Generalize discrete forward/reverse processes to stochastic differential equations \(dx_t = f(x,t)\,dt + g(t)\,dB_t\).</li>
-    <li><strong>Noise Schedules:</strong> Map variance schedules \(\beta(t)\) to drift and diffusion coefficients.</li>
+    <li><strong>Continuous SDEs:</strong> Generalize discrete forward/reverse processes to stochastic differential equations of the form dx_t = f(x, t) dt + g(t) dB_t.</li>
+    <li><strong>Noise Schedules:</strong> Map variance schedules beta(t) to drift and diffusion coefficients.</li>
     <li><strong>Variational Objectives:</strong> Derive a continuous-time ELBO using Girsanov’s theorem and connect it to the Fisher information integral.</li>
-    <li><strong>Score Matching:</strong> Interpret the loss as continuous-time score matching for learning \(\nabla_x \log p_t(x)\).</li>
+    <li><strong>Score Matching:</strong> Interpret the loss as continuous-time score matching for learning nabla_x log p_t(x).</li>
     <li><strong>Outlook:</strong> Preview Predictor–Corrector samplers and deterministic probability flow ODEs for faster sampling.</li>
   </ol>
   <p>
