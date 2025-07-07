@@ -268,8 +268,8 @@ body {
   </p>
 </aside>
 
-<!-- ========== Introduction Section ========== -->
-<h2 id="introduction">Introduction</h2>
+<!-- ========== 1. Introduction ========== -->
+<h2 id="section-1">1. Introduction</h2>
 <p class="lead">
   In our <a href="https://backpropthoughts.netlify.app/post?postId=stochastic-to-diffusion" target="_blank">previous post</a>, we traced the mathematical spine of diffusion models—from Brownian motion and Itô calculus to the discrete Denoising Diffusion Probabilistic Models (DDPM) framework. We derived the forward and reverse stochastic differential equations (SDEs), explored their connection to the Fokker–Planck PDE, and built up to the variational ELBO that makes DDPMs trainable in practice.
 </p>
@@ -288,21 +288,22 @@ body {
 </p>
 
 
-<!-- ========== Section: Forward and Reverse SDEs ========== -->
-<h2 id="forward-reverse-sdes">Forward and Reverse SDEs</h2>
+<!-- ========== 2. Forward and Reverse SDEs ========== -->
+<h2 id="section-2">2. Forward and Reverse SDEs</h2>
 
 <p class="lead">
   In the <a href="https://backpropthoughts.netlify.app/post?postId=stochastic-to-diffusion" target="_blank">previous post</a>, we derived both the forward and reverse stochastic differential equations (SDEs) that form the backbone of diffusion models. Let’s briefly revisit these results to set the stage for continuous-time formulations.
 </p>
 
-<!-- ----- Forward SDE ----- -->
-<h3 id="forward-sde">Forward SDE</h3>
+<!-- ----- 2.1 Forward SDE ----- -->
+<h3 id="section-2-1">2.1 Forward SDE</h3>
 <p>
   The forward diffusion process incrementally perturbs a clean data sample \(x_0\) by adding Gaussian noise at each timestep. In the continuous-time limit, this is modeled by the SDE:
 </p>
 
 <div class="eq-scroll">
-  dx_t = f(x, t) dt + g(t) dB_t
+  (2.1)\;
+  \(dx_t = f(x, t)\,dt + g(t)\,dB_t\)
 </div>
 
 <p>
@@ -319,26 +320,27 @@ body {
 </p>
 
 
-<!-- ----- Reverse SDE ----- -->
-<h3 id="reverse-sde">Reverse SDE</h3>
+<!-- ----- 2.2 Reverse SDE ----- -->
+<h3 id="section-2-2">2.2 Reverse SDE</h3>
 <p>
   To reverse the corruption process, we derived the reverse-time SDE (Anderson, 1982):
 </p>
 
 <div class="eq-scroll">
-  dx_t = [f(x, t) - g(t)^2 ∇_x log p_t(x)] dt + g(t) dB̄_t
+  (2.2)\;
+  \(dx_t = [f(x, t) - g(t)^2 \nabla_x \log p_t(x)]\,dt + g(t)\,d\bar{B}_t\)
 </div>
 
 <p>
-  The key insight is the additional drift term \(-g(t)^2 ∇_x log p_t(x)\), which steers noisy samples back toward high-density regions of the data distribution. In practice, we approximate \(\nabla_x \log p_t(x)\) with a neural network \(s_θ(x, t)\) trained via score matching.
+  The key insight is the additional drift term \(-g(t)^2 \nabla_x \log p_t(x)\), which steers noisy samples back toward high-density regions of the data distribution. In practice, we approximate \(\nabla_x \log p_t(x)\) with a neural network \(s_θ(x, t)\) trained via score matching.
 </p>
 
 <p class="note">
-  For the full derivation of this reverse SDE using the Fokker–Planck PDE and Itô calculus, refer to Section 4 in the <a href="https://backpropthoughts.netlify.app/post?postId=stochastic-to-diffusion" target="_blank">previous post</a>.
+  <strong>Note:</strong> For the full derivation of this reverse SDE using the Fokker–Planck PDE and Itô calculus, refer to Section 4 in the <a href="https://backpropthoughts.netlify.app/post?postId=stochastic-to-diffusion" target="_blank">previous post</a>.
 </p>
 
-<!-- ========== Section: Noise Schedules and Drift/Diffusion Coefficients ========== -->
-<h2 id="noise-schedules">Noise Schedules and Drift/Diffusion Coefficients</h2>
+<!-- ========== 3. Noise Schedules and Drift/Diffusion Coefficients ========== -->
+<h2 id="section-3">3. Noise Schedules and Drift/Diffusion Coefficients</h2>
 
 <p class="lead">
   In discrete diffusion models like DDPM, we define a variance schedule \(\{\beta_t\}\) to control how much noise is added at each timestep. As we transition to continuous-time models, we replace this with a smooth function \(\beta(t)\) defined for \(t \in [0, T]\). This section shows how \(\beta(t)\) determines the drift \(f(x, t)\) and diffusion coefficient \(g(t)\) in the forward SDE.
@@ -349,9 +351,8 @@ body {
 </p>
 
 <div class="eq-scroll">
-  \[
-    dx_t = f(x, t)\,dt + g(t)\,dB_t
-  \]
+  (3.1)\;
+  \(dx_t = f(x, t)\,dt + g(t)\,dB_t\)
 </div>
 
 <p>
@@ -359,9 +360,8 @@ body {
 </p>
 
 <div class="eq-scroll">
-  \[
-    f(x, t) = -\tfrac{1}{2}\,\beta(t)\,x
-  \]
+  (3.2)\;
+  \(f(x, t) = -\tfrac{1}{2}\,\beta(t)\,x\)
 </div>
 
 <p>
@@ -369,9 +369,8 @@ body {
 </p>
 
 <div class="eq-scroll">
-  \[
-    g(t) = \sqrt{\beta(t)}
-  \]
+  (3.3)\;
+  \(g(t) = \sqrt{\beta(t)}\)
 </div>
 
 <p class="bridge">
@@ -379,15 +378,14 @@ body {
 </p>
 
 <!-- ----- 3.1 From Discrete to Continuous ----- -->
-<h3 id="discrete-to-continuous">3.1 From Discrete to Continuous</h3>
+<h3 id="section-3-1">3.1 From Discrete to Continuous</h3>
 <p class="lead">
   In DDPM, the forward process is defined as:
 </p>
 
 <div class="eq-scroll">
-  \[
-    x_t = \sqrt{1 - \beta_t}\,x_{t-1} + \sqrt{\beta_t}\,\epsilon_t,\quad \epsilon_t \sim \mathcal{N}(0, I)
-  \]
+  (3.4)\;
+  \(x_t = \sqrt{1 - \beta_t}\,x_{t-1} + \sqrt{\beta_t}\,\epsilon_t,\; \epsilon_t \sim \mathcal{N}(0, I)\)
 </div>
 
 <p>
@@ -395,9 +393,8 @@ body {
 </p>
 
 <div class="eq-scroll">
-  \[
-    \sqrt{1 - \beta_t} \approx 1 - \tfrac{1}{2}\,\beta_t
-  \]
+  (3.5)\;
+  \(\sqrt{1 - \beta_t} \approx 1 - \tfrac{1}{2}\,\beta_t\)
 </div>
 
 <p>
@@ -405,9 +402,8 @@ body {
 </p>
 
 <div class="eq-scroll">
-  \[
-    x_t - x_{t-1} \approx -\tfrac{1}{2}\,\beta_t\,x_{t-1} + \sqrt{\beta_t}\,\epsilon_t
-  \]
+  (3.6)\;
+  \(x_t - x_{t-1} \approx -\tfrac{1}{2}\,\beta_t\,x_{t-1} + \sqrt{\beta_t}\,\epsilon_t\)
 </div>
 
 <p>
@@ -415,9 +411,8 @@ body {
 </p>
 
 <div class="eq-scroll">
-  \[
-    dx_t = -\tfrac{1}{2}\,\beta(t)\,x_t\,dt + \sqrt{\beta(t)}\,dB_t
-  \]
+  (3.7)\;
+  \(dx_t = -\tfrac{1}{2}\,\beta(t)\,x_t\,dt + \sqrt{\beta(t)}\,dB_t\)
 </div>
 
 <details>
@@ -427,9 +422,8 @@ body {
   </p>
 
   <div class="eq-scroll">
-    \[
-      x_t = \sqrt{1 - \beta_t}\,x_{t-1} + \sqrt{\beta_t}\,\epsilon_t
-    \]
+    (3.8)\;
+    \(x_t = \sqrt{1 - \beta_t}\,x_{t-1} + \sqrt{\beta_t}\,\epsilon_t\)
   </div>
 
   <p>
@@ -437,9 +431,8 @@ body {
   </p>
 
   <div class="eq-scroll">
-    \[
-      x_t \approx (1 - \tfrac{1}{2}\,\beta_t)\,x_{t-1} + \sqrt{\beta_t}\,\epsilon_t
-    \]
+    (3.9)\;
+    \(x_t \approx (1 - \tfrac{1}{2}\,\beta_t)\,x_{t-1} + \sqrt{\beta_t}\,\epsilon_t\)
   </div>
 
   <p>
@@ -447,19 +440,17 @@ body {
   </p>
 
   <div class="eq-scroll">
-    \[
-      x_t - x_{t-1} \approx -\tfrac{1}{2}\,\beta_t\,x_{t-1} + \sqrt{\beta_t}\,\epsilon_t
-    \]
+    (3.10)\;
+    \(x_t - x_{t-1} \approx -\tfrac{1}{2}\,\beta_t\,x_{t-1} + \sqrt{\beta_t}\,\epsilon_t\)
   </div>
 
   <p>
-    Divide by \(\Delta t\) and recognize the limits:
+    Divide by \(\Delta t\) and recognize limits:
   </p>
 
   <div class="eq-scroll">
-    \[
-      \frac{x_t - x_{t-1}}{\Delta t} \to \frac{dx_t}{dt},\quad \frac{\sqrt{\beta_t}}{\sqrt{\Delta t}} \to \sqrt{\beta(t)}
-    \]
+    (3.11)\;
+    \(\frac{x_t - x_{t-1}}{\Delta t} \to \frac{dx_t}{dt},\; \frac{\sqrt{\beta_t}}{\sqrt{\Delta t}} \to \sqrt{\beta(t)}\)
   </div>
 
   <p>
@@ -467,9 +458,8 @@ body {
   </p>
 
   <div class="eq-scroll">
-    \[
-      dx_t = -\tfrac{1}{2}\,\beta(t)\,x_t\,dt + \sqrt{\beta(t)}\,dB_t
-    \]
+    (3.12)\;
+    \(dx_t = -\tfrac{1}{2}\,\beta(t)\,x_t\,dt + \sqrt{\beta(t)}\,dB_t\)
   </div>
 </details>
 
@@ -477,10 +467,8 @@ body {
   <strong>Key Insight:</strong> The drift term \(-\tfrac{1}{2}\,\beta(t)\,x_t\) pulls samples toward the origin, while the diffusion term \(\sqrt{\beta(t)}\) injects Gaussian noise.
 </p>
 
-
-
 <!-- ----- 3.2 Common Noise Schedules ----- -->
-<h3 id="common-schedules">3.2 Common Noise Schedules</h3>
+<h3 id="section-3-2">3.2 Common Noise Schedules</h3>
 <p class="lead">
   The choice of \(\beta(t)\) profoundly affects training stability and sample quality. Common schedules include:
 </p>
@@ -498,7 +486,7 @@ body {
 <figure>
   <img src="posts/continious-time-diffuision-models/assets/figure1.png" alt="Examples of noise schedules β(t)">
   <figcaption>
-    <strong>Figure 1:</strong> Common noise schedules used in continuous-time diffusion models. Linear schedules steadily increase noise, while cosine schedules emphasize early timesteps.
+    <strong>Figure 3.1:</strong> Common noise schedules used in continuous-time diffusion models. Linear schedules steadily increase noise, while cosine schedules emphasize early timesteps.
   </figcaption>
 </figure>
 
@@ -506,11 +494,12 @@ body {
   <strong>Takeaway:</strong> Carefully designing \(\beta(t)\) balances noise injection across time, crucial for stable training.
 </p>
 
-<!-- ========== Section: Training Objective in Continuous Time ========== -->
-<h2 id="training-objective">Training Objective in Continuous Time</h2>
+
+<!-- ========== 4. Training Objective in Continuous Time ========== -->
+<h2 id="section-4">4. Training Objective in Continuous Time</h2>
 
 <p class="lead">
-  In discrete diffusion models, we derived the variational lower bound (ELBO) using KL divergences between Gaussian distributions at each timestep. In continuous-time diffusion models, the derivation requires more advanced tools from stochastic calculus—specifically <strong>Girsanov’s theorem</strong>—to handle the change of measure between the forward and reverse SDEs.
+  In discrete diffusion models, we derived the variational lower bound (ELBO) using KL divergences between Gaussian distributions at each timestep. For continuous-time diffusion models, we need more advanced stochastic calculus—specifically <strong>Girsanov’s theorem</strong>—to handle the change of measure between the forward and reverse SDEs.
 </p>
 
 <p>
@@ -518,9 +507,8 @@ body {
 </p>
 
 <div class="eq-scroll">
-  \[
-    dx_t = f(x, t)\,dt + g(t)\,dB_t
-  \]
+  (4.1)\;
+  \(dx_t = f(x, t)\,dt + g(t)\,dB_t\)
 </div>
 
 <p>
@@ -528,9 +516,8 @@ body {
 </p>
 
 <div class="eq-scroll">
-  \[
-    dx_t = \big[f(x, t) - g(t)^2 \nabla_x \log p_t(x)\big]\,dt + g(t)\,d\bar{B}_t
-  \]
+  (4.2)\;
+  \(dx_t = [f(x, t) - g(t)^2 \nabla_x \log p_t(x)]\,dt + g(t)\,d\bar{B}_t\)
 </div>
 
 <p class="bridge">
@@ -538,11 +525,10 @@ body {
 </p>
 
 
-
 <!-- ----- 4.1 Girsanov’s Theorem ----- -->
-<h3 id="girsanov-theorem">4.1 Girsanov’s Theorem</h3>
+<h3 id="section-4-1">4.1 Girsanov’s Theorem</h3>
 <p class="lead">
-  Girsanov’s theorem provides the Radon–Nikodym derivative (likelihood ratio) between two probability measures induced by different SDEs.
+  Girsanov’s theorem gives the Radon–Nikodym derivative (likelihood ratio) between two probability measures induced by different SDEs.
 </p>
 
 <p>
@@ -550,9 +536,8 @@ body {
 </p>
 
 <div class="eq-scroll">
-  \[
-    dx_t = f(x, t)\,dt + g(t)\,dB_t
-  \]
+  (4.3)\;
+  \(dx_t = f(x, t)\,dt + g(t)\,dB_t\)
 </div>
 
 <p>
@@ -560,9 +545,8 @@ body {
 </p>
 
 <div class="eq-scroll">
-  \[
-    dx_t = \tilde{f}(x, t)\,dt + g(t)\,d\tilde{B}_t
-  \]
+  (4.4)\;
+  \(dx_t = \tilde{f}(x, t)\,dt + g(t)\,d\tilde{B}_t\)
 </div>
 
 <p>
@@ -570,191 +554,182 @@ body {
 </p>
 
 <div class="eq-scroll">
+  (4.5)\;
   \[
-    \frac{d\mathbb{Q}}{d\mathbb{P}} = \exp\left(
-      \int_0^T \frac{\tilde{f}(x, t) - f(x, t)}{g(t)}\,dB_t
-      - \frac{1}{2} \int_0^T \left\|\frac{\tilde{f}(x, t) - f(x, t)}{g(t)}\right\|^2 dt
-    \right)
+  \frac{d\mathbb{Q}}{d\mathbb{P}} = \exp\left(
+    \int_0^T \frac{\tilde{f}(x, t) - f(x, t)}{g(t)}\,dB_t
+    - \frac{1}{2} \int_0^T \left\|\frac{\tilde{f}(x, t) - f(x, t)}{g(t)}\right\|^2 dt
+  \right)
   \]
 </div>
 
 <details>
   <summary><strong>Step-by-step derivation of likelihood ratio</strong></summary>
   <p>
-    Starting from the two SDEs, we write their increments:
+    Define the drift difference:
   </p>
 
   <div class="eq-scroll">
-    \[
-      dx_t = f(x, t)\,dt + g(t)\,dB_t,\quad
-      dx_t = \tilde{f}(x, t)\,dt + g(t)\,d\tilde{B}_t
-    \]
+    (4.6)\;
+    \(\delta(x, t) = \frac{\tilde{f}(x, t) - f(x, t)}{g(t)}\)
   </div>
 
   <p>
-    Since \(g(t)\) is the same, the difference in drift can be expressed as:
+    Substituting \(\delta(x, t)\) gives:
   </p>
 
   <div class="eq-scroll">
+    (4.7)\;
     \[
-      \delta(x, t) = \frac{\tilde{f}(x, t) - f(x, t)}{g(t)}
-    \]
-  </div>
-
-  <p>
-    Girsanov’s theorem then gives:
-  </p>
-
-  <div class="eq-scroll">
-    \[
-      \frac{d\mathbb{Q}}{d\mathbb{P}} = \exp\left(\int_0^T \delta(x, t)\,dB_t - \tfrac{1}{2}\int_0^T \|\delta(x, t)\|^2 dt\right)
+    \frac{d\mathbb{Q}}{d\mathbb{P}} = \exp\left(
+      \int_0^T \delta(x, t)\,dB_t
+      - \frac{1}{2}\int_0^T \|\delta(x, t)\|^2 dt
+    \right)
     \]
   </div>
 </details>
 
 <p class="note">
-  <strong>Key Insight:</strong> This change-of-measure forms the backbone of continuous-time variational objectives.
+  <strong>Key Insight:</strong> This change-of-measure underpins the derivation of continuous-time variational objectives.
 </p>
-
 
 
 <!-- ----- 4.2 ELBO Derivation ----- -->
-<h3 id="elbo-derivation">4.2 ELBO Derivation</h3>
+<h3 id="section-4-2">4.2 ELBO Derivation</h3>
 <p class="lead">
-  To train the reverse model, we seek to minimize the KL divergence between the true forward process \(q\) and the parameterized reverse process \(p_\theta\):
+  To train the reverse model, we minimize the KL divergence between the true forward process \(q\) and the parameterized reverse process \(p_\theta\):
 </p>
 
 <div class="eq-scroll">
-  \[
-    \mathrm{KL}(q \| p_\theta) = \mathbb{E}_{q}\left[\log\frac{q(x_{0:T})}{p_\theta(x_{0:T})}\right]
-  \]
+  (4.8)\;
+  \(\mathrm{KL}(q \| p_\theta) = \mathbb{E}_{q}\left[\log\frac{q(x_{0:T})}{p_\theta(x_{0:T})}\right]\)
 </div>
 
 <p>
-  Using Girsanov’s theorem, we express this as:
+  Using Girsanov’s theorem, this simplifies to:
 </p>
 
 <div class="eq-scroll">
+  (4.9)\;
   \[
-    \mathrm{KL}(q \| p_\theta) = \mathbb{E}_{q}\left[\tfrac{1}{2}\int_0^T \left\|s_\theta(x, t) - \nabla_x \log p_t(x)\right\|^2 g(t)^2 dt\right] + \mathrm{const.}
+  \mathrm{KL}(q \| p_\theta) = \mathbb{E}_q\left[\frac{1}{2}\int_0^T \|s_\theta(x, t) - \nabla_x \log p_t(x)\|^2 g(t)^2\,dt\right] + C
   \]
 </div>
 
 <p class="bridge">
-  This term measures how well the neural network \(s_\theta(x, t)\) approximates the score function \(\nabla_x \log p_t(x)\).
+  Here, \(C\) is a constant independent of \(\theta\), and \(s_\theta(x, t)\) approximates \(\nabla_x \log p_t(x)\).
 </p>
-
 
 
 <!-- ----- 4.3 Fisher Information Integral ----- -->
-<h3 id="fisher-information">4.3 Fisher Information Integral</h3>
+<h3 id="section-4-3">4.3 Fisher Information Integral</h3>
 <p class="lead">
-  Notice the appearance of the Fisher information:
+  Notice the appearance of the Fisher information weighted by \(g(t)^2\):
 </p>
 
 <div class="eq-scroll">
+  (4.10)\;
   \[
-    \int_0^T g(t)^2 \mathbb{E}_{p_t(x)}\left[\left\|s_\theta(x, t) - \nabla_x \log p_t(x)\right\|^2\right] dt
+  \int_0^T g(t)^2 \mathbb{E}_{p_t(x)}\left[\|s_\theta(x, t) - \nabla_x \log p_t(x)\|^2\right]\,dt
   \]
 </div>
 
 <p>
-  This integral captures the expected squared error between the predicted and true scores, weighted by the diffusion strength \(g(t)^2\).
+  Minimizing this term is equivalent to matching the network’s score predictions to the true score at every time \(t\).
 </p>
 
 <p class="note">
-  <strong>Key Takeaway:</strong> Minimizing this term is equivalent to matching the score function at all times, leading to effective denoising.
+  <strong>Takeaway:</strong> This weighted error forms the continuous-time denoising score matching objective.
 </p>
 
 
-
 <!-- ----- 4.4 Summary ----- -->
-<h3 id="objective-summary">4.4 Summary</h3>
+<h3 id="section-4-4">4.4 Summary</h3>
 <p class="lead">
-  The continuous-time training objective elegantly unifies stochastic calculus and variational inference. Using Girsanov’s theorem, we arrive at a loss function that encourages the neural network to predict the score function \(\nabla_x \log p_t(x)\) across all timesteps.
+  Using Girsanov’s theorem, we derive a continuous-time ELBO that unifies stochastic calculus and variational inference. The resulting objective trains the model to learn \(\nabla_x \log p_t(x)\) across all noise levels.
 </p>
 
 <figure>
   <img src="posts/continious-time-diffuision-models/assets/figure2.png" alt="Continuous-time ELBO schematic">
   <figcaption>
-    <strong>Figure 2:</strong> Schematic of the continuous-time ELBO derived via Girsanov’s theorem.
+    <strong>Figure 1:</strong> Schematic of the continuous-time ELBO derived via Girsanov’s theorem.
   </figcaption>
 </figure>
 
-<!-- ========== Section: Implications for Score Matching ========== -->
-<h2 id="score-matching">Implications for Score Matching</h2>
+
+<!-- ========== 5. Implications for Score Matching ========== -->
+<h2 id="section-5">5. Implications for Score Matching</h2>
 
 <p class="lead">
-  The continuous-time training objective derived in the previous section elegantly connects diffusion models to <strong>denoising score matching</strong>—a concept first proposed by Vincent (2011). Let’s unpack this connection step by step.
+  The continuous-time variational objective derived earlier connects beautifully to <strong>denoising score matching</strong>, originally proposed by Vincent (2011). Let’s unpack this connection step by step and relate it to diffusion models.
 </p>
 
 <p>
-  Recall our variational loss derived via Girsanov’s theorem:
+  Recall the continuous-time loss:
 </p>
 
 <div class="eq-scroll">
+  (5.1)\;
   \[
-    L(\theta) = \int_0^T g(t)^2\, \mathbb{E}_{p_t(x)}\left[\|s_\theta(x, t) - \nabla_x \log p_t(x)\|^2\right]\,dt
+  L(\theta) = \int_0^T g(t)^2\, \mathbb{E}_{p_t(x)}\left[\|s_\theta(x, t) - \nabla_x \log p_t(x)\|^2\right]\, dt
   \]
 </div>
-
-<p>
-  This objective aims to match the network prediction \(s_\theta(x, t)\) to the true score function \(\nabla_x \log p_t(x)\) at every time \(t\), weighted by the diffusion strength \(g(t)^2\).
-</p>
-
-
-
-<h3 id="score-matching-recap">5.1 Score Matching Recap</h3>
-<p class="lead">
-  Score matching seeks to minimize the expected squared error between the model’s score estimate and the true score:
-</p>
-
-<div class="eq-scroll">
-  \[
-    \mathcal{J}(\theta) = \mathbb{E}_{p(x)}\left[\|\nabla_x \log p(x) - s_\theta(x)\|^2\right]
-  \]
-</div>
-
-<p>
-  We explored this concept in depth in our earlier post on 
-  <a href="https://backpropthoughts.netlify.app/post?postId=diffusion-maths" target="_blank">
-    denoising score matching
-  </a>. In diffusion models, the idea extends naturally across a continuum of noise levels \(t \in [0, T]\).
-</p>
 
 <p class="bridge">
-  But how exactly does the diffusion process lead to score matching? The key lies in the parameterization of the reverse drift and the change of measure.
+  This objective encourages the neural network \(s_\theta(x, t)\) to approximate the true score function \(\nabla_x \log p_t(x)\) at every \(t \in [0, T]\).
 </p>
 
 
+<!-- ----- 5.1 Score Matching Recap ----- -->
+<h3 id="section-5-1">5.1 Score Matching Recap</h3>
+<p class="lead">
+  Score matching minimizes the expected squared error between the model’s score estimate and the true score:
+</p>
+
+<div class="eq-scroll">
+  (5.2)\;
+  \[
+  \mathcal{J}(\theta) = \mathbb{E}_{p(x)}\left[\|\nabla_x \log p(x) - s_\theta(x)\|^2\right]
+  \]
+</div>
+
+<p>
+  In diffusion models, this idea extends across a continuum of noise levels \(t \in [0, T]\).
+</p>
+
+<p class="note">
+  <strong>Reference:</strong> See our <a href="https://backpropthoughts.netlify.app/post?postId=diffusion-maths" target="_blank">earlier post on score matching</a> for a full derivation and motivation.
+</p>
 
 
 <!-- ----- 5.2 Derivation: From ELBO to Score Matching ----- -->
-<h3 id="elbo-to-score-matching">5.2 From ELBO to Score Matching</h3>
+<h3 id="section-5-2">5.2 From ELBO to Score Matching</h3>
 <p class="lead">
-  Let’s expand the variational objective step by step.
+  Let’s expand the continuous-time ELBO step by step to see its equivalence to score matching.
 </p>
 
 <details>
   <summary><strong>Step-by-step derivation</strong></summary>
 
   <p>
-    Start from the KL divergence between the true process \(q(x_{0:T})\) and the reverse process \(p_\theta(x_{0:T})\):
+    Start with the KL divergence between \(q(x_{0:T})\) and \(p_\theta(x_{0:T})\):
   </p>
 
   <div class="eq-scroll">
+    (5.3)\;
     \[
-      \mathrm{KL}(q \| p_\theta) = \mathbb{E}_q\left[\log\frac{q(x_{0:T})}{p_\theta(x_{0:T})}\right]
+    \mathrm{KL}(q \| p_\theta) = \mathbb{E}_q\left[\log\frac{q(x_{0:T})}{p_\theta(x_{0:T})}\right]
     \]
   </div>
 
   <p>
-    Using Girsanov’s theorem, the likelihood ratio simplifies to:
+    Applying Girsanov’s theorem, we rewrite this as:
   </p>
 
   <div class="eq-scroll">
+    (5.4)\;
     \[
-      \log\frac{q(x_{0:T})}{p_\theta(x_{0:T})} = \frac{1}{2}\int_0^T \|s_\theta(x, t) - \nabla_x \log p_t(x)\|^2 g(t)^2\,dt + C
+    \log\frac{q(x_{0:T})}{p_\theta(x_{0:T})} = \frac{1}{2}\int_0^T \|s_\theta(x, t) - \nabla_x \log p_t(x)\|^2 g(t)^2\, dt + C
     \]
   </div>
 
@@ -767,195 +742,208 @@ body {
   </p>
 
   <div class="eq-scroll">
+    (5.5)\;
     \[
-      L(\theta) = \frac{1}{2}\int_0^T g(t)^2\,\mathbb{E}_{p_t(x)}\left[\|s_\theta(x, t) - \nabla_x \log p_t(x)\|^2\right]\,dt + C
+    L(\theta) = \frac{1}{2}\int_0^T g(t)^2\, \mathbb{E}_{p_t(x)}\left[\|s_\theta(x, t) - \nabla_x \log p_t(x)\|^2\right]\, dt + C
     \]
   </div>
-
-  <p>
-    Thus, minimizing \(L(\theta)\) is equivalent to matching the predicted score \(s_\theta(x, t)\) to the true score \(\nabla_x \log p_t(x)\) across all time \(t\).
-  </p>
 </details>
 
 <p class="note">
-  <strong>Insight:</strong> The continuous-time loss integrates the score matching error over the diffusion trajectory.
+  <strong>Key Insight:</strong> Minimizing \(L(\theta)\) matches the predicted score to the true score across all time \(t\).
 </p>
-
 
 
 <!-- ----- 5.3 Discrete DDPM Loss Connection ----- -->
-<h3 id="discrete-ddpm-loss">5.3 Discrete DDPM Loss Connection</h3>
+<h3 id="section-5-3">5.3 Discrete DDPM Loss Connection</h3>
 <p class="lead">
-  Recall the simplified DDPM loss in Ho et al. (2020):
+  In discrete diffusion models, Ho et al. (2020) use the simplified loss:
 </p>
 
 <div class="eq-scroll">
+  (5.6)\;
   \[
-    L_{\text{simple}}(\theta) = \mathbb{E}_{t, x_0, \epsilon}\left[
-      \|\epsilon - \epsilon_\theta(x_t, t)\|^2
-    \right]
+  L_{\text{simple}}(\theta) = \mathbb{E}_{t, x_0, \epsilon}\left[
+    \|\epsilon - \epsilon_\theta(x_t, t)\|^2
+  \right]
   \]
 </div>
 
 <p>
-  Here, \(\epsilon_\theta(x_t, t)\) predicts the noise added at timestep \(t\). This is a special case of score matching, since:
+  where \(\epsilon_\theta(x_t, t)\) predicts the noise added at timestep \(t\).
+</p>
+
+<p>
+  This is a special case of score matching since:
 </p>
 
 <div class="eq-scroll">
+  (5.7)\;
   \[
-    \epsilon = -g(t)\,\nabla_x \log p_t(x) + \mathcal{N}(0, I)
+  \epsilon = -g(t)\,\nabla_x \log p_t(x) + \mathcal{N}(0, I)
   \]
 </div>
 
 <p>
-  Hence, training \(\epsilon_\theta\) to predict \(\epsilon\) indirectly learns the score \(\nabla_x \log p_t(x)\).
+  Training \(\epsilon_\theta\) to predict \(\epsilon\) indirectly learns the score \(\nabla_x \log p_t(x)\).
 </p>
 
 <p class="bridge">
-  In the continuous-time case, we learn \(s_\theta(x, t)\) directly instead of going through \(\epsilon\).
+  In continuous time, we directly train \(s_\theta(x, t)\) to approximate \(\nabla_x \log p_t(x)\).
 </p>
-
 
 
 <!-- ----- 5.4 Summary ----- -->
-<h3 id="score-matching-summary">5.4 Summary</h3>
+<h3 id="section-5-4">5.4 Summary</h3>
 <p class="lead">
-  The continuous-time objective derived from variational inference naturally reduces to denoising score matching. By learning the score function \(\nabla_x \log p_t(x)\) across all noise levels, the model can effectively reverse the diffusion process.
+  The continuous-time variational loss reduces to denoising score matching over the entire diffusion trajectory.
 </p>
 
 <p class="note">
-  <strong>Key Takeaway:</strong> Continuous-time diffusion models unify stochastic calculus and score-based learning under a single elegant loss function.
+  <strong>Takeaway:</strong> This elegant connection generalizes discrete DDPM objectives to the continuous domain.
 </p>
 
 
-<!-- ========== Section: Continuous-Time Loss Interpretation ========== -->
-<h2 id="continuous-time-loss">Continuous-Time Loss Interpretation</h2>
+<!-- ========== 6. Continuous-Time Loss Interpretation ========== -->
+<h2 id="section-6">6. Continuous-Time Loss Interpretation</h2>
 
 <p class="lead">
-  The continuous-time training objective we derived earlier integrates a time-weighted error across all noise levels \(t \in [0, T]\). Understanding how this loss distributes over time is crucial for designing effective noise schedules \(\beta(t)\) and sampling strategies.
+  The continuous-time training objective integrates a time-weighted error over all noise levels \(t \in [0, T]\). Understanding how this loss distributes across time is key to designing effective noise schedules \(\beta(t)\) and samplers.
 </p>
 
 <p>
-  Recall the continuous-time objective:
+  Recall the continuous-time loss:
 </p>
 
 <div class="eq-scroll">
+  (6.1)\;
   \[
-    L(\theta) = \int_0^T g(t)^2\, \mathbb{E}_{p_t(x)}\left[\|s_\theta(x, t) - \nabla_x \log p_t(x)\|^2\right]\, dt
+  L(\theta) = \int_0^T g(t)^2\, \mathbb{E}_{p_t(x)}\left[\|s_\theta(x, t) - \nabla_x \log p_t(x)\|^2\right]\, dt
   \]
 </div>
 
 <p>
-  Here, the weighting term \(g(t)^2\) arises from the diffusion process and controls how much each time \(t\) contributes to the total loss.
+  Here, \(g(t)^2\) weights the contribution of each time \(t\) to the total loss.
 </p>
 
 
 <!-- ----- 6.1 Time-Weighted Loss Density ----- -->
-<h3 id="time-weighted-loss">6.1 Time-Weighted Loss Density</h3>
+<h3 id="section-6-1">6.1 Time-Weighted Loss Density</h3>
 <p class="lead">
-  Let’s define the instantaneous loss density \(\ell(t)\) as:
+  Define the instantaneous loss density \(\ell(t)\) as:
 </p>
 
 <div class="eq-scroll">
+  (6.2)\;
   \[
-    \ell(t) = g(t)^2\, \mathbb{E}_{p_t(x)}\left[\|s_\theta(x, t) - \nabla_x \log p_t(x)\|^2\right]
+  \ell(t) = g(t)^2\, \mathbb{E}_{p_t(x)}\left[\|s_\theta(x, t) - \nabla_x \log p_t(x)\|^2\right]
   \]
 </div>
 
 <p>
-  Then the total loss integrates \(\ell(t)\) over the interval \([0, T]\):
+  The total loss integrates \(\ell(t)\) over the interval \([0, T]\):
 </p>
 
 <div class="eq-scroll">
+  (6.3)\;
   \[
-    L(\theta) = \int_0^T \ell(t)\, dt
+  L(\theta) = \int_0^T \ell(t)\, dt
   \]
 </div>
 
-<p>
-  The function \(\ell(t)\) captures how much error arises at each point in time. Different noise schedules \(\beta(t)\) directly affect \(g(t)\) and hence redistribute loss density across the interval.
+<p class="note">
+  <strong>Key Insight:</strong> \(\ell(t)\) shows how error is distributed along the diffusion trajectory.
 </p>
+
 
 <!-- ----- 6.2 Early vs. Late Time Contributions ----- -->
-<h3 id="early-late-time">6.2 Early vs. Late Time Contributions</h3>
+<h3 id="section-6-2">6.2 Early vs. Late Time Contributions</h3>
 <p class="lead">
-  Consider two common noise schedules:
+  Consider two noise schedules:
 </p>
 <ul>
   <li><strong>Linear schedule:</strong> \(\beta(t)\) grows linearly over time.</li>
-  <li><strong>Cosine schedule:</strong> \(\beta(t)\) follows a cosine-shaped curve, emphasizing earlier timesteps.</li>
+  <li><strong>Cosine schedule:</strong> \(\beta(t)\) follows a cosine curve, emphasizing earlier timesteps.</li>
 </ul>
 
 <p>
-  In a linear schedule, late times (high noise levels) dominate \(\ell(t)\) because \(g(t)^2\) is larger. Conversely, a cosine schedule redistributes weight towards early times, ensuring the model focuses more on denoising in low-noise regions where data structure remains.
+  In a linear schedule, late times dominate \(\ell(t)\) since \(g(t)^2\) grows with time. Conversely, cosine schedules redistribute weight toward early times, focusing learning where data retains structure.
 </p>
 
 <details>
-  <summary><strong>Why does \(g(t)^2\) weight later times more heavily?</strong></summary>
+  <summary><strong>Why does \(g(t)^2\) emphasize late times?</strong></summary>
   <p>
-    Recall that \(g(t)\) reflects the diffusion strength. In linear schedules, \(g(t)\) increases with \(t\), so \(g(t)^2\) scales quadratically with time.
-  </p>
-  <p>
-    As a result, errors at high noise levels (late times) contribute disproportionately to \(L(\theta)\).
+    Since \(g(t)^2 = \beta(t)\), a linear \(\beta(t)\) means \(g(t)^2\) grows proportionally with time. Errors at high noise levels contribute more to \(L(\theta)\).
   </p>
 </details>
 
 <p class="note">
-  <strong>Insight:</strong> The choice of \(\beta(t)\) indirectly shapes which regions in time the model prioritizes during training.
+  <strong>Takeaway:</strong> Cosine schedules balance learning across noise levels, leading to better sample quality.
 </p>
 
+
 <!-- ----- 6.3 Fisher Information Perspective ----- -->
-<h3 id="fisher-perspective">6.3 Fisher Information Perspective</h3>
+<h3 id="section-6-3">6.3 Fisher Information Perspective</h3>
 <p class="lead">
-  The loss can also be viewed through the lens of Fisher information. Recall from score matching:
+  Recall the Fisher information at time \(t\):
 </p>
 
 <div class="eq-scroll">
+  (6.4)\;
   \[
-    \mathcal{I}(t) = \mathbb{E}_{p_t(x)}\left[\|\nabla_x \log p_t(x)\|^2\right]
+  \mathcal{I}(t) = \mathbb{E}_{p_t(x)}\left[\|\nabla_x \log p_t(x)\|^2\right]
   \]
 </div>
 
 <p>
-  This measures the sensitivity of the data distribution at time \(t\). The model’s objective is to approximate \(\nabla_x \log p_t(x)\) with \(s_\theta(x, t)\) across all \(t\).
-</p>
-
-<p class="bridge">
-  Viewing \(\ell(t)\) as a “time-local Fisher information error” highlights why uniform weighting across \(t\) (as in some schedules) can lead to suboptimal performance: some time regions are inherently more informative for learning.
-</p>
-
-<!-- ----- 6.4 Summary ----- -->
-<h3 id="loss-summary">6.4 Summary</h3>
-<p class="lead">
-  The continuous-time loss distributes error contributions unevenly across the diffusion trajectory. Understanding and visualizing \(\ell(t)\) helps design better noise schedules and samplers that align training emphasis with regions of high information content.
-</p>
-
-<p class="note">
-  <strong>Key Takeaway:</strong> The instantaneous loss density \(\ell(t)\) explains how noise schedules influence model focus. Cosine schedules, for example, encourage learning in lower-noise regimes where data structure is richer.
-</p>
-
-<!-- ========== Section: SDE and ODE Duality: Probability Flow Perspective ========== -->
-<h2 id="sde-ode-duality">SDE and ODE Duality: Probability Flow Perspective</h2>
-
-<p class="lead">
-  In the previous sections, we derived the reverse SDE and discussed its role in denoising. But stochastic sampling isn’t the only way to recover clean data. Remarkably, there exists a deterministic counterpart—the <strong>probability flow ODE</strong>—that transports probability mass in continuous time without randomness.
-</p>
-
-<p>
-  This duality between SDE and ODE is a cornerstone of continuous-time diffusion models. Let’s derive the probability flow ODE from first principles, step by step.
-</p>
-
----
-
-<!-- ----- 7.1 The Reverse-Time SDE (Recap) ----- -->
-<h3 id="reverse-sde-recap">7.1 The Reverse-Time SDE (Recap)</h3>
-<p class="lead">
-  Recall the reverse-time SDE:
+  The loss can be viewed as a Fisher-weighted score error:
 </p>
 
 <div class="eq-scroll">
+  (6.5)\;
   \[
-    dx_t = \big[f(x_t, t) - g(t)^2 \nabla_x \log p_t(x)\big]\, dt + g(t)\, d\bar{B}_t
+  L(\theta) = \int_0^T g(t)^2\, \mathcal{I}(t)\, dt
+  \]
+</div>
+
+<p>
+  This highlights how noise schedules determine which regions of \(t\) are emphasized during training.
+</p>
+
+
+<!-- ----- 6.4 Summary ----- -->
+<h3 id="section-6-4">6.4 Summary</h3>
+<p class="lead">
+  The continuous-time loss explains why the choice of \(\beta(t)\) affects model focus during training. Balancing \(\ell(t)\) across \(t\) is crucial for effective score learning.
+</p>
+
+<p class="note">
+  <strong>Key Takeaway:</strong> Visualizing \(\ell(t)\) helps in designing noise schedules and sampling strategies tailored to model capacity.
+</p>
+
+
+<!-- ========== 7. SDE and ODE Duality: Probability Flow Perspective ========== -->
+<h2 id="section-7">7. SDE and ODE Duality: Probability Flow Perspective</h2>
+
+<p class="lead">
+  So far, we’ve described the reverse-time SDE for sampling. But stochasticity isn’t mandatory: there exists a deterministic counterpart—the <strong>probability flow ODE</strong>—that preserves the marginal distributions \(p_t(x)\) without noise.
+</p>
+
+<p>
+  This duality between SDE and ODE is a cornerstone of continuous-time diffusion models. Let’s derive the probability flow ODE step by step.
+</p>
+
+
+<!-- ----- 7.1 The Reverse-Time SDE (Recap) ----- -->
+<h3 id="section-7-1">7.1 The Reverse-Time SDE (Recap)</h3>
+<p class="lead">
+  Recall the reverse-time SDE (Anderson, 1982):
+</p>
+
+<div class="eq-scroll">
+  (7.1)\;
+  \[
+  dx_t = \big[f(x_t, t) - g(t)^2 \nabla_x \log p_t(x)\big]\, dt + g(t)\, d\bar{B}_t
   \]
 </div>
 
@@ -963,245 +951,219 @@ body {
   where:
 </p>
 <ul>
-  <li>\(f(x, t)\): forward drift</li>
+  <li>\(f(x, t)\): drift of the forward SDE</li>
   <li>\(g(t)\): diffusion coefficient</li>
-  <li>\(d\bar{B}_t\): reverse-time Brownian increment</li>
+  <li>\(d\bar{B}_t\): reverse-time Brownian motion increment</li>
 </ul>
 
 <p class="bridge">
-  To find a deterministic system, we need to examine how this SDE affects the evolution of \(p_t(x)\).
+  To find a deterministic equivalent, we examine the Fokker–Planck PDE of this SDE.
 </p>
 
----
 
 <!-- ----- 7.2 Fokker–Planck PDE for the Reverse SDE ----- -->
-<h3 id="fp-reverse-sde">7.2 Fokker–Planck PDE for the Reverse SDE</h3>
+<h3 id="section-7-2">7.2 Fokker–Planck PDE for the Reverse SDE</h3>
 <p class="lead">
-  The Fokker–Planck PDE describes how \(p_t(x)\) evolves under the reverse SDE:
+  The evolution of \(p_t(x)\) under the reverse SDE satisfies:
 </p>
 
 <div class="eq-scroll">
+  (7.2)\;
   \[
-    \partial_t p_t(x) = -\nabla_x \cdot \left(\big[f(x, t) - g(t)^2 \nabla_x \log p_t(x)\big]p_t(x)\right) + \frac{1}{2}g(t)^2 \Delta_x p_t(x)
+  \partial_t p_t(x) = -\nabla_x \cdot \left(\mu(x, t)p_t(x)\right) + \frac{1}{2}g(t)^2\Delta_x p_t(x)
   \]
 </div>
 
+<p>
+  where:
+</p>
+<ul>
+  <li>\(\mu(x, t) = f(x, t) - g(t)^2 \nabla_x \log p_t(x)\): drift term</li>
+  <li>\(\Delta_x\): Laplacian operator in \(x\)</li>
+</ul>
+
 <details>
-  <summary><strong>Step-by-step derivation of the PDE</strong></summary>
-
+  <summary><strong>Derivation of the PDE</strong></summary>
   <p>
-    Start from the reverse SDE:
+    Starting from the reverse SDE:
   </p>
 
   <div class="eq-scroll">
     \[
-      dx_t = \mu(x_t, t)\, dt + \sigma(t)\, d\bar{B}_t
-    \]
-  </div>
-  <p>
-    where:
-  </p>
-  <div class="eq-scroll">
-    \[
-      \mu(x, t) = f(x, t) - g(t)^2 \nabla_x \log p_t(x),\; \sigma(t) = g(t)
+    dx_t = \mu(x, t)\, dt + g(t)\, d\bar{B}_t
     \]
   </div>
 
   <p>
-    The Fokker–Planck PDE is:
+    The Fokker–Planck PDE is given by:
   </p>
+
   <div class="eq-scroll">
     \[
-      \partial_t p_t(x) = -\nabla_x \cdot [\mu(x, t)p_t(x)] + \frac{1}{2}\sigma(t)^2\Delta_x p_t(x)
+    \partial_t p_t(x) = -\nabla_x \cdot [\mu(x, t)p_t(x)] + \tfrac{1}{2}g(t)^2\Delta_x p_t(x)
     \]
   </div>
-
-  <p>
-    Substituting \(\mu(x, t)\) and \(\sigma(t)\) gives the desired PDE.
-  </p>
 </details>
 
 <p class="note">
-  <strong>Key Point:</strong> The PDE has a drift term (transport) and a diffusion term (randomness).
+  <strong>Key Insight:</strong> The PDE has two terms—drift (transport) and diffusion (randomness).
 </p>
 
----
 
-<!-- ----- 7.3 Towards a Deterministic Flow ----- -->
-<h3 id="deterministic-flow">7.3 Towards a Deterministic Flow</h3>
+<!-- ----- 7.3 Deterministic Flow: Dropping Diffusion ----- -->
+<h3 id="section-7-3">7.3 Deterministic Flow: Dropping Diffusion</h3>
 <p class="lead">
-  If we eliminate stochasticity, we are left with a purely deterministic system:
+  To get a deterministic system, we drop the diffusion term (\(\tfrac{1}{2}g(t)^2\Delta_x p_t(x)\)). The resulting continuity equation is:
 </p>
 
 <div class="eq-scroll">
+  (7.3)\;
   \[
-    \frac{dx}{dt} = v(x, t)
+  \partial_t p_t(x) = -\nabla_x \cdot (v(x, t)p_t(x))
   \]
 </div>
 
 <p>
-  where \(v(x, t)\) is a vector field transporting probability mass.
+  where \(v(x, t)\) is a deterministic velocity field.
 </p>
-
-<p>
-  The continuity equation for deterministic flow is:
-</p>
-
-<div class="eq-scroll">
-  \[
-    \partial_t p_t(x) = -\nabla_x \cdot (v(x, t)p_t(x))
-  \]
-</div>
 
 <p class="bridge">
-  To match the drift term in the Fokker–Planck PDE, set:
+  To match the drift term of the reverse SDE, set:
 </p>
 
 <div class="eq-scroll">
+  (7.4)\;
   \[
-    v(x, t) = f(x, t) - \tfrac{1}{2}g(t)^2 \nabla_x \log p_t(x)
+  v(x, t) = f(x, t) - g(t)^2 \nabla_x \log p_t(x)
   \]
 </div>
 
-<p>
-  This yields the probability flow ODE:
-</p>
 
-<div class="eq-scroll">
-  \[
-    \frac{dx}{dt} = f(x, t) - \tfrac{1}{2}g(t)^2 \nabla_x \log p_t(x)
-  \]
-</div>
-
----
-
-<!-- ----- 7.4 Continuous-Time Connection ----- -->
-<h3 id="continuous-time-connection">7.4 Continuous-Time Connection</h3>
+<!-- ----- 7.4 The Probability Flow ODE ----- -->
+<h3 id="section-7-4">7.4 The Probability Flow ODE</h3>
 <p class="lead">
-  This ODE emerges naturally from the continuous-time framework.
-</p>
-
-<p>
-  The SDE describes stochastic trajectories across \(t \in [0, T]\):
+  The deterministic probability flow ODE is then:
 </p>
 
 <div class="eq-scroll">
+  (7.5)\;
   \[
-    dx_t = f(x_t, t)\, dt + g(t)\, dB_t
+  \frac{dx}{dt} = f(x, t) - g(t)^2 s_\theta(x, t)
   \]
 </div>
 
 <p>
-  Dropping \(g(t)\,dB_t\) leads to deterministic trajectories following the same density evolution \(p_t(x)\):
+  where \(s_\theta(x, t)\) approximates \(\nabla_x \log p_t(x)\) with a neural network.
 </p>
-
-<div class="eq-scroll">
-  \[
-    \frac{dx}{dt} = f(x, t) - \tfrac{1}{2}g(t)^2 s_\theta(x, t)
-  \]
-</div>
 
 <p class="note">
-  <strong>Key Insight:</strong> The SDE and ODE are two sides of the same continuous-time generative process: one stochastic, one deterministic.
+  <strong>Key Insight:</strong> This ODE traces deterministic trajectories matching the marginals of the reverse SDE.
 </p>
 
----
 
 <!-- ----- 7.5 Summary ----- -->
-<h3 id="pf-ode-summary">7.5 Summary</h3>
+<h3 id="section-7-5">7.5 Summary</h3>
 <p class="lead">
-  The probability flow ODE provides a deterministic alternative to stochastic sampling while preserving the marginal distributions \(p_t(x)\).
+  The probability flow ODE is a deterministic alternative to the reverse SDE. It avoids stochasticity while preserving the density evolution \(p_t(x)\).
 </p>
 
 <p class="note">
-  <strong>Essential Takeaway:</strong> This duality is a hallmark of continuous-time diffusion models and underpins advanced sampling strategies.
+  <strong>Essential Takeaway:</strong> SDE and ODE are two sides of the same coin: stochastic and deterministic sampling in continuous-time diffusion models.
 </p>
 
 
 
-<!-- ========== Section: Predictor–Corrector Samplers ========== -->
-<h2 id="pc-samplers">Predictor–Corrector Samplers</h2>
+<!-- ========== 8. Predictor–Corrector Samplers ========== -->
+<h2 id="section-8">8. Predictor–Corrector Samplers</h2>
 
 <p class="lead">
-  While the probability flow ODE enables deterministic sampling, stochasticity is sometimes desirable—for diversity, robustness, and avoiding mode collapse. Song et al. (2021) proposed <strong>Predictor–Corrector (PC) samplers</strong> that combine deterministic and stochastic steps to balance accuracy and randomness.
+  While the probability flow ODE enables deterministic sampling, stochasticity can be desirable for diversity and robustness. To combine the strengths of both approaches, Song et al. (2021) introduced <strong>Predictor–Corrector (PC) samplers</strong>. These alternate between deterministic and stochastic steps to generate high-quality samples.
 </p>
 
 <p>
-  PC samplers alternate between:
+  The PC sampler consists of:
 </p>
 <ul>
-  <li><strong>Predictor steps:</strong> Advance samples using a discretized SDE (e.g., Euler–Maruyama).</li>
-  <li><strong>Corrector steps:</strong> Apply Langevin Dynamics to refine samples by perturbing them along score estimates.</li>
+  <li><strong>Predictor steps:</strong> Deterministic updates using a discretized reverse SDE.</li>
+  <li><strong>Corrector steps:</strong> Stochastic refinements using Langevin Dynamics.</li>
 </ul>
 
 <p class="bridge">
-  Together, these steps allow iterative refinement while preserving the underlying data distribution.
+  Let’s derive and explain each step in detail.
 </p>
 
 
-<!-- ----- 8.1 Predictor Step (SDE Update) ----- -->
-<h3 id="predictor-step">8.1 Predictor Step (SDE Update)</h3>
+<!-- ----- 8.1 Predictor Step (Discretized SDE) ----- -->
+<h3 id="section-8-1">8.1 Predictor Step (Discretized SDE)</h3>
 <p class="lead">
-  The predictor step advances the sample along the reverse SDE trajectory using a numerical method like Euler–Maruyama:
+  The predictor step advances the sample along the reverse SDE using Euler–Maruyama discretization:
 </p>
 
 <div class="eq-scroll">
+  (8.1)\;
   \[
-    x_{t - \Delta t} = x_t + \left[f(x_t, t) - g(t)^2 s_\theta(x_t, t)\right]\Delta t + g(t)\sqrt{\Delta t}\, z
+  x_{t - \Delta t} = x_t + \left[f(x_t, t) - g(t)^2 s_\theta(x_t, t)\right]\Delta t + g(t)\sqrt{\Delta t}\, z
   \]
 </div>
 
 <p>
-  where \(z \sim \mathcal{N}(0, I)\) is standard Gaussian noise.
+  where:
 </p>
+<ul>
+  <li>\(z \sim \mathcal{N}(0, I)\): standard Gaussian noise</li>
+  <li>\(\Delta t\): step size</li>
+</ul>
 
 <details>
   <summary><strong>Step-by-step breakdown</strong></summary>
   <p>
-    1️⃣ Compute the drift term:
+    Compute the drift term:
   </p>
   <div class="eq-scroll">
     \[
-      \mu(x_t, t) = f(x_t, t) - g(t)^2 s_\theta(x_t, t)
+    \mu(x_t, t) = f(x_t, t) - g(t)^2 s_\theta(x_t, t)
     \]
   </div>
+
   <p>
-    2️⃣ Add stochasticity:
+    Compute the diffusion term:
   </p>
   <div class="eq-scroll">
     \[
-      \sigma(x_t, t) = g(t)\sqrt{\Delta t}
+    \sigma(x_t, t) = g(t)\sqrt{\Delta t}
     \]
   </div>
+
   <p>
-    3️⃣ Update:
+    Update:
   </p>
   <div class="eq-scroll">
     \[
-      x_{t - \Delta t} = x_t + \mu(x_t, t)\Delta t + \sigma(x_t, t)z
+    x_{t - \Delta t} = x_t + \mu(x_t, t)\Delta t + \sigma(x_t, t)z
     \]
   </div>
 </details>
 
 <p class="note">
-  <strong>Key Point:</strong> The predictor step alone corresponds to simulating the reverse SDE.
+  <strong>Key Point:</strong> The predictor step alone corresponds to simulating the reverse SDE trajectory.
 </p>
 
 
 <!-- ----- 8.2 Corrector Step (Langevin Dynamics) ----- -->
-<h3 id="corrector-step">8.2 Corrector Step (Langevin Dynamics)</h3>
+<h3 id="section-8-2">8.2 Corrector Step (Langevin Dynamics)</h3>
 <p class="lead">
-  The corrector step refines \(x_t\) using Langevin Dynamics. This reduces approximation errors and ensures samples remain on the data manifold:
+  The corrector step applies Langevin Dynamics to refine samples and reduce errors:
 </p>
 
 <div class="eq-scroll">
+  (8.2)\;
   \[
-    x_t^{(k+1)} = x_t^{(k)} + \epsilon s_\theta(x_t^{(k)}, t) + \sqrt{2\epsilon}\, z
+  x_t^{(k+1)} = x_t^{(k)} + \epsilon s_\theta(x_t^{(k)}, t) + \sqrt{2\epsilon}\, z
   \]
 </div>
 
 <p>
-  Here:
+  where:
 </p>
 <ul>
   <li>\(\epsilon\): Langevin step size</li>
@@ -1211,25 +1173,27 @@ body {
 <details>
   <summary><strong>Why Langevin Dynamics?</strong></summary>
   <p>
-    Langevin Dynamics performs score-based MCMC sampling:
+    Langevin Dynamics performs MCMC sampling from the distribution defined by \(s_\theta(x, t)\):
   </p>
+
   <div class="eq-scroll">
     \[
-      dx = s_\theta(x, t)\, dt + \sqrt{2}\, dB_t
+    dx = s_\theta(x, t)\, dt + \sqrt{2}\, dB_t
     \]
   </div>
+
   <p>
-    Discretizing this yields the update formula above.
+    Discretizing yields the update above.
   </p>
 </details>
 
 <p class="note">
-  <strong>Key Point:</strong> The corrector step denoises while adding small stochastic perturbations to maintain diversity.
+  <strong>Key Point:</strong> The corrector step denoises while maintaining sample diversity through small stochastic perturbations.
 </p>
 
 
 <!-- ----- 8.3 Combined Predictor–Corrector Algorithm ----- -->
-<h3 id="pc-algorithm">8.3 Combined Predictor–Corrector Algorithm</h3>
+<h3 id="section-8-3">8.3 Combined Predictor–Corrector Algorithm</h3>
 <p class="lead">
   The PC sampler alternates predictor and corrector steps from \(t = T\) down to \(t = 0\):
 </p>
@@ -1238,26 +1202,26 @@ body {
   <li>Initialize \(x_T \sim \mathcal{N}(0, I)\).</li>
   <li>For each timestep \(t_i\) (from large to small):</li>
   <ol>
-    <li>Perform one or more corrector steps (Langevin Dynamics).</li>
-    <li>Perform one predictor step (Euler–Maruyama).</li>
+    <li>Perform \(K\) corrector steps (Langevin updates).</li>
+    <li>Perform one predictor step (Euler–Maruyama update).</li>
   </ol>
   <li>Return \(x_0\) as the generated sample.</li>
 </ol>
 
 <figure>
-  <img src="posts/continuous-diffusion/assets/figure2_pc_sampler.png" alt="Predictor–Corrector Sampler Diagram">
+  <img src="posts/continuous-diffusion/assets/figure3_pc_sampler.png" alt="Predictor–Corrector Sampler Diagram">
   <figcaption>
-    <strong>Figure 2:</strong> Predictor–Corrector sampler alternates Langevin correction (dotted arrows) with SDE updates (solid arrows).
+    <strong>Figure 3:</strong> Predictor–Corrector sampler alternates Langevin correction (dotted arrows) with SDE updates (solid arrows).
   </figcaption>
 </figure>
 
-
-<!-- ----- 8.4 Summary ----- -->
-<h3 id="pc-summary">8.4 Summary</h3>
-<p class="lead">
-  Predictor–Corrector samplers provide a hybrid approach for sampling: deterministic SDE steps guide trajectories, while stochastic Langevin steps correct for approximation errors and maintain sample diversity.
+<p class="note">
+  <strong>Key Takeaway:</strong> PC samplers balance accuracy and stochasticity for robust sampling.
 </p>
 
-<p class="note">
-  <strong>Essential Takeaway:</strong> PC samplers bridge stochastic and deterministic sampling, making them robust and effective for continuous-time diffusion models.
+
+<!-- ----- 8.4 Summary ----- -->
+<h3 id="section-8-4">8.4 Summary</h3>
+<p class="lead">
+  Predictor–Corrector samplers combine deterministic and stochastic updates to navigate the reverse diffusion process effectively. This hybrid approach produces diverse, high-quality samples in continuous-time diffusion models.
 </p>
