@@ -933,3 +933,153 @@ body {
 <p class="note">
   <strong>Key Takeaway:</strong> The instantaneous loss density \(\ell(t)\) explains how noise schedules influence model focus. Cosine schedules, for example, encourage learning in lower-noise regimes where data structure is richer.
 </p>
+
+<!-- ========== Section: SDE and ODE Duality: Probability Flow Perspective ========== -->
+<h2 id="sde-ode-duality">SDE and ODE Duality: Probability Flow Perspective</h2>
+
+<p class="lead">
+  In the previous sections, we developed the continuous-time diffusion framework and derived the reverse SDE for sampling. But stochastic sampling is not the only possibility—Song et al. (2021) revealed a remarkable duality: there exists a deterministic ordinary differential equation (ODE) whose solutions yield the same marginal distributions \(p_t(x)\) as the SDE.
+</p>
+
+<p>
+  This probability flow ODE is central to continuous-time diffusion models. Let’s derive it step by step and understand its relationship to the SDE and the broader continuous-time formulation.
+</p>
+
+---
+
+<!-- ----- 7.1 The Reverse-Time SDE (Recap) ----- -->
+<h3 id="reverse-sde-recap">7.1 The Reverse-Time SDE (Recap)</h3>
+<p class="lead">
+  Recall the reverse-time SDE we obtained earlier:
+</p>
+
+<div class="eq-scroll">
+  \[
+    dx_t = \big[f(x_t, t) - g(t)^2 \nabla_x \log p_t(x)\big]\, dt + g(t)\, d\bar{B}_t
+  \]
+</div>
+
+<p>
+  Here:
+</p>
+<ul>
+  <li>\(f(x, t)\): forward drift</li>
+  <li>\(g(t)\): diffusion coefficient</li>
+  <li>\(d\bar{B}_t\): reverse-time Brownian increment</li>
+</ul>
+
+<p class="bridge">
+  Our goal is to construct a deterministic system that shares the same density evolution \(p_t(x)\) as this SDE.
+</p>
+
+---
+
+<!-- ----- 7.2 Derivation of the Probability Flow ODE ----- -->
+<h3 id="pf-ode-derivation">7.2 Derivation of the Probability Flow ODE</h3>
+<p class="lead">
+  The Fokker–Planck equation for the reverse SDE governs the evolution of \(p_t(x)\):
+</p>
+
+<div class="eq-scroll">
+  \[
+    \partial_t p_t(x) = -\nabla_x \cdot \big([f - g^2 \nabla_x \log p_t]p_t\big) + \tfrac{1}{2}g(t)^2 \Delta_x p_t(x)
+  \]
+</div>
+
+<p>
+  If we drop the stochastic term in the SDE, we propose the deterministic ODE:
+</p>
+
+<div class="eq-scroll">
+  \[
+    \frac{dx}{dt} = f(x, t) - \tfrac{1}{2}g(t)^2 \nabla_x \log p_t(x)
+  \]
+</div>
+
+<p>
+  To verify its validity, we check the continuity equation for this flow:
+</p>
+
+<div class="eq-scroll">
+  \[
+    \partial_t p_t(x) = -\nabla_x \cdot (v(x, t)p_t(x))
+  \]
+</div>
+
+<p>
+  where \(v(x, t) = f(x, t) - \tfrac{1}{2}g(t)^2 \nabla_x \log p_t(x)\).
+</p>
+
+<p>
+  Comparing this to the Fokker–Planck equation, we see that removing the diffusion term \(\tfrac{1}{2}g(t)^2 \Delta_x p_t(x)\) leaves us with the same divergence form as the deterministic system.
+</p>
+
+<p class="note">
+  <strong>Result:</strong> The probability flow ODE preserves the marginal densities \(p_t(x)\) while eliminating randomness.
+</p>
+
+---
+
+<!-- ----- 7.3 Continuous-Time Connection ----- -->
+<h3 id="continuous-time-connection">7.3 Continuous-Time Connection</h3>
+<p class="lead">
+  The probability flow ODE is deeply tied to the continuous-time diffusion perspective.
+</p>
+
+<p>
+  In our continuous-time formulation, the SDE describes stochastic paths:
+</p>
+
+<div class="eq-scroll">
+  \[
+    dx_t = f(x_t, t)\, dt + g(t)\, dB_t
+  \]
+</div>
+
+<p>
+  This models the noisy forward process and, when reversed, the denoising process. The probability flow ODE instead traces the deterministic “mean paths” of this process:
+</p>
+
+<div class="eq-scroll">
+  \[
+    \frac{dx}{dt} = f(x, t) - \tfrac{1}{2}g(t)^2 s_\theta(x, t)
+  \]
+</div>
+
+<p>
+  where \(s_\theta(x, t)\) approximates \(\nabla_x \log p_t(x)\).
+</p>
+
+<p class="bridge">
+  Crucially, both the SDE and ODE describe the same family of densities \(p_t(x)\) evolving over the continuous interval \(t \in [0, T]\).
+</p>
+
+<p class="note">
+  <strong>Key Insight:</strong> The continuous-time framework provides a unified lens through which stochastic and deterministic sampling become two sides of the same coin.
+</p>
+
+---
+
+<!-- ----- 7.4 Benefits of ODE Sampling ----- -->
+<h3 id="ode-benefits">7.4 Benefits of ODE Sampling</h3>
+<ul>
+  <li><strong>Deterministic Sampling:</strong> No stochasticity during generation.</li>
+  <li><strong>Adaptive Solvers:</strong> Allows larger, variable step sizes using ODE solvers like Runge–Kutta.</li>
+  <li><strong>Exact Likelihood Evaluation:</strong> Change of variables formula enables likelihood computation.</li>
+</ul>
+
+<p class="bridge">
+  These advantages make the probability flow ODE a practical alternative for generating high-quality samples.
+</p>
+
+---
+
+<!-- ----- 7.5 Summary ----- -->
+<h3 id="pf-ode-summary">7.5 Summary</h3>
+<p class="lead">
+  The probability flow ODE offers a deterministic counterpart to the stochastic reverse SDE, preserving marginals and enabling efficient sampling in continuous-time diffusion models.
+</p>
+
+<p class="note">
+  <strong>Essential Takeaway:</strong> SDE and ODE duality is a cornerstone of modern score-based generative modeling.
+</p>
