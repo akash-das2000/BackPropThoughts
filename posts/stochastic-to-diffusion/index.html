@@ -591,7 +591,7 @@ body {
 
 <!-- ----- 3.5 Visual Explanation Placeholder ----- -->
 <figure>
-  <img src="posts/assets/figure1.png" alt="Drift and Diffusion of probability density">
+  <img src="posts/stochastic-to-diffusion/assets/figure1.png" alt="Drift and Diffusion of probability density">
   <figcaption>
     Figure 1: Evolution of probability density showing drift (left) and diffusion (right). Drift compresses or shifts densities, while diffusion spreads them out.
   </figcaption>
@@ -630,3 +630,173 @@ body {
 <p class="bridge">
   This PDE underpins the forward noising process. Reversing it (Section 4) leads to the reverse-time SDE—the foundation of DDPMs.
 </p>
+
+<!-- ========== Section 4: Reverse-Time SDE ========== -->
+<h2 id="reverse-sde">4. Deriving the Reverse-Time SDE</h2>
+
+<p class="lead">
+  The forward SDE models how noise progressively corrupts data. But in diffusion models, our goal is the reverse: we want to denoise step-by-step.
+  To do this, we must derive the SDE that describes how to reverse a stochastic process in time.
+  This was first rigorously derived by Anderson (1982) and later applied in diffusion models by Song et al. (2020).
+</p>
+
+<p>
+  Recall the forward SDE for a stochastic process \(x_t\):
+</p>
+
+<div class="eq-scroll">
+  \[
+    dx_t = \mu(x_t, t)\,dt + \sigma(t)\,dB_t,
+  \tag{20}
+  \]
+</div>
+
+<p>
+  where:
+</p>
+<ul>
+  <li>\(\mu(x, t)\): drift term (deterministic dynamics)</li>
+  <li>\(\sigma(t)\): diffusion coefficient (strength of noise)</li>
+  <li>\(dB_t\): Brownian motion increment</li>
+</ul>
+
+<p class="bridge">
+  We now derive the SDE governing \(x_t\) when time is reversed from \(t=T\) to \(t=0\).
+</p>
+
+<!-- ----- 4.1 Probability flow perspective ----- -->
+<h3 id="probability-flow">4.1 Probability Flow Perspective</h3>
+<p class="lead">
+  To reverse a stochastic process, we need to reverse not just trajectories but also probability densities \(p(x,t)\).
+</p>
+
+<p>
+  The probability density evolution is governed by the Fokker–Planck PDE (Eq. (18)):
+</p>
+
+<div class="eq-scroll">
+  \[
+    \partial_t p(x,t) = -\nabla_x\cdot(\mu(x,t)p(x,t)) + \tfrac12\sigma^2(t)\Delta_x p(x,t).
+  \tag{21}
+  \]
+</div>
+
+<p class="note">
+  Reversing time means finding the dynamics that result in \(p(x,t)\) evolving backward: from \(p(x,T)\) to \(p(x,0)\).
+</p>
+
+<p class="bridge">
+  Anderson’s key insight was to adjust the drift term so that the reverse process preserves the same probability trajectories in reverse order.
+</p>
+
+<!-- ----- 4.2 Derivation of Reverse Drift ----- -->
+<h3 id="reverse-drift-derivation">4.2 Derivation of the Reverse Drift (Anderson 1982)</h3>
+<p>
+  Let \(\tilde{\mu}(x,t)\) denote the drift of the reverse-time process. It can be shown:
+</p>
+
+<div class="eq-scroll">
+  \[
+    \tilde{\mu}(x,t) = \mu(x,t) - \sigma^2(t)\nabla_x\log p(x,t).
+  \tag{22}
+  \]
+</div>
+
+<p class="lead">
+  <strong>Derivation:</strong> Start by writing the forward Fokker–Planck equation in divergence form:
+</p>
+
+<div class="eq-scroll">
+  \[
+    \partial_t p = -\nabla_x\cdot(\mu p) + \tfrac12\sigma^2\Delta_x p.
+  \tag{23}
+  \]
+</div>
+
+<p>
+  Under time reversal (\(t \to T - t\)), we define the reverse-time density \(\tilde{p}(x,t) = p(x, T - t)\).
+  The reverse-time Fokker–Planck equation becomes:
+</p>
+
+<div class="eq-scroll">
+  \[
+    \partial_t \tilde{p} = -\nabla_x\cdot(\tilde{\mu}\tilde{p}) + \tfrac12\sigma^2(t)\Delta_x\tilde{p}.
+  \tag{24}
+  \]
+</div>
+
+<p>
+  Comparing Eq. (23) and Eq. (24) leads to the condition:
+</p>
+
+<div class="eq-scroll">
+  \[
+    \tilde{\mu}(x,t)\tilde{p}(x,t) = \mu(x,t)\tilde{p}(x,t) - \sigma^2(t)\nabla_x\tilde{p}(x,t).
+  \tag{25}
+  \]
+</div>
+
+<p>
+  Divide both sides by \(\tilde{p}(x,t)\) (assuming \(\tilde{p}(x,t) > 0\)):
+</p>
+
+<div class="eq-scroll">
+  \[
+    \tilde{\mu}(x,t) = \mu(x,t) - \sigma^2(t)\nabla_x\log\tilde{p}(x,t).
+  \tag{26}
+  \]
+</div>
+
+<p class="explain">
+  Since \(\tilde{p}(x,t) = p(x,T - t)\), we obtain Eq. (22).
+</p>
+
+<!-- ----- 4.3 Final Reverse SDE ----- -->
+<h3 id="reverse-sde-final">4.3 The Reverse-Time SDE</h3>
+<p class="lead">
+  Substituting \(\tilde{\mu}(x,t)\) back gives the reverse-time SDE:
+</p>
+
+<div class="eq-scroll">
+  \[
+    dx_t = \left[\mu(x,t) - \sigma^2(t)\nabla_x\log p(x,t)\right]dt + \sigma(t)d\bar{B}_t,
+  \tag{27}
+  \]
+</div>
+
+<p>
+  where \(d\bar{B}_t\) is Brownian motion in reverse time (with inverted increments).
+</p>
+
+<p class="note">
+  The reverse drift contains a score function \(-\nabla_x\log p(x,t)\), which must be estimated in practice.
+</p>
+
+<!-- ----- 4.4 Connection to Diffusion Models ----- -->
+<h3 id="reverse-sde-diffusion">4.4 Connection to Diffusion Models (Song et al. 2020)</h3>
+<p>
+  In diffusion models:
+</p>
+<ul>
+  <li>The forward process progressively adds Gaussian noise.</li>
+  <li>The reverse process uses a neural network to approximate the score function \(\nabla_x\log p(x,t)\).</li>
+</ul>
+
+<p class="bridge">
+  Song et al. (2020) discretize Eq. (27) and learn \(-\nabla_x\log p(x,t)\) via score-matching. This forms the basis of denoising diffusion probabilistic models (DDPMs).
+</p>
+
+<p class="explain">
+  Each step in the learned reverse process approximates sampling from the true posterior \(p(x_{t-1}|x_t)\).
+</p>
+
+<!-- ----- 4.5 Summary ----- -->
+<h3 id="reverse-sde-summary">4.5 Summary</h3>
+<p class="lead">
+  The reverse-time SDE is the mathematical backbone of DDPMs. It connects stochastic calculus (Anderson, 1982) with modern generative modeling (Song et al., 2020).
+</p>
+
+<p class="note">
+  <strong>Key Insight:</strong> The correction term \(-\sigma^2(t)\nabla_x\log p(x,t)\) guides noisy samples back to the data manifold.
+</p>
+
