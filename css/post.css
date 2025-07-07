@@ -308,3 +308,17 @@ mjx-container[display="block"]{
 mjx-container[display="inline"]{
   white-space:normal !important;
 }
+
+/* ==============  printing CSS  ============== */
+@media print {
+  .toc-box {
+    position: static !important;
+    margin-top: 1.5rem;
+  }
+  .toc-header {
+    display: block;
+  }
+  mjx-container {
+    font-weight: normal !important; /* Prevent bold equations */
+  }
+}
