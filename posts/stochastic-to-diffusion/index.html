@@ -1374,3 +1374,47 @@ plt.show()</code></pre>
   <strong>Key Takeaway:</strong> DDPM was only the beginning. Its successors—DDIM, SGMs, LDMs, and classifier-free guidance—define the current state of generative modeling.
 </p>
 
+  <!-- ========== Section 9: Conclusions and Outlook ========== -->
+<h2 id="conclusions">9. Conclusions and Outlook</h2>
+
+<p class="lead">
+  From Brownian motion to score-based modeling, we have traced the mathematical backbone of diffusion models. Starting with stochastic calculus, we derived the Fokker–Planck equation, its reverse-time SDE, and ultimately arrived at the discrete DDPM framework powering today’s generative models.
+</p>
+
+<p>
+  Along the way, we saw how the elegance of Itô calculus and variational inference converge in the DDPM training objective. Our toy 2D implementation demonstrated the core principles of forward noising and reverse denoising, bridging theory with practice.
+</p>
+
+<!-- ----- 9.1 Key Takeaways ----- -->
+<h3 id="key-takeaways">9.1 Key Takeaways</h3>
+<ul>
+  <li>Stochastic differential equations underpin the forward and reverse dynamics in diffusion models.</li>
+  <li>The Fokker–Planck PDE provides a probabilistic description of density evolution.</li>
+  <li>The reverse-time SDE links Anderson’s 1982 theory to modern denoising frameworks.</li>
+  <li>The DDPM formulation discretizes these ideas for practical, scalable training.</li>
+</ul>
+
+<p class="note">
+  <strong>Essential Insight:</strong> Diffusion models elegantly merge physics-inspired dynamics with deep learning to achieve state-of-the-art generative performance.
+</p>
+
+<!-- ----- 9.2 Looking Ahead ----- -->
+<h3 id="future-work">9.2 Looking Ahead</h3>
+<p>
+  As the field evolves, several exciting directions lie ahead:
+</p>
+<ul>
+  <li><strong>Faster Sampling:</strong> Reducing the number of steps from hundreds to just a few without sacrificing quality.</li>
+  <li><strong>Conditional Generation:</strong> Expanding diffusion models for text, audio, and multimodal tasks.</li>
+  <li><strong>Theoretical Foundations:</strong> Deeper understanding of convergence, stability, and expressiveness of diffusion processes.</li>
+  <li><strong>Scalable Architectures:</strong> Leveraging latent spaces and efficient parameterizations to scale to ultra-high resolutions.</li>
+</ul>
+
+<p class="bridge">
+  Diffusion models are still young but already transforming fields from image synthesis to protein folding. Their strong theoretical grounding suggests they are here to stay as a core paradigm in generative modeling.
+</p>
+
+<p class="lead">
+  <em>This post completes our deep dive into the mathematics of diffusion. From here, we can explore applications, optimizations, and new theoretical frontiers.</em>
+</p>
+
