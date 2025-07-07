@@ -85,15 +85,41 @@ function buildMetaBar(pubDateISO) {
   const pdfIcon = document.createElement("i");
   pdfIcon.className = "fa-solid fa-download";
   pdfIcon.title = "Download as PDF";
-  pdfIcon.addEventListener("click", () => {
-    const opt = {
-      margin: 0.5,
-      filename: `${document.title || "post"}.pdf`,
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: "in", format: "letter", orientation: "portrait" }
-    };
-    html2pdf().from(contentDiv).set(opt).save();
+  pdfIcon.addEventListener("click", async () => {
+    try {
+      // Expand all <details>
+      const details = contentDiv.querySelectorAll("details");
+      details.forEach(d => d.open = true);
+
+      // Wait for MathJax to fully typeset
+      await window.MathJax?.typesetPromise?.([contentDiv]);
+
+      // Configure options for html2pdf
+      const opt = {
+        margin: 0.5,
+        filename: `${document.title || "post"}.pdf`,
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: "in", format: "letter", orientation: "portrait" }
+      };
+
+      // Scale images properly for PDF
+      contentDiv.querySelectorAll("img").forEach(img => {
+        img.style.maxWidth = "100%";
+        img.style.height = "auto";
+        img.style.display = "block";
+      });
+
+      // Generate PDF
+      await html2pdf().from(contentDiv).set(opt).save();
+    } catch (err) {
+      console.error("PDF generation failed:", err);
+      alert("Failed to generate PDF. Please try again.");
+    } finally {
+      // Collapse all <details> back
+      const details = contentDiv.querySelectorAll("details");
+      details.forEach(d => d.open = false);
+    }
   });
 
   /* Copy link */
@@ -229,9 +255,6 @@ function relocateMobileTOC() {
     console.warn("Mobile TOC placement failed:", e);
   }
 }
-
-
-
 
 /* Meta title (optional posts/{slug}/meta.json) */
 function loadTitleFromMeta() {
