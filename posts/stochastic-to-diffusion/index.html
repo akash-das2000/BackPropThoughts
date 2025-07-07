@@ -295,4 +295,99 @@ body {
   both theoretical and practical mastery.
 </p>
 
+<h2 id="brownian-motion">2. Brownian Motion &amp; Quadratic Variation</h2>
+
+<h3 id="brownian-intuition">2.1 Intuition: Brownian Motion and Quadratic Variation</h3>
+
+<p class="lead">
+  Brownian motion, or <em>Wiener process</em>, is the backbone of stochastic calculus.
+  It describes a continuous-time random walk where every increment is independent and normally distributed:
+</p>
+
+<div class="eq-scroll">
+  \[
+    B_{t+s} - B_t \sim \mathcal{N}(0, s),
+    \quad \text{for all } s \geq 0.
+  \]
+</div>
+
+<p>
+  Two crucial properties make Brownian motion special:
+</p>
+<ul>
+  <li><strong>Independent increments:</strong> The changes \( B_{t+s} - B_t \) are independent of the past.</li>
+  <li><strong>Scaling of variance:</strong> Variance grows linearly with time (\( \mathrm{Var}[B_t] = t \)).</li>
+</ul>
+
+<p class="bridge">
+  But there’s something subtle and unique about Brownian motion: its paths are
+  nowhere differentiable, yet they have a well-defined <strong>quadratic variation</strong>.
+  This quadratic variation is key to Itô calculus, and leads directly to the famous identity:
+</p>
+
+<div class="eq-scroll">
+  \[
+    (dB_t)^2 = dt.
+  \]
+</div>
+
+<p class="explain">
+  Informally, this means that the “square” of an infinitesimal Brownian increment \(dB_t\) behaves like a deterministic \(dt\) as we sum over many tiny steps.
+  In contrast, higher powers like \((dB_t)^3\) vanish in expectation.
+</p>
+
+
+<h3 id="brownian-proof">2.2 Proof: Why \((dB_t)^2 = dt\)</h3>
+
+<p class="lead">
+  Let’s derive the quadratic variation rigorously and explain why \((dB_t)^2\) contributes to Itô’s calculus while higher powers like \((dB_t)^3\) vanish.
+</p>
+
+<p>
+  Consider a partition of \([0, t]\) into \(n\) intervals of width \(\Delta t = t/n\).
+  The increments \(\Delta B_i = B_{t_i} - B_{t_{i-1}}\) satisfy:
+</p>
+
+<div class="eq-scroll">
+  \[
+    \Delta B_i \sim \mathcal{N}(0, \Delta t).
+  \]
+</div>
+
+<p>
+  The quadratic variation of \(B_t\) is defined as:
+</p>
+
+<div class="eq-scroll">
+  \[
+    [B]_t = \lim_{n \to \infty} \sum_{i=1}^n (\Delta B_i)^2.
+  \]
+</div>
+
+<p>
+  Since \((\Delta B_i)^2\) has expected value \(\mathbb{E}[(\Delta B_i)^2] = \Delta t\), we get:
+</p>
+
+<div class="eq-scroll">
+  \[
+    \mathbb{E}\left[\sum_{i=1}^n (\Delta B_i)^2\right] = n \Delta t = t.
+  \]
+</div>
+
+<p class="bridge">
+  As \(n \to \infty\), this sum converges in probability to \(t\), showing that:
+</p>
+
+<div class="eq-scroll">
+  \[
+    [B]_t = t.
+  \]
+</div>
+
+<p class="explain">
+  In differential form, this becomes \((dB_t)^2 = dt\).
+  Itô calculus generalizes this idea to stochastic integrals, where the second-order term \((dB_t)^2\) survives while terms like \((dB_t)^3\) disappear.
+</p>
+
+
 
