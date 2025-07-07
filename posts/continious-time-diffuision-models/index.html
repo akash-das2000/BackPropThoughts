@@ -318,7 +318,6 @@ body {
   For a step-by-step derivation of this SDE from discrete Gaussian perturbations, see Section 2 of the <a href="https://backpropthoughts.netlify.app/post?postId=stochastic-to-diffusion" target="_blank">previous blog</a>.
 </p>
 
----
 
 <!-- ----- Reverse SDE ----- -->
 <h3 id="reverse-sde">Reverse SDE</h3>
@@ -378,8 +377,6 @@ body {
 <p class="bridge">
   Let’s derive these relationships starting from the discrete variance schedule.
 </p>
-
----
 
 <!-- ----- 3.1 From Discrete to Continuous ----- -->
 <h3 id="discrete-to-continuous">3.1 From Discrete to Continuous</h3>
@@ -480,7 +477,7 @@ body {
   <strong>Key Insight:</strong> The drift term \(-\tfrac{1}{2}\,\beta(t)\,x_t\) pulls samples toward the origin, while the diffusion term \(\sqrt{\beta(t)}\) injects Gaussian noise.
 </p>
 
----
+
 
 <!-- ----- 3.2 Common Noise Schedules ----- -->
 <h3 id="common-schedules">3.2 Common Noise Schedules</h3>
@@ -540,7 +537,7 @@ body {
   Our goal is to find a tractable objective for training a neural network \(s_\theta(x, t) \approx \nabla_x \log p_t(x)\) that approximates the score function.
 </p>
 
----
+
 
 <!-- ----- 4.1 Girsanov’s Theorem ----- -->
 <h3 id="girsanov-theorem">4.1 Girsanov’s Theorem</h3>
@@ -619,7 +616,7 @@ body {
   <strong>Key Insight:</strong> This change-of-measure forms the backbone of continuous-time variational objectives.
 </p>
 
----
+
 
 <!-- ----- 4.2 ELBO Derivation ----- -->
 <h3 id="elbo-derivation">4.2 ELBO Derivation</h3>
@@ -647,7 +644,7 @@ body {
   This term measures how well the neural network \(s_\theta(x, t)\) approximates the score function \(\nabla_x \log p_t(x)\).
 </p>
 
----
+
 
 <!-- ----- 4.3 Fisher Information Integral ----- -->
 <h3 id="fisher-information">4.3 Fisher Information Integral</h3>
@@ -669,7 +666,7 @@ body {
   <strong>Key Takeaway:</strong> Minimizing this term is equivalent to matching the score function at all times, leading to effective denoising.
 </p>
 
----
+
 
 <!-- ----- 4.4 Summary ----- -->
 <h3 id="objective-summary">4.4 Summary</h3>
@@ -705,7 +702,7 @@ body {
   This objective aims to match the network prediction \(s_\theta(x, t)\) to the true score function \(\nabla_x \log p_t(x)\) at every time \(t\), weighted by the diffusion strength \(g(t)^2\).
 </p>
 
----
+
 
 <h3 id="score-matching-recap">5.1 Score Matching Recap</h3>
 <p class="lead">
@@ -730,7 +727,7 @@ body {
 </p>
 
 
----
+
 
 <!-- ----- 5.2 Derivation: From ELBO to Score Matching ----- -->
 <h3 id="elbo-to-score-matching">5.2 From ELBO to Score Matching</h3>
@@ -784,7 +781,7 @@ body {
   <strong>Insight:</strong> The continuous-time loss integrates the score matching error over the diffusion trajectory.
 </p>
 
----
+
 
 <!-- ----- 5.3 Discrete DDPM Loss Connection ----- -->
 <h3 id="discrete-ddpm-loss">5.3 Discrete DDPM Loss Connection</h3>
@@ -818,7 +815,7 @@ body {
   In the continuous-time case, we learn \(s_\theta(x, t)\) directly instead of going through \(\epsilon\).
 </p>
 
----
+
 
 <!-- ----- 5.4 Summary ----- -->
 <h3 id="score-matching-summary">5.4 Summary</h3>
