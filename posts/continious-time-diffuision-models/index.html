@@ -678,3 +678,148 @@ body {
   </figcaption>
 </figure>
 
+<!-- ========== Section: Implications for Score Matching ========== -->
+<h2 id="score-matching">Implications for Score Matching</h2>
+
+<p class="lead">
+  The continuous-time training objective derived in the previous section elegantly connects diffusion models to <strong>denoising score matching</strong>—a concept first proposed by Vincent (2011). Let’s unpack this connection step by step.
+</p>
+
+<p>
+  Recall our variational loss derived via Girsanov’s theorem:
+</p>
+
+<div class="eq-scroll">
+  \[
+    L(\theta) = \int_0^T g(t)^2\, \mathbb{E}_{p_t(x)}\left[\|s_\theta(x, t) - \nabla_x \log p_t(x)\|^2\right]\,dt
+  \]
+</div>
+
+<p>
+  This objective aims to match the network prediction \(s_\theta(x, t)\) to the true score function \(\nabla_x \log p_t(x)\) at every time \(t\), weighted by the diffusion strength \(g(t)^2\).
+</p>
+
+---
+
+<h3 id="score-matching-recap">5.1 Score Matching Recap</h3>
+<p class="lead">
+  Score matching seeks to minimize the expected squared error between the model’s score estimate and the true score:
+</p>
+
+<div class="eq-scroll">
+  \[
+    \mathcal{J}(\theta) = \mathbb{E}_{p(x)}\left[\|\nabla_x \log p(x) - s_\theta(x)\|^2\right]
+  \]
+</div>
+
+<p>
+  We explored this concept in depth in our earlier post on 
+  <a href="https://backpropthoughts.netlify.app/post?postId=diffusion-maths" target="_blank">
+    denoising score matching
+  </a>. In diffusion models, the idea extends naturally across a continuum of noise levels \(t \in [0, T]\).
+</p>
+
+<p class="bridge">
+  But how exactly does the diffusion process lead to score matching? The key lies in the parameterization of the reverse drift and the change of measure.
+</p>
+
+
+---
+
+<!-- ----- 5.2 Derivation: From ELBO to Score Matching ----- -->
+<h3 id="elbo-to-score-matching">5.2 From ELBO to Score Matching</h3>
+<p class="lead">
+  Let’s expand the variational objective step by step.
+</p>
+
+<details>
+  <summary><strong>Step-by-step derivation</strong></summary>
+
+  <p>
+    Start from the KL divergence between the true process \(q(x_{0:T})\) and the reverse process \(p_\theta(x_{0:T})\):
+  </p>
+
+  <div class="eq-scroll">
+    \[
+      \mathrm{KL}(q \| p_\theta) = \mathbb{E}_q\left[\log\frac{q(x_{0:T})}{p_\theta(x_{0:T})}\right]
+    \]
+  </div>
+
+  <p>
+    Using Girsanov’s theorem, the likelihood ratio simplifies to:
+  </p>
+
+  <div class="eq-scroll">
+    \[
+      \log\frac{q(x_{0:T})}{p_\theta(x_{0:T})} = \frac{1}{2}\int_0^T \|s_\theta(x, t) - \nabla_x \log p_t(x)\|^2 g(t)^2\,dt + C
+    \]
+  </div>
+
+  <p>
+    Here \(C\) is a constant independent of \(\theta\).
+  </p>
+
+  <p>
+    Taking expectations gives:
+  </p>
+
+  <div class="eq-scroll">
+    \[
+      L(\theta) = \frac{1}{2}\int_0^T g(t)^2\,\mathbb{E}_{p_t(x)}\left[\|s_\theta(x, t) - \nabla_x \log p_t(x)\|^2\right]\,dt + C
+    \]
+  </div>
+
+  <p>
+    Thus, minimizing \(L(\theta)\) is equivalent to matching the predicted score \(s_\theta(x, t)\) to the true score \(\nabla_x \log p_t(x)\) across all time \(t\).
+  </p>
+</details>
+
+<p class="note">
+  <strong>Insight:</strong> The continuous-time loss integrates the score matching error over the diffusion trajectory.
+</p>
+
+---
+
+<!-- ----- 5.3 Discrete DDPM Loss Connection ----- -->
+<h3 id="discrete-ddpm-loss">5.3 Discrete DDPM Loss Connection</h3>
+<p class="lead">
+  Recall the simplified DDPM loss in Ho et al. (2020):
+</p>
+
+<div class="eq-scroll">
+  \[
+    L_{\text{simple}}(\theta) = \mathbb{E}_{t, x_0, \epsilon}\left[
+      \|\epsilon - \epsilon_\theta(x_t, t)\|^2
+    \right]
+  \]
+</div>
+
+<p>
+  Here, \(\epsilon_\theta(x_t, t)\) predicts the noise added at timestep \(t\). This is a special case of score matching, since:
+</p>
+
+<div class="eq-scroll">
+  \[
+    \epsilon = -g(t)\,\nabla_x \log p_t(x) + \mathcal{N}(0, I)
+  \]
+</div>
+
+<p>
+  Hence, training \(\epsilon_\theta\) to predict \(\epsilon\) indirectly learns the score \(\nabla_x \log p_t(x)\).
+</p>
+
+<p class="bridge">
+  In the continuous-time case, we learn \(s_\theta(x, t)\) directly instead of going through \(\epsilon\).
+</p>
+
+---
+
+<!-- ----- 5.4 Summary ----- -->
+<h3 id="score-matching-summary">5.4 Summary</h3>
+<p class="lead">
+  The continuous-time objective derived from variational inference naturally reduces to denoising score matching. By learning the score function \(\nabla_x \log p_t(x)\) across all noise levels, the model can effectively reverse the diffusion process.
+</p>
+
+<p class="note">
+  <strong>Key Takeaway:</strong> Continuous-time diffusion models unify stochastic calculus and score-based learning under a single elegant loss function.
+</p>
