@@ -1231,8 +1231,7 @@ body {
 <h2 id="worked-example">9. Worked Example: 2D Gaussian Mixture</h2>
 
 <p class="lead">
-To solidify our understanding of continuous-time diffusion models, we now work through a complete example using a simple 2D Gaussian mixture dataset. This mirrors the approach in our <a href="https://backpropthoughts.netlify.app/post?postId=stochastic-to-diffusion" target="_blank">previous post</a> but extends it to the continuous-time SDE framework derived earlier.
-</p>
+To solidify our understanding of continuous-time diffusion models, we now work through a complete example using a simple 2D Gaussian mixture dataset. 
 
 <p>
 Our goal is to visualize both the <strong>forward diffusion</strong> (corruption) and <strong>reverse diffusion</strong> (denoising) processes, demonstrating how a neural network can approximate the score function \(\nabla_x \log p_t(x)\) across continuous time.
@@ -1400,9 +1399,9 @@ Although the plots visually resemble DDPM results, the underlying process is fun
 </p>
 
 <ul>
-  <li>⏳ <strong>Time Representation:</strong> Here \(t\) is continuous, enabling any granularity of timesteps for analysis or sampling.</li>
-  <li>📜 <strong>Loss Function:</strong> Derived via Girsanov’s theorem as an integral over time (see Section 4).</li>
-  <li>🌀 <strong>Sampling Flexibility:</strong> The reverse SDE can be simulated stochastically or replaced by a deterministic probability flow ODE (see Section 7).</li>
+  <li><strong>Time Representation:</strong> Here \(t\) is continuous, enabling any granularity of timesteps for analysis or sampling.</li>
+  <li><strong>Loss Function:</strong> Derived via Girsanov’s theorem as an integral over time (see Section 4).</li>
+  <li><strong>Sampling Flexibility:</strong> The reverse SDE can be simulated stochastically or replaced by a deterministic probability flow ODE (see Section 7).</li>
 </ul>
 
 <p class="note">
