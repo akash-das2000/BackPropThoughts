@@ -302,9 +302,12 @@ body {
 </p>
 
 <div class="eq-scroll">
-  (2.1)\;
-  \(dx_t = f(x, t)\,dt + g(t)\,dB_t\)
+  \[
+    dx_t = f(x, t)\,dt + g(t)\,dB_t
+    \tag{1}
+  \]
 </div>
+
 
 <p>
   Here:
@@ -327,9 +330,12 @@ body {
 </p>
 
 <div class="eq-scroll">
-  (2.2)\;
-  \(dx_t = [f(x, t) - g(t)^2 \nabla_x \log p_t(x)]\,dt + g(t)\,d\bar{B}_t\)
+  \[
+    dx_t = [f(x, t) - g(t)^2 \nabla_x \log p_t(x)]\,dt + g(t)\,d\bar{B}_t
+    \tag{2}
+  \]
 </div>
+
 
 <p>
   The key insight is the additional drift term \(-g(t)^2 \nabla_x \log p_t(x)\), which steers noisy samples back toward high-density regions of the data distribution. In practice, we approximate \(\nabla_x \log p_t(x)\) with a neural network \(s_θ(x, t)\) trained via score matching.
@@ -351,27 +357,36 @@ body {
 </p>
 
 <div class="eq-scroll">
-  (3.1)\;
-  \(dx_t = f(x, t)\,dt + g(t)\,dB_t\)
+  \[
+    dx_t = f(x, t)\,dt + g(t)\,dB_t
+    \tag{3}
+  \]
 </div>
+
 
 <p>
   In most diffusion models, the drift is chosen to keep the process isotropic and centered, leading to:
 </p>
 
 <div class="eq-scroll">
-  (3.2)\;
-  \(f(x, t) = -\tfrac{1}{2}\,\beta(t)\,x\)
+  \[
+    f(x, t) = -\tfrac{1}{2}\,\beta(t)\,x
+    \tag{4}
+  \]
 </div>
+
 
 <p>
   The diffusion coefficient \(g(t)\) relates directly to \(\beta(t)\):
 </p>
 
 <div class="eq-scroll">
-  (3.3)\;
-  \(g(t) = \sqrt{\beta(t)}\)
+  \[
+    g(t) = \sqrt{\beta(t)}
+    \tag{5}
+  \]
 </div>
+
 
 <p class="bridge">
   Let’s derive these relationships starting from the discrete variance schedule.
@@ -384,36 +399,48 @@ body {
 </p>
 
 <div class="eq-scroll">
-  (3.4)\;
-  \(x_t = \sqrt{1 - \beta_t}\,x_{t-1} + \sqrt{\beta_t}\,\epsilon_t,\; \epsilon_t \sim \mathcal{N}(0, I)\)
+  \[
+    x_t = \sqrt{1 - \beta_t}\,x_{t-1} + \sqrt{\beta_t}\,\epsilon_t,\; \epsilon_t \sim \mathcal{N}(0, I)
+    \tag{6}
+  \]
 </div>
+
 
 <p>
   For small \(\beta_t\), expand \(\sqrt{1 - \beta_t}\) using a first-order Taylor approximation:
 </p>
 
 <div class="eq-scroll">
-  (3.5)\;
-  \(\sqrt{1 - \beta_t} \approx 1 - \tfrac{1}{2}\,\beta_t\)
+  \[
+    \sqrt{1 - \beta_t} \approx 1 - \tfrac{1}{2}\,\beta_t
+    \tag{7}
+  \]
 </div>
+
 
 <p>
   Substituting back, we get:
 </p>
 
 <div class="eq-scroll">
-  (3.6)\;
-  \(x_t - x_{t-1} \approx -\tfrac{1}{2}\,\beta_t\,x_{t-1} + \sqrt{\beta_t}\,\epsilon_t\)
+  \[
+    x_t - x_{t-1} \approx -\tfrac{1}{2}\,\beta_t\,x_{t-1} + \sqrt{\beta_t}\,\epsilon_t
+    \tag{8}
+  \]
 </div>
+
 
 <p>
   Dividing both sides by \(\Delta t\) (where \(\Delta t = 1/T\), the timestep size) and taking the limit \(\Delta t \to 0\), we obtain the continuous-time forward SDE:
 </p>
 
 <div class="eq-scroll">
-  (3.7)\;
-  \(dx_t = -\tfrac{1}{2}\,\beta(t)\,x_t\,dt + \sqrt{\beta(t)}\,dB_t\)
+  \[
+    dx_t = -\tfrac{1}{2}\,\beta(t)\,x_t\,dt + \sqrt{\beta(t)}\,dB_t
+    \tag{9}
+  \]
 </div>
+
 
 <details>
   <summary><strong>Step-by-step derivation</strong></summary>
@@ -421,46 +448,62 @@ body {
     Starting from the discrete update:
   </p>
 
-  <div class="eq-scroll">
-    (3.8)\;
-    \(x_t = \sqrt{1 - \beta_t}\,x_{t-1} + \sqrt{\beta_t}\,\epsilon_t\)
-  </div>
+<div class="eq-scroll">
+  \[
+    x_t = \sqrt{1 - \beta_t}\,x_{t-1} + \sqrt{\beta_t}\,\epsilon_t
+    \tag{10}
+  \]
+</div>
+
 
   <p>
     Approximate \(\sqrt{1 - \beta_t} \approx 1 - \tfrac{1}{2}\,\beta_t\):
   </p>
 
-  <div class="eq-scroll">
-    (3.9)\;
-    \(x_t \approx (1 - \tfrac{1}{2}\,\beta_t)\,x_{t-1} + \sqrt{\beta_t}\,\epsilon_t\)
-  </div>
+<div class="eq-scroll">
+  \[
+    x_t \approx (1 - \tfrac{1}{2}\,\beta_t)\,x_{t-1} + \sqrt{\beta_t}\,\epsilon_t
+    \tag{11}
+  \]
+</div>
+
 
   <p>
     Simplify:
   </p>
 
-  <div class="eq-scroll">
-    (3.10)\;
-    \(x_t - x_{t-1} \approx -\tfrac{1}{2}\,\beta_t\,x_{t-1} + \sqrt{\beta_t}\,\epsilon_t\)
-  </div>
+<div class="eq-scroll">
+  \[
+    x_t - x_{t-1} \approx -\tfrac{1}{2}\,\beta_t\,x_{t-1} + \sqrt{\beta_t}\,\epsilon_t
+    \tag{12}
+  \]
+</div>
+
 
   <p>
     Divide by \(\Delta t\) and recognize limits:
   </p>
 
-  <div class="eq-scroll">
-    (3.11)\;
-    \(\frac{x_t - x_{t-1}}{\Delta t} \to \frac{dx_t}{dt},\; \frac{\sqrt{\beta_t}}{\sqrt{\Delta t}} \to \sqrt{\beta(t)}\)
-  </div>
+<div class="eq-scroll">
+  \[
+    \frac{x_t - x_{t-1}}{\Delta t} \to \frac{dx_t}{dt},\;
+    \frac{\sqrt{\beta_t}}{\sqrt{\Delta t}} \to \sqrt{\beta(t)}
+    \tag{13}
+  \]
+</div>
+
 
   <p>
     Resulting in:
   </p>
 
-  <div class="eq-scroll">
-    (3.12)\;
-    \(dx_t = -\tfrac{1}{2}\,\beta(t)\,x_t\,dt + \sqrt{\beta(t)}\,dB_t\)
-  </div>
+<div class="eq-scroll">
+  \[
+    dx_t = -\tfrac{1}{2}\,\beta(t)\,x_t\,dt + \sqrt{\beta(t)}\,dB_t
+    \tag{14}
+  \]
+</div>
+
 </details>
 
 <p class="note">
@@ -507,18 +550,24 @@ body {
 </p>
 
 <div class="eq-scroll">
-  (4.1)\;
-  \(dx_t = f(x, t)\,dt + g(t)\,dB_t\)
+  \[
+    dx_t = f(x, t)\,dt + g(t)\,dB_t
+    \tag{15}
+  \]
 </div>
+
 
 <p>
   and the reverse SDE:
 </p>
 
 <div class="eq-scroll">
-  (4.2)\;
-  \(dx_t = [f(x, t) - g(t)^2 \nabla_x \log p_t(x)]\,dt + g(t)\,d\bar{B}_t\)
+  \[
+    dx_t = [f(x, t) - g(t)^2 \nabla_x \log p_t(x)]\,dt + g(t)\,d\bar{B}_t
+    \tag{16}
+  \]
 </div>
+
 
 <p class="bridge">
   Our goal is to find a tractable objective for training a neural network \(s_\theta(x, t) \approx \nabla_x \log p_t(x)\) that approximates the score function.
@@ -536,17 +585,22 @@ body {
 </p>
 
 <div class="eq-scroll">
-  (4.3)\;
-  \(dx_t = f(x, t)\,dt + g(t)\,dB_t\)
+  \[
+    dx_t = f(x, t)\,dt + g(t)\,dB_t
+    \tag{17}
+  \]
 </div>
+
 
 <p>
   and
 </p>
 
 <div class="eq-scroll">
-  (4.4)\;
-  \(dx_t = \tilde{f}(x, t)\,dt + g(t)\,d\tilde{B}_t\)
+  \[
+    dx_t = \tilde{f}(x, t)\,dt + g(t)\,d\tilde{B}_t
+    \tag{18}
+  \]
 </div>
 
 <p>
@@ -554,14 +608,15 @@ body {
 </p>
 
 <div class="eq-scroll">
-  (4.5)\;
   \[
-  \frac{d\mathbb{Q}}{d\mathbb{P}} = \exp\left(
-    \int_0^T \frac{\tilde{f}(x, t) - f(x, t)}{g(t)}\,dB_t
-    - \frac{1}{2} \int_0^T \left\|\frac{\tilde{f}(x, t) - f(x, t)}{g(t)}\right\|^2 dt
-  \right)
+    \frac{d\mathbb{Q}}{d\mathbb{P}} = \exp\left(
+      \int_0^T \frac{\tilde{f}(x, t) - f(x, t)}{g(t)}\,dB_t
+      - \frac{1}{2} \int_0^T \left\|\frac{\tilde{f}(x, t) - f(x, t)}{g(t)}\right\|^2 dt
+    \right)
+    \tag{19}
   \]
 </div>
+
 
 <details>
   <summary><strong>Step-by-step derivation of likelihood ratio</strong></summary>
@@ -569,24 +624,28 @@ body {
     Define the drift difference:
   </p>
 
-  <div class="eq-scroll">
-    (4.6)\;
-    \(\delta(x, t) = \frac{\tilde{f}(x, t) - f(x, t)}{g(t)}\)
-  </div>
+<div class="eq-scroll">
+  \[
+    \delta(x, t) = \frac{\tilde{f}(x, t) - f(x, t)}{g(t)}
+    \tag{20}
+  \]
+</div>
+
 
   <p>
     Substituting \(\delta(x, t)\) gives:
   </p>
 
-  <div class="eq-scroll">
-    (4.7)\;
-    \[
+ <div class="eq-scroll">
+  \[
     \frac{d\mathbb{Q}}{d\mathbb{P}} = \exp\left(
       \int_0^T \delta(x, t)\,dB_t
-      - \frac{1}{2}\int_0^T \|\delta(x, t)\|^2 dt
+      - \tfrac{1}{2}\int_0^T \|\delta(x, t)\|^2 dt
     \right)
-    \]
-  </div>
+    \tag{21}
+  \]
+</div>
+
 </details>
 
 <p class="note">
@@ -601,20 +660,24 @@ body {
 </p>
 
 <div class="eq-scroll">
-  (4.8)\;
-  \(\mathrm{KL}(q \| p_\theta) = \mathbb{E}_{q}\left[\log\frac{q(x_{0:T})}{p_\theta(x_{0:T})}\right]\)
+  \[
+    \mathrm{KL}(q \| p_\theta) = \mathbb{E}_{q}\left[\log\frac{q(x_{0:T})}{p_\theta(x_{0:T})}\right]
+    \tag{22}
+  \]
 </div>
+
 
 <p>
   Using Girsanov’s theorem, this simplifies to:
 </p>
 
 <div class="eq-scroll">
-  (4.9)\;
   \[
-  \mathrm{KL}(q \| p_\theta) = \mathbb{E}_q\left[\frac{1}{2}\int_0^T \|s_\theta(x, t) - \nabla_x \log p_t(x)\|^2 g(t)^2\,dt\right] + C
+    \mathrm{KL}(q \| p_\theta) = \mathbb{E}_q\left[\frac{1}{2}\int_0^T \|s_\theta(x, t) - \nabla_x \log p_t(x)\|^2 g(t)^2\,dt\right] + C
+    \tag{23}
   \]
 </div>
+
 
 <p class="bridge">
   Here, \(C\) is a constant independent of \(\theta\), and \(s_\theta(x, t)\) approximates \(\nabla_x \log p_t(x)\).
@@ -628,11 +691,12 @@ body {
 </p>
 
 <div class="eq-scroll">
-  (4.10)\;
   \[
-  \int_0^T g(t)^2 \mathbb{E}_{p_t(x)}\left[\|s_\theta(x, t) - \nabla_x \log p_t(x)\|^2\right]\,dt
+    \int_0^T g(t)^2 \mathbb{E}_{p_t(x)}\left[\|s_\theta(x, t) - \nabla_x \log p_t(x)\|^2\right]\,dt
+    \tag{24}
   \]
 </div>
+
 
 <p>
   Minimizing this term is equivalent to matching the network’s score predictions to the true score at every time \(t\).
@@ -669,11 +733,12 @@ body {
 </p>
 
 <div class="eq-scroll">
-  (5.1)\;
   \[
-  L(\theta) = \int_0^T g(t)^2\, \mathbb{E}_{p_t(x)}\left[\|s_\theta(x, t) - \nabla_x \log p_t(x)\|^2\right]\, dt
+    L(\theta) = \int_0^T g(t)^2\, \mathbb{E}_{p_t(x)}\left[\|s_\theta(x, t) - \nabla_x \log p_t(x)\|^2\right]\, dt
+    \tag{25}
   \]
 </div>
+
 
 <p class="bridge">
   This objective encourages the neural network \(s_\theta(x, t)\) to approximate the true score function \(\nabla_x \log p_t(x)\) at every \(t \in [0, T]\).
@@ -687,11 +752,12 @@ body {
 </p>
 
 <div class="eq-scroll">
-  (5.2)\;
   \[
-  \mathcal{J}(\theta) = \mathbb{E}_{p(x)}\left[\|\nabla_x \log p(x) - s_\theta(x)\|^2\right]
+    \mathcal{J}(\theta) = \mathbb{E}_{p(x)}\left[\|\nabla_x \log p(x) - s_\theta(x)\|^2\right]
+    \tag{26}
   \]
 </div>
+
 
 <p>
   In diffusion models, this idea extends across a continuum of noise levels \(t \in [0, T]\).
@@ -715,23 +781,25 @@ body {
     Start with the KL divergence between \(q(x_{0:T})\) and \(p_\theta(x_{0:T})\):
   </p>
 
-  <div class="eq-scroll">
-    (5.3)\;
-    \[
+<div class="eq-scroll">
+  \[
     \mathrm{KL}(q \| p_\theta) = \mathbb{E}_q\left[\log\frac{q(x_{0:T})}{p_\theta(x_{0:T})}\right]
-    \]
-  </div>
+    \tag{27}
+  \]
+</div>
+
 
   <p>
     Applying Girsanov’s theorem, we rewrite this as:
   </p>
 
-  <div class="eq-scroll">
-    (5.4)\;
-    \[
+<div class="eq-scroll">
+  \[
     \log\frac{q(x_{0:T})}{p_\theta(x_{0:T})} = \frac{1}{2}\int_0^T \|s_\theta(x, t) - \nabla_x \log p_t(x)\|^2 g(t)^2\, dt + C
-    \]
-  </div>
+    \tag{28}
+  \]
+</div>
+
 
   <p>
     Here \(C\) is a constant independent of \(\theta\).
@@ -741,12 +809,13 @@ body {
     Taking expectations gives:
   </p>
 
-  <div class="eq-scroll">
-    (5.5)\;
-    \[
+<div class="eq-scroll">
+  \[
     L(\theta) = \frac{1}{2}\int_0^T g(t)^2\, \mathbb{E}_{p_t(x)}\left[\|s_\theta(x, t) - \nabla_x \log p_t(x)\|^2\right]\, dt + C
-    \]
-  </div>
+    \tag{29}
+  \]
+</div>
+
 </details>
 
 <p class="note">
@@ -761,13 +830,14 @@ body {
 </p>
 
 <div class="eq-scroll">
-  (5.6)\;
   \[
-  L_{\text{simple}}(\theta) = \mathbb{E}_{t, x_0, \epsilon}\left[
-    \|\epsilon - \epsilon_\theta(x_t, t)\|^2
-  \right]
+    L_{\text{simple}}(\theta) = \mathbb{E}_{t, x_0, \epsilon}\left[
+      \|\epsilon - \epsilon_\theta(x_t, t)\|^2
+    \right]
+    \tag{30}
   \]
 </div>
+
 
 <p>
   where \(\epsilon_\theta(x_t, t)\) predicts the noise added at timestep \(t\).
@@ -778,11 +848,12 @@ body {
 </p>
 
 <div class="eq-scroll">
-  (5.7)\;
   \[
-  \epsilon = -g(t)\,\nabla_x \log p_t(x) + \mathcal{N}(0, I)
+    \epsilon = -g(t)\,\nabla_x \log p_t(x) + \mathcal{N}(0, I)
+    \tag{31}
   \]
 </div>
+
 
 <p>
   Training \(\epsilon_\theta\) to predict \(\epsilon\) indirectly learns the score \(\nabla_x \log p_t(x)\).
@@ -816,11 +887,12 @@ body {
 </p>
 
 <div class="eq-scroll">
-  (6.1)\;
   \[
-  L(\theta) = \int_0^T g(t)^2\, \mathbb{E}_{p_t(x)}\left[\|s_\theta(x, t) - \nabla_x \log p_t(x)\|^2\right]\, dt
+    L(\theta) = \int_0^T g(t)^2\, \mathbb{E}_{p_t(x)}\left[\|s_\theta(x, t) - \nabla_x \log p_t(x)\|^2\right]\, dt
+    \tag{32}
   \]
 </div>
+
 
 <p>
   Here, \(g(t)^2\) weights the contribution of each time \(t\) to the total loss.
@@ -834,22 +906,24 @@ body {
 </p>
 
 <div class="eq-scroll">
-  (6.2)\;
   \[
-  \ell(t) = g(t)^2\, \mathbb{E}_{p_t(x)}\left[\|s_\theta(x, t) - \nabla_x \log p_t(x)\|^2\right]
+    \ell(t) = g(t)^2\, \mathbb{E}_{p_t(x)}\left[\|s_\theta(x, t) - \nabla_x \log p_t(x)\|^2\right]
+    \tag{33}
   \]
 </div>
+
 
 <p>
   The total loss integrates \(\ell(t)\) over the interval \([0, T]\):
 </p>
 
 <div class="eq-scroll">
-  (6.3)\;
   \[
-  L(\theta) = \int_0^T \ell(t)\, dt
+    L(\theta) = \int_0^T \ell(t)\, dt
+    \tag{34}
   \]
 </div>
+
 
 <p class="note">
   <strong>Key Insight:</strong> \(\ell(t)\) shows how error is distributed along the diffusion trajectory.
@@ -889,22 +963,24 @@ body {
 </p>
 
 <div class="eq-scroll">
-  (6.4)\;
   \[
-  \mathcal{I}(t) = \mathbb{E}_{p_t(x)}\left[\|\nabla_x \log p_t(x)\|^2\right]
+    \mathcal{I}(t) = \mathbb{E}_{p_t(x)}\left[\|\nabla_x \log p_t(x)\|^2\right]
+    \tag{35}
   \]
 </div>
+
 
 <p>
   The loss can be viewed as a Fisher-weighted score error:
 </p>
 
 <div class="eq-scroll">
-  (6.5)\;
   \[
-  L(\theta) = \int_0^T g(t)^2\, \mathcal{I}(t)\, dt
+    L(\theta) = \int_0^T g(t)^2\, \mathcal{I}(t)\, dt
+    \tag{36}
   \]
 </div>
+
 
 <p>
   This highlights how noise schedules determine which regions of \(t\) are emphasized during training.
@@ -941,11 +1017,12 @@ body {
 </p>
 
 <div class="eq-scroll">
-  (7.1)\;
   \[
-  dx_t = \big[f(x_t, t) - g(t)^2 \nabla_x \log p_t(x)\big]\, dt + g(t)\, d\bar{B}_t
+    dx_t = \big[f(x_t, t) - g(t)^2 \nabla_x \log p_t(x)\big]\, dt + g(t)\, d\bar{B}_t
+    \tag{37}
   \]
 </div>
+
 
 <p>
   where:
@@ -968,11 +1045,12 @@ body {
 </p>
 
 <div class="eq-scroll">
-  (7.2)\;
   \[
-  \partial_t p_t(x) = -\nabla_x \cdot \left(\mu(x, t)p_t(x)\right) + \frac{1}{2}g(t)^2\Delta_x p_t(x)
+    \partial_t p_t(x) = -\nabla_x \cdot \left(\mu(x, t)p_t(x)\right) + \tfrac{1}{2}g(t)^2\Delta_x p_t(x)
+    \tag{38}
   \]
 </div>
+
 
 <p>
   where:
@@ -988,22 +1066,26 @@ body {
     Starting from the reverse SDE:
   </p>
 
-  <div class="eq-scroll">
-    \[
+<div class="eq-scroll">
+  \[
     dx_t = \mu(x, t)\, dt + g(t)\, d\bar{B}_t
-    \]
-  </div>
+    \tag{39}
+  \]
+</div>
+
 
   <p>
     The Fokker–Planck PDE is given by:
   </p>
 
-  <div class="eq-scroll">
-    \[
-    \partial_t p_t(x) = -\nabla_x \cdot [\mu(x, t)p_t(x)] + \tfrac{1}{2}g(t)^2\Delta_x p_t(x)
-    \]
-  </div>
+<div class="eq-scroll">
+  \[
+  \partial_t p_t(x) = -\nabla_x \cdot [\mu(x, t)p_t(x)] + \tfrac{1}{2}g(t)^2\Delta_x p_t(x)
+  \tag{40}
+  \]
+</div>
 </details>
+
 
 <p class="note">
   <strong>Key Insight:</strong> The PDE has two terms—drift (transport) and diffusion (randomness).
@@ -1017,11 +1099,12 @@ body {
 </p>
 
 <div class="eq-scroll">
-  (7.3)\;
   \[
   \partial_t p_t(x) = -\nabla_x \cdot (v(x, t)p_t(x))
+  \tag{41}
   \]
 </div>
+
 
 <p>
   where \(v(x, t)\) is a deterministic velocity field.
@@ -1032,11 +1115,12 @@ body {
 </p>
 
 <div class="eq-scroll">
-  (7.4)\;
   \[
   v(x, t) = f(x, t) - g(t)^2 \nabla_x \log p_t(x)
+  \tag{42}
   \]
 </div>
+
 
 
 <!-- ----- 7.4 The Probability Flow ODE ----- -->
@@ -1046,11 +1130,12 @@ body {
 </p>
 
 <div class="eq-scroll">
-  (7.5)\;
   \[
   \frac{dx}{dt} = f(x, t) - g(t)^2 s_\theta(x, t)
+  \tag{43}
   \]
 </div>
+
 
 <p>
   where \(s_\theta(x, t)\) approximates \(\nabla_x \log p_t(x)\) with a neural network.
@@ -1100,11 +1185,12 @@ body {
 </p>
 
 <div class="eq-scroll">
-  (8.1)\;
   \[
   x_{t - \Delta t} = x_t + \left[f(x_t, t) - g(t)^2 s_\theta(x_t, t)\right]\Delta t + g(t)\sqrt{\Delta t}\, z
+  \tag{44}
   \]
 </div>
+
 
 <p>
   where:
@@ -1119,29 +1205,35 @@ body {
   <p>
     Compute the drift term:
   </p>
-  <div class="eq-scroll">
-    \[
-    \mu(x_t, t) = f(x_t, t) - g(t)^2 s_\theta(x_t, t)
-    \]
-  </div>
+<div class="eq-scroll">
+  \[
+  \mu(x_t, t) = f(x_t, t) - g(t)^2 s_\theta(x_t, t)
+  \tag{45}
+  \]
+</div>
+
 
   <p>
     Compute the diffusion term:
   </p>
-  <div class="eq-scroll">
-    \[
-    \sigma(x_t, t) = g(t)\sqrt{\Delta t}
-    \]
-  </div>
+<div class="eq-scroll">
+  \[
+  \sigma(x_t, t) = g(t)\sqrt{\Delta t}
+  \tag{46}
+  \]
+</div>
+
 
   <p>
     Update:
   </p>
-  <div class="eq-scroll">
-    \[
-    x_{t - \Delta t} = x_t + \mu(x_t, t)\Delta t + \sigma(x_t, t)z
-    \]
-  </div>
+<div class="eq-scroll">
+  \[
+  x_{t - \Delta t} = x_t + \mu(x_t, t)\Delta t + \sigma(x_t, t)z
+  \tag{47}
+  \]
+</div>
+
 </details>
 
 <p class="note">
@@ -1156,11 +1248,12 @@ body {
 </p>
 
 <div class="eq-scroll">
-  (8.2)\;
   \[
   x_t^{(k+1)} = x_t^{(k)} + \epsilon s_\theta(x_t^{(k)}, t) + \sqrt{2\epsilon}\, z
+  \tag{48}
   \]
 </div>
+
 
 <p>
   where:
@@ -1176,11 +1269,13 @@ body {
     Langevin Dynamics performs MCMC sampling from the distribution defined by \(s_\theta(x, t)\):
   </p>
 
-  <div class="eq-scroll">
-    \[
-    dx = s_\theta(x, t)\, dt + \sqrt{2}\, dB_t
-    \]
-  </div>
+<div class="eq-scroll">
+  \[
+  dx = s_\theta(x, t)\, dt + \sqrt{2}\, dB_t
+  \tag{49}
+  \]
+</div>
+
 
   <p>
     Discretizing yields the update above.
@@ -1421,11 +1516,11 @@ We started by deriving the forward and reverse stochastic differential equations
 Key highlights include:
 </p>
 <ul>
-  <li>✅ <strong>Unification of DDPM and score-based models:</strong> We saw how the continuous-time SDE formulation seamlessly generalizes discrete timesteps, providing a unified view of forward and reverse processes.</li>
-  <li>✅ <strong>Noise scheduling and loss weighting:</strong> By analyzing \(\beta(t)\), \(g(t)\), and the instantaneous loss density \(\ell(t)\), we understood how different schedules redistribute model focus across the diffusion trajectory.</li>
-  <li>✅ <strong>Variational objectives via Girsanov’s theorem:</strong> We derived a continuous-time ELBO and connected it to the Fisher information, highlighting its natural link to score matching.</li>
-  <li>✅ <strong>Sampling algorithms:</strong> Explored Predictor–Corrector samplers for hybrid stochastic–deterministic updates and probability flow ODEs for deterministic generation.</li>
-  <li>✅ <strong>Hands-on 2D Gaussian mixture example:</strong> Implemented a toy dataset with forward and reverse diffusion steps, visualizing the core dynamics of these models.</li>
+  <li><strong>Unification of DDPM and score-based models:</strong> We saw how the continuous-time SDE formulation seamlessly generalizes discrete timesteps, providing a unified view of forward and reverse processes.</li>
+  <li><strong>Noise scheduling and loss weighting:</strong> By analyzing \(\beta(t)\), \(g(t)\), and the instantaneous loss density \(\ell(t)\), we understood how different schedules redistribute model focus across the diffusion trajectory.</li>
+  <li><strong>Variational objectives via Girsanov’s theorem:</strong> We derived a continuous-time ELBO and connected it to the Fisher information, highlighting its natural link to score matching.</li>
+  <li><strong>Sampling algorithms:</strong> Explored Predictor–Corrector samplers for hybrid stochastic–deterministic updates and probability flow ODEs for deterministic generation.</li>
+  <li><strong>Hands-on 2D Gaussian mixture example:</strong> Implemented a toy dataset with forward and reverse diffusion steps, visualizing the core dynamics of these models.</li>
 </ul>
 
 <p class="bridge">
