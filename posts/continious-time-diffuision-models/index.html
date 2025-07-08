@@ -1227,15 +1227,199 @@ body {
 </p>
 
 
-<!-- ========== 9. Outlook: Beyond Continuous-Time Diffusion ========== -->
-<h2 id="outlook">9. Outlook: Beyond Continuous-Time Diffusion</h2>
+<!-- ========== Section: Worked Example: 2D Gaussian Mixture ========== -->
+<h2 id="worked-example">9. Worked Example: 2D Gaussian Mixture</h2>
+
+<p class="lead">
+To solidify our understanding of continuous-time diffusion models, we now work through a complete example using a simple 2D Gaussian mixture dataset. This mirrors the approach in our <a href="https://backpropthoughts.netlify.app/post?postId=stochastic-to-diffusion" target="_blank">previous post</a> but extends it to the continuous-time SDE framework derived earlier.
+</p>
+
+<p>
+Our goal is to visualize both the <strong>forward diffusion</strong> (corruption) and <strong>reverse diffusion</strong> (denoising) processes, demonstrating how a neural network can approximate the score function \(\nabla_x \log p_t(x)\) across continuous time.
+</p>
+
+---
+
+<!-- ========== Subsection: Toy Dataset ========== -->
+<h3 id="toy-dataset">9.1 Setting up the Toy Dataset</h3>
+
+<p class="lead">
+We start with a simple 2D Gaussian mixture: two clusters centered at \([2,2]\) and \([-2,-2]\). This provides a low-dimensional, visualizable setting for exploring forward and reverse diffusion.
+</p>
+
+<div class="code-card">
+  <div class="code-header">Dataset generation</div>
+  <pre><code>n_samples = 1000
+data = torch.cat([
+    torch.randn(n_samples // 2, 2) * 0.5 + torch.tensor([2, 2]),
+    torch.randn(n_samples // 2, 2) * 0.5 + torch.tensor([-2, -2])
+], dim=0).to(device)
+</code></pre>
+</div>
+
+<figure>
+  <img src="posts/continuous-time-diffusion/assets/original_dataset.png" alt="Original 2D Gaussian Mixture Dataset">
+  <figcaption><strong>Figure 9.1:</strong> Original dataset: Two Gaussian blobs at \([2,2]\) and \([-2,-2]\).</figcaption>
+</figure>
+
+---
+
+<!-- ========== Subsection: Forward Diffusion ========== -->
+<h3 id="forward-diffusion">9.2 Forward Diffusion Process</h3>
+
+<p class="lead">
+The forward process incrementally corrupts \(x_0\) using the SDE:
+</p>
+
+<div class="eq-scroll">
+  \[
+  dx_t = -\tfrac{1}{2}\,\beta(t)\,x_t\,dt + \sqrt{\beta(t)}\,dB_t
+  \]
+</div>
+
+<p>
+This is implemented as small timestep updates:
+</p>
+
+<div class="code-card">
+  <div class="code-header">forward_diffusion()</div>
+  <pre><code>def forward_diffusion(x0, steps, snap_points):
+    x = x0.clone()
+    for step in range(steps):
+        t = torch.ones(x.size(0), device=device) * (step / steps)
+        d = drift(x, t)
+        g = diffusion(t)
+        x += d * dt + g * torch.sqrt(torch.tensor(dt, device=device)) * torch.randn_like(x)
+</code></pre>
+</div>
+
+<p class="note">
+<strong>Theory ↔ Code:</strong> The drift term <code>d * dt</code> models \(-½\beta(t)x_t\,dt\), while the noise term <code>g * sqrt(dt) * randn_like(x)</code> represents \(\sqrt{\beta(t)}\,dB_t\).
+</p>
+
+<figure>
+  <img src="posts/continuous-time-diffusion/assets/pseudo_forward.png" alt="Forward Diffusion Snapshots">
+  <figcaption><strong>Figure 9.2:</strong> Snapshots of the forward diffusion process at increasing \(t\). The original structure dissolves as Gaussian noise dominates.</figcaption>
+</figure>
+
+<p class="bridge">
+Notice how continuous-time evolution allows us to observe arbitrary intermediate noise levels—not constrained to discrete timesteps as in DDPM.
+</p>
+
+---
+
+<!-- ========== Subsection: Reverse Diffusion ========== -->
+<h3 id="reverse-diffusion">9.3 Reverse Diffusion Process</h3>
+
+<p class="lead">
+The reverse SDE guides samples from Gaussian noise back to data:
+</p>
+
+<div class="eq-scroll">
+  \[
+  dx_t = \big[-\tfrac{1}{2}\beta(t)x_t - \beta(t)\nabla_x \log p_t(x)\big]dt + \sqrt{\beta(t)}\,d\bar{B}_t
+  \]
+</div>
+
+<p>
+Here \(\nabla_x \log p_t(x)\) is approximated by a neural network \(s_\theta(x, t)\). The code for reverse diffusion is:
+</p>
+
+<div class="code-card">
+  <div class="code-header">reverse_diffusion()</div>
+  <pre><code>def reverse_diffusion(scorenet, steps, snap_points, scale_score=1.5):
+    x = torch.randn(1000, 2, device=device)
+    for step in reversed(range(steps)):
+        t = torch.ones(x.size(0), device=device) * (step / steps)
+        drift_term = drift(x, t) - diffusion(t)**2 * scale_score * scorenet(x, t)
+        noise_term = diffusion(t) * torch.sqrt(torch.tensor(dt, device=device)) * torch.randn_like(x)
+        x += drift_term * dt + noise_term
+</code></pre>
+</div>
+
+<p class="note">
+<strong>Theory ↔ Code:</strong> The term <code>-diffusion(t)**2 * scorenet(x, t)</code> implements \(-\beta(t)\nabla_x \log p_t(x)\).
+</p>
+
+<figure>
+  <img src="posts/continuous-time-diffusion/assets/pseudo_reverse.png" alt="Reverse Diffusion Snapshots">
+  <figcaption><strong>Figure 9.3:</strong> Snapshots of the reverse diffusion process. Starting from noise, the structure of the original data re-emerges.</figcaption>
+</figure>
+
+<p class="bridge">
+This reverse process aligns with Equation (4) from the reverse SDE derivation earlier.
+</p>
+
+---
+
+<!-- ========== Subsection: Training the Score Network ========== -->
+<h3 id="training-scorenet">9.4 Training the Score Network</h3>
+
+<p class="lead">
+We train \(s_\theta(x, t)\) by minimizing the continuous-time loss:
+</p>
+
+<div class="eq-scroll">
+  \[
+  L(\theta) = \int_0^T \mathbb{E}_{p_t(x)}\left[\left\|s_\theta(x, t) + \frac{\epsilon}{\sqrt{\beta(t)}}\right\|^2\right]\,dt
+  \]
+</div>
+
+<p>
+This is implemented as:
+</p>
+
+<div class="code-card">
+  <div class="code-header">loss_fn()</div>
+  <pre><code>def loss_fn(scorenet, x0, num_steps=200):
+    x = x0
+    loss = 0
+    for step in range(num_steps):
+        t = torch.ones(x.size(0), device=device) * (step / num_steps)
+        d = drift(x, t)
+        g = diffusion(t)
+        noise = torch.randn_like(x)
+        x += d * dt + g * torch.sqrt(torch.tensor(dt, device=device)) * noise
+        score = scorenet(x, t)
+        loss += torch.mean((score + noise / g)**2)
+    return loss / num_steps
+</code></pre>
+</div>
+
+<p class="note">
+<strong>Theory ↔ Code:</strong> The term <code>(score + noise / g)**2</code> corresponds to the squared error in approximating \(\nabla_x \log p_t(x)\) in Equation (12).
+</p>
+
+---
+
+<!-- ========== Subsection: Continuous vs Discrete Perspective ========== -->
+<h3 id="continuous-vs-discrete">9.5 Continuous vs Discrete: Key Differences</h3>
+
+<p class="lead">
+Although the plots visually resemble DDPM results, the underlying process is fundamentally different:
+</p>
+
+<ul>
+  <li>⏳ <strong>Time Representation:</strong> Here \(t\) is continuous, enabling any granularity of timesteps for analysis or sampling.</li>
+  <li>📜 <strong>Loss Function:</strong> Derived via Girsanov’s theorem as an integral over time (see Section 4).</li>
+  <li>🌀 <strong>Sampling Flexibility:</strong> The reverse SDE can be simulated stochastically or replaced by a deterministic probability flow ODE (see Section 7).</li>
+</ul>
+
+<p class="note">
+<strong>Takeaway:</strong> This continuous framework unifies and generalizes discrete DDPMs, while allowing novel samplers like Predictor–Corrector (Section 8).
+</p>
+
+
+
+<!-- ========== 10. Outlook: Beyond Continuous-Time Diffusion ========== -->
+<h2 id="outlook">10. Outlook: Beyond Continuous-Time Diffusion</h2>
 
 <p class="lead">
   Continuous-time diffusion models unify stochastic processes, variational inference, and score-based learning under one elegant mathematical framework. But this is far from the end of the story. Let’s briefly survey where these ideas lead next.
 </p>
 
-<!-- ----- 9.1 Deterministic Sampling with DDIM ----- -->
-<h3 id="ddim">9.1 Deterministic Sampling with DDIM</h3>
+<!-- ----- 10.1 Deterministic Sampling with DDIM ----- -->
+<h3 id="ddim">10.1 Deterministic Sampling with DDIM</h3>
 <p class="lead">
   In discrete models, Ho et al. (2020) introduced Denoising Diffusion Implicit Models (DDIM) as a deterministic alternative to stochastic DDPM sampling.
 </p>
@@ -1258,8 +1442,8 @@ body {
   <strong>Key Insight:</strong> DDIM is effectively an ODE solver applied to the probability flow field.
 </p>
 
-<!-- ----- 9.2 Advanced Samplers: Consistency Models and Beyond ----- -->
-<h3 id="consistency-models">9.2 Advanced Samplers: Consistency Models and Beyond</h3>
+<!-- ----- 10.2 Advanced Samplers: Consistency Models and Beyond ----- -->
+<h3 id="consistency-models">10.2 Advanced Samplers: Consistency Models and Beyond</h3>
 <p class="lead">
   Recent work explores even faster samplers and training paradigms. <strong>Consistency models</strong> (Song et al., 2023) train a neural network to predict denoised samples directly at arbitrary noise levels.
 </p>
@@ -1282,8 +1466,8 @@ body {
   <strong>Takeaway:</strong> Consistency models leverage the continuous-time view to create efficient, plug-and-play samplers.
 </p>
 
-<!-- ----- 9.3 Connections to Other Generative Models ----- -->
-<h3 id="connections">9.3 Connections to Other Generative Models</h3>
+<!-- ----- 10.3 Connections to Other Generative Models ----- -->
+<h3 id="connections">10.3 Connections to Other Generative Models</h3>
 <p class="lead">
   Continuous-time diffusion models also connect to other generative frameworks:
 </p>
@@ -1297,8 +1481,8 @@ body {
   These connections suggest a broader unification of generative modeling under the lens of differential equations.
 </p>
 
-<!-- ----- 9.4 Summary and Future Directions ----- -->
-<h3 id="outlook-summary">9.4 Summary and Future Directions</h3>
+<!-- ----- 10.4 Summary and Future Directions ----- -->
+<h3 id="outlook-summary">10.4 Summary and Future Directions</h3>
 <p class="lead">
   Continuous-time diffusion models open doors to faster sampling, novel training methods, and deep connections across generative modeling. As research advances, we anticipate:
 </p>
