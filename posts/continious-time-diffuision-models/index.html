@@ -23,7 +23,7 @@
   color: #000;                    /* highlight keywords in pure black */
 }
 
-/* ----------  Ensure TL;DR inline math and text wrap on mobile  ---------- */
+/* -  Ensure TL;DR inline math and text wrap on mobile  ---------- */
 .tldr,
 .tldr p,
 .tldr ol,
@@ -1237,7 +1237,6 @@ To solidify our understanding of continuous-time diffusion models, we now work t
 Our goal is to visualize both the <strong>forward diffusion</strong> (corruption) and <strong>reverse diffusion</strong> (denoising) processes, demonstrating how a neural network can approximate the score function \(\nabla_x \log p_t(x)\) across continuous time.
 </p>
 
----
 
 <!-- ========== Subsection: Toy Dataset ========== -->
 <h3 id="toy-dataset">9.1 Setting up the Toy Dataset</h3>
@@ -1261,7 +1260,7 @@ data = torch.cat([
   <figcaption><strong>Figure 9.1:</strong> Original dataset: Two Gaussian blobs at \([2,2]\) and \([-2,-2]\).</figcaption>
 </figure>
 
----
+
 
 <!-- ========== Subsection: Forward Diffusion ========== -->
 <h3 id="forward-diffusion">9.2 Forward Diffusion Process</h3>
@@ -1305,7 +1304,6 @@ This is implemented as small timestep updates:
 Notice how continuous-time evolution allows us to observe arbitrary intermediate noise levels—not constrained to discrete timesteps as in DDPM.
 </p>
 
----
 
 <!-- ========== Subsection: Reverse Diffusion ========== -->
 <h3 id="reverse-diffusion">9.3 Reverse Diffusion Process</h3>
@@ -1349,7 +1347,6 @@ Here \(\nabla_x \log p_t(x)\) is approximated by a neural network \(s_\theta(x, 
 This reverse process aligns with Equation (4) from the reverse SDE derivation earlier.
 </p>
 
----
 
 <!-- ========== Subsection: Training the Score Network ========== -->
 <h3 id="training-scorenet">9.4 Training the Score Network</h3>
@@ -1389,7 +1386,6 @@ This is implemented as:
 <strong>Theory ↔ Code:</strong> The term <code>(score + noise / g)**2</code> corresponds to the squared error in approximating \(\nabla_x \log p_t(x)\) in Equation (12).
 </p>
 
----
 
 <!-- ========== Subsection: Continuous vs Discrete Perspective ========== -->
 <h3 id="continuous-vs-discrete">9.5 Continuous vs Discrete: Key Differences</h3>
