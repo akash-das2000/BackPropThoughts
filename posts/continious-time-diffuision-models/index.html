@@ -1258,7 +1258,7 @@ data = torch.cat([
 </div>
 
 <figure>
-  <img src="posts/continuous-time-diffusion/assets/original_dataset.png" alt="Original 2D Gaussian Mixture Dataset">
+  <img src="posts/continious-time-diffuision-models/assets/figure4.png" alt="Original 2D Gaussian Mixture Dataset">
   <figcaption><strong>Figure 9.1:</strong> Original dataset: Two Gaussian blobs at \([2,2]\) and \([-2,-2]\).</figcaption>
 </figure>
 
@@ -1298,7 +1298,7 @@ This is implemented as small timestep updates:
 </p>
 
 <figure>
-  <img src="posts/continuous-time-diffusion/assets/pseudo_forward.png" alt="Forward Diffusion Snapshots">
+  <img src="posts/continious-time-diffuision-models/assets/figure5.png" alt="Forward Diffusion Snapshots">
   <figcaption><strong>Figure 9.2:</strong> Snapshots of the forward diffusion process at increasing \(t\). The original structure dissolves as Gaussian noise dominates.</figcaption>
 </figure>
 
@@ -1342,7 +1342,7 @@ Here \(\nabla_x \log p_t(x)\) is approximated by a neural network \(s_\theta(x, 
 </p>
 
 <figure>
-  <img src="posts/continuous-time-diffusion/assets/pseudo_reverse.png" alt="Reverse Diffusion Snapshots">
+  <img src="posts/continious-time-diffuision-models/assets/figure6.png" alt="Reverse Diffusion Snapshots">
   <figcaption><strong>Figure 9.3:</strong> Snapshots of the reverse diffusion process. Starting from noise, the structure of the original data re-emerges.</figcaption>
 </figure>
 
@@ -1411,88 +1411,32 @@ Although the plots visually resemble DDPM results, the underlying process is fun
 
 
 
-<!-- ========== 10. Outlook: Beyond Continuous-Time Diffusion ========== -->
-<h2 id="outlook">10. Outlook: Beyond Continuous-Time Diffusion</h2>
+<!-- ========== Section: Conclusion ========== -->
+<h2 id="conclusion">10. Conclusion</h2>
 
 <p class="lead">
-  Continuous-time diffusion models unify stochastic processes, variational inference, and score-based learning under one elegant mathematical framework. But this is far from the end of the story. Let’s briefly survey where these ideas lead next.
-</p>
-
-<!-- ----- 10.1 Deterministic Sampling with DDIM ----- -->
-<h3 id="ddim">10.1 Deterministic Sampling with DDIM</h3>
-<p class="lead">
-  In discrete models, Ho et al. (2020) introduced Denoising Diffusion Implicit Models (DDIM) as a deterministic alternative to stochastic DDPM sampling.
+In this post, we took a deep dive into <strong>continuous-time diffusion models</strong>, building on the foundations of Brownian motion, Itô calculus, and discrete DDPMs from our <a href="https://backpropthoughts.netlify.app/post?postId=stochastic-to-diffusion" target="_blank">previous blog</a>.
 </p>
 
 <p>
-  DDIM can be viewed as a non-stochastic discretization of the probability flow ODE derived in Section 7:
-</p>
-
-<div class="eq-scroll">
-  \[
-    \frac{dx}{dt} = f(x, t) - \tfrac{1}{2}g(t)^2 s_\theta(x, t)
-  \]
-</div>
-
-<p>
-  By dropping the stochastic term \(g(t)dB_t\), DDIM produces deterministic trajectories that still approximate the data distribution. This enables faster sampling with fewer steps, though at the cost of sample diversity.
-</p>
-
-<p class="note">
-  <strong>Key Insight:</strong> DDIM is effectively an ODE solver applied to the probability flow field.
-</p>
-
-<!-- ----- 10.2 Advanced Samplers: Consistency Models and Beyond ----- -->
-<h3 id="consistency-models">10.2 Advanced Samplers: Consistency Models and Beyond</h3>
-<p class="lead">
-  Recent work explores even faster samplers and training paradigms. <strong>Consistency models</strong> (Song et al., 2023) train a neural network to predict denoised samples directly at arbitrary noise levels.
+We started by deriving the forward and reverse stochastic differential equations (SDEs) and showed how noise schedules \(\beta(t)\) map to drift and diffusion coefficients. Using <strong>Girsanov’s theorem</strong>, we obtained a continuous-time variational lower bound (ELBO) and interpreted it as an elegant generalization of denoising score matching.
 </p>
 
 <p>
-  The idea is to approximate the solution map of the probability flow ODE:
-</p>
-
-<div class="eq-scroll">
-  \[
-    \Phi_{t_0 \to t_1}(x_{t_0}) \approx x_{t_1}
-  \]
-</div>
-
-<p>
-  This avoids the need for iterative sampling entirely, enabling one-shot generation of high-quality samples.
-</p>
-
-<p class="note">
-  <strong>Takeaway:</strong> Consistency models leverage the continuous-time view to create efficient, plug-and-play samplers.
-</p>
-
-<!-- ----- 10.3 Connections to Other Generative Models ----- -->
-<h3 id="connections">10.3 Connections to Other Generative Models</h3>
-<p class="lead">
-  Continuous-time diffusion models also connect to other generative frameworks:
+Key highlights include:
 </p>
 <ul>
-  <li><strong>Normalizing Flows:</strong> The probability flow ODE defines a continuous flow of densities, akin to continuous normalizing flows.</li>
-  <li><strong>Energy-Based Models:</strong> Score-based learning estimates \(\nabla_x \log p(x)\), the same object optimized in EBMs.</li>
-  <li><strong>Generative Adversarial Networks (GANs):</strong> Both frameworks transport noise to data distributions, though GANs lack the explicit density modeling of diffusion processes.</li>
+  <li>✅ <strong>Unification of DDPM and score-based models:</strong> We saw how the continuous-time SDE formulation seamlessly generalizes discrete timesteps, providing a unified view of forward and reverse processes.</li>
+  <li>✅ <strong>Noise scheduling and loss weighting:</strong> By analyzing \(\beta(t)\), \(g(t)\), and the instantaneous loss density \(\ell(t)\), we understood how different schedules redistribute model focus across the diffusion trajectory.</li>
+  <li>✅ <strong>Variational objectives via Girsanov’s theorem:</strong> We derived a continuous-time ELBO and connected it to the Fisher information, highlighting its natural link to score matching.</li>
+  <li>✅ <strong>Sampling algorithms:</strong> Explored Predictor–Corrector samplers for hybrid stochastic–deterministic updates and probability flow ODEs for deterministic generation.</li>
+  <li>✅ <strong>Hands-on 2D Gaussian mixture example:</strong> Implemented a toy dataset with forward and reverse diffusion steps, visualizing the core dynamics of these models.</li>
 </ul>
 
 <p class="bridge">
-  These connections suggest a broader unification of generative modeling under the lens of differential equations.
+These insights not only demystify the mathematics behind continuous-time diffusion but also prepare us for practical implementation and optimization in high-dimensional settings.
 </p>
-
-<!-- ----- 10.4 Summary and Future Directions ----- -->
-<h3 id="outlook-summary">10.4 Summary and Future Directions</h3>
-<p class="lead">
-  Continuous-time diffusion models open doors to faster sampling, novel training methods, and deep connections across generative modeling. As research advances, we anticipate:
-</p>
-<ul>
-  <li>Hybrid SDE-ODE solvers for adaptive sampling.</li>
-  <li>New parameterizations of score functions for stability.</li>
-  <li>Applications to domains beyond images, such as molecular modeling and speech synthesis.</li>
-</ul>
 
 <p class="note">
-  <strong>Essential Takeaway:</strong> The continuous-time perspective is not just a mathematical curiosity—it’s a foundation for the next generation of generative models.
+<strong>Looking Ahead:</strong> In the next post, we will explore <strong>advanced sampling strategies and deterministic solvers</strong>, including adaptive step-size ODE solvers, and see how they can accelerate generation in score-based models.
 </p>
-
