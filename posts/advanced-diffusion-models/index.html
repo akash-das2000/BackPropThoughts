@@ -247,11 +247,25 @@ body {
 <div class="tldr">
   <h2>TL;DR</h2>
   <ol>
-    <li><strong>Guidance & Conditioning (Week 8):</strong> Steering diffusion models using <em>classifier gradients</em>, <em>classifier-free interpolation (CFG)</em>, and <em>model guidance (MG)</em>. These methods modify the reverse SDE drift term to control generation towards desired conditions like text prompts or labels.</li>
-    <li><strong>Latent Diffusion (Week 9):</strong> Scaling diffusion to high resolutions by operating in VAE-compressed latent spaces. We explain the KL divergence factorization and multi-scale hierarchical diffusion in detail.</li>
-    <li><strong>Convergence Theory (Week 10):</strong> Deriving non-asymptotic convergence rates for score-based models, interpreting them as Wasserstein gradient flows, and detailing the Jordan-Kinderlehrer-Otto (JKO) scheme step-by-step.</li>
-    <li><strong>Inverse Problems & Control (Week 11):</strong> Reformulating reverse SDEs as stochastic control problems (Pontryagin’s Maximum Principle), and exploring Plug-and-Play priors and Regularized Score Distillation (RSD) as applications.</li>
+    <li><strong>Guidance & Conditioning:</strong> Steering diffusion models using <em>classifier gradients</em>, <em>classifier-free interpolation (CFG)</em>, and <em>model guidance (MG)</em>. These methods modify the reverse SDE drift term to control generation towards desired conditions like text prompts or labels.</li>
+    <li><strong>Latent Diffusion:</strong> Scaling diffusion to high resolutions by operating in VAE-compressed latent spaces. We explain the KL divergence factorization and multi-scale hierarchical diffusion in detail.</li>
+    <li><strong>Convergence Theory:</strong> Deriving non-asymptotic convergence rates for score-based models, interpreting them as Wasserstein gradient flows, and detailing the Jordan-Kinderlehrer-Otto (JKO) scheme step-by-step.</li>
+    <li><strong>Inverse Problems & Control:</strong> Reformulating reverse SDEs as stochastic control problems (Pontryagin’s Maximum Principle), and exploring Plug-and-Play priors and Regularized Score Distillation (RSD) as applications.</li>
     <li>This blog ties all theory back to practical diffusion models, creating a unified narrative of <strong>control, scalability, convergence, and applications.</strong></li>
   </ol>
 </div>
+
+<!-- ========== Introduction Section ========== -->
+<h2 id="introduction">Introduction</h2>
+<p class="lead">
+  In the previous parts of this series, we built up a mathematical foundation for understanding diffusion models. <a href="https://backpropthoughts.netlify.app/post?postId=diffusion-maths" target="_blank">Part 1</a> introduced the forward and reverse stochastic differential equations (SDEs) and showed how score functions drive the generative process. <a href="https://backpropthoughts.netlify.app/post?postId=stochastic-to-diffusion" target="_blank">Part 2</a> extended this by analyzing variational objectives and Fisher information, revealing how ELBO minimization governs model training. Finally, <a href="https://backpropthoughts.netlify.app/post?postId=continious-time-diffuision-models" target="_blank">Part 3</a> bridged discrete-time DDPMs with their continuous-time counterparts, framing diffusion as a limit of variational bounds and connecting it to KL divergence flows.
+</p>
+
+<p>
+  In this part, we turn to <strong>advanced techniques and theoretical perspectives</strong> that extend diffusion models beyond their vanilla formulations. We explore methods for <em>controlling the generative process</em> (via guidance and conditioning), scaling to <em>higher resolutions efficiently</em> (through latent diffusion), and understanding the <em>convergence behavior</em> of these models. We also examine connections between diffusion and stochastic control, illuminating how inverse problems can be solved using learned score functions.
+</p>
+
+<p>
+  Throughout, we will focus on new derivations and insights, referring back to the earlier parts where foundational concepts are already established. This allows us to delve deeper into the mathematics of advanced diffusion techniques while keeping the narrative tightly connected to their practical implementations.
+</p>
 
