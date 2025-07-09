@@ -269,3 +269,179 @@ body {
   Throughout, we will focus on new derivations and insights, referring back to the earlier parts where foundational concepts are already established. This allows us to delve deeper into the mathematics of advanced diffusion techniques while keeping the narrative tightly connected to their practical implementations.
 </p>
 
+<!-- ========== Section 2: Guidance & Conditioning ========== -->
+<h2 id="guidance-conditioning">2. Guidance &amp; Conditioning</h2>
+
+<!-- ----- 2.1 Intuition ----- -->
+<h3 id="guidance-intuition">2.1 Intuition: Steering Diffusion with Conditional Information</h3>
+<p class="lead">
+  Vanilla diffusion models learn to reverse a noising process, recovering data distributions \(p(x)\) without explicit conditioning. However, many tasks require controlling generation based on auxiliary inputs like class labels or text prompts. Guidance techniques achieve this by modifying the reverse SDE drift.
+</p>
+
+<p>
+  Recall from <a href="https://backpropthoughts.netlify.app/post?postId=diffusion-maths" target="_blank">Part 1</a> that the reverse SDE is:
+</p>
+
+<div class="eq-scroll">
+  \[
+  dx = \big[f(x,t) - g(t)^2 \nabla_x \log p_t(x)\big]\, dt + g(t)\, d\bar{B}_t.
+  \tag{1}
+  \]
+</div>
+
+<p>
+  Guidance augments the score \(\nabla_x \log p_t(x)\) with conditional gradients to bias trajectories towards \(p(x|y)\).
+</p>
+
+---
+
+<!-- ----- 2.2 Classifier Guidance ----- -->
+<h3 id="classifier-guidance">2.2 Classifier Guidance</h3>
+<p>
+  Classifier guidance (Dhariwal & Nichol, 2021) introduces an external classifier \(p_\phi(y|x)\) to steer samples. Using Bayes’ theorem:
+</p>
+
+<div class="eq-scroll">
+  \[
+  \log p(x|y) = \log p(y|x) + \log p(x) - \log p(y).
+  \tag{2}
+  \]
+</div>
+
+<p>
+  Differentiating w.r.t. \(x\) gives:
+</p>
+
+<div class="eq-scroll">
+  \[
+  \nabla_x \log p(x|y) = \nabla_x \log p(y|x) + \nabla_x \log p(x).
+  \tag{3}
+  \]
+</div>
+
+<p>
+  Substituting Eq. (3) into Eq. (1), the modified drift becomes:
+</p>
+
+<div class="eq-scroll">
+  \[
+  f(x,t) - g(t)^2\big[\nabla_x \log p(x) + \nabla_x \log p(y|x)\big].
+  \tag{4}
+  \]
+</div>
+
+<details>
+  <summary><strong>Step-by-step derivation of Eq. (4)</strong></summary>
+  <p>
+    Start from the original reverse SDE:
+  </p>
+  <div class="eq-scroll">
+    \[
+    dx = [f(x,t) - g(t)^2 \nabla_x \log p(x)]\, dt + g(t)\, d\bar{B}_t.
+    \]
+  </div>
+  <p>
+    To bias toward \(p(x|y)\), replace \(\nabla_x \log p(x)\) with \(\nabla_x \log p(x|y)\):
+  </p>
+  <div class="eq-scroll">
+    \[
+    \nabla_x \log p(x|y) = \nabla_x \log p(x) + \nabla_x \log p(y|x).
+    \]
+  </div>
+  <p>
+    Substitution yields Eq. (4) directly.
+  </p>
+</details>
+
+<p class="bridge">
+  This additional term \(\nabla_x \log p(y|x)\) acts as a guiding force, pulling samples toward regions where the classifier assigns high probability to \(y\).
+</p>
+
+---
+
+<!-- ----- 2.3 Classifier-Free Guidance (CFG) ----- -->
+<h3 id="cfg">2.3 Classifier-Free Guidance (CFG)</h3>
+<p>
+  Classifier guidance requires training a separate classifier \(p_\phi(y|x)\) across all noise levels, which can be expensive. Classifier-Free Guidance (Ho & Salimans, 2021) bypasses this by jointly training a model to predict both conditional and unconditional scores.
+</p>
+
+<p>
+  At sampling time, CFG interpolates:
+</p>
+
+<div class="eq-scroll">
+  \[
+  s_\theta^{CFG}(x, t, y) = s_\theta(x, t) + w\big[s_\theta(x, t, y) - s_\theta(x, t)\big],
+  \tag{5}
+  \]
+</div>
+
+<p>
+  where \(w > 1\) amplifies conditional information, increasing fidelity at the cost of sample diversity.
+</p>
+
+<details>
+  <summary><strong>Step-by-step derivation of Eq. (5)</strong></summary>
+  <p>
+    Approximate \(\log p(x|y)\) using a Taylor expansion:
+  </p>
+  <div class="eq-scroll">
+    \[
+    \log p(x|y) \approx \log p(x) + w[\log p(x|y) - \log p(x)].
+    \tag{6}
+    \]
+  </div>
+
+  <p>
+    Differentiating:
+  </p>
+  <div class="eq-scroll">
+    \[
+    \nabla_x \log p(x|y) \approx \nabla_x \log p(x) + w[\nabla_x \log p(x|y) - \nabla_x \log p(x)].
+    \tag{7}
+    \]
+  </div>
+
+  <p>
+    Rearranging leads to Eq. (5).
+  </p>
+</details>
+
+<p class="note">
+  <strong>Key Insight:</strong> CFG treats conditional guidance as a weighted correction to the unconditional score, requiring no external classifier.
+</p>
+
+---
+
+<!-- ----- 2.4 Model Guidance (MG) ----- -->
+<h3 id="model-guidance">2.4 Model Guidance (MG)</h3>
+<p>
+  Model Guidance integrates conditioning directly into training by minimizing:
+</p>
+
+<div class="eq-scroll">
+  \[
+  \mathcal{L}_{MG} = \mathbb{E}_{q(x, y)}\left[\|s_\theta(x, t, y) - \nabla_x \log p(x, y)\|^2\right].
+  \tag{8}
+  \]
+</div>
+
+<p>
+  The reverse SDE drift then becomes:
+</p>
+
+<div class="eq-scroll">
+  \[
+  f(x,t) - g(t)^2 s_\theta(x,t,y).
+  \tag{9}
+  \]
+</div>
+
+<p>
+  This approach embeds conditional structure into the model itself, avoiding runtime interpolation but increasing training complexity.
+</p>
+
+<p class="bridge">
+  In pipelines like Stable Diffusion, CFG is preferred for its simplicity, but MG remains an attractive end-to-end alternative.
+</p>
+
