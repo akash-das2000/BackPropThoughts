@@ -293,7 +293,7 @@ body {
   Guidance augments the score \(\nabla_x \log p_t(x)\) with conditional gradients to bias trajectories towards \(p(x|y)\).
 </p>
 
----
+
 
 <!-- ----- 2.2 Classifier Guidance ----- -->
 <h3 id="classifier-guidance">2.2 Classifier Guidance</h3>
@@ -357,7 +357,7 @@ body {
   This additional term \(\nabla_x \log p(y|x)\) acts as a guiding force, pulling samples toward regions where the classifier assigns high probability to \(y\).
 </p>
 
----
+
 
 <!-- ----- 2.3 Classifier-Free Guidance (CFG) ----- -->
 <h3 id="cfg">2.3 Classifier-Free Guidance (CFG)</h3>
@@ -411,7 +411,7 @@ body {
   <strong>Key Insight:</strong> CFG treats conditional guidance as a weighted correction to the unconditional score, requiring no external classifier.
 </p>
 
----
+
 
 <!-- ----- 2.4 Model Guidance (MG) ----- -->
 <h3 id="model-guidance">2.4 Model Guidance (MG)</h3>
@@ -443,5 +443,556 @@ body {
 
 <p class="bridge">
   In pipelines like Stable Diffusion, CFG is preferred for its simplicity, but MG remains an attractive end-to-end alternative.
+</p>
+
+
+
+<!-- ========== Section 3: Latent Diffusion Models ========== -->
+<h2 id="latent-diffusion">3. Latent Diffusion Models</h2>
+
+<!-- ----- 3.1 Motivation ----- -->
+<h3 id="latent-motivation">3.1 Motivation: Scaling Diffusion to High Dimensions</h3>
+<p class="lead">
+  Diffusion models operating directly in pixel space are computationally expensive, especially for high-resolution data. Latent diffusion mitigates this by performing denoising in a compressed representation space.
+</p>
+
+<p>
+  The key idea is to first encode images into a latent space \(z = E(x)\) using a variational autoencoder (VAE). Diffusion then operates in this lower-dimensional space, followed by decoding via \(x = D(z)\) after denoising.
+</p>
+
+<p class="bridge">
+  This shift not only accelerates training and sampling but also enables semantic abstraction, where noise is injected at the level of high-level features rather than raw pixels.
+</p>
+
+
+
+<!-- ----- 3.2 KL Divergence Factorization ----- -->
+<h3 id="kl-factorization">3.2 KL Divergence Factorization</h3>
+<p>
+  To justify latent diffusion, consider the joint distribution \(p(z, x)\). The variational objective factorizes:
+</p>
+
+<div class="eq-scroll">
+  \[
+  \mathrm{KL}(q(z, x)\|p(z, x)) = \mathrm{KL}(q(z)\|p(z)) + \mathbb{E}_{q(z)}\big[\mathrm{KL}(q(x|z)\|p(x|z))\big].
+  \tag{10}
+  \]
+</div>
+
+<details>
+  <summary><strong>Step-by-step derivation of Eq. (10)</strong></summary>
+  <p>
+    Start with the definition:
+  </p>
+
+  <div class="eq-scroll">
+    \[
+    \mathrm{KL}(q(z, x)\|p(z, x)) = \mathbb{E}_{q(z, x)}\left[\log \frac{q(z, x)}{p(z, x)}\right].
+    \tag{11}
+    \]
+  </div>
+
+  <p>
+    Expand \(q(z, x) = q(z)q(x|z)\) and \(p(z, x) = p(z)p(x|z)\):
+  </p>
+
+  <div class="eq-scroll">
+    \[
+    \log \frac{q(z, x)}{p(z, x)} = \log \frac{q(z)}{p(z)} + \log \frac{q(x|z)}{p(x|z)}.
+    \tag{12}
+    \]
+  </div>
+
+  <p>
+    Taking expectation over \(q(z, x)\):
+  </p>
+
+  <div class="eq-scroll">
+    \[
+    \mathrm{KL}(q(z)\|p(z)) + \mathbb{E}_{q(z)}\big[\mathrm{KL}(q(x|z)\|p(x|z))\big],
+    \]
+  </div>
+
+  <p>
+    proving Eq. (10).
+  </p>
+</details>
+
+<p class="note">
+  <strong>Key Insight:</strong> Diffusion only needs to model \(\mathrm{KL}(q(z)\|p(z))\), while the decoder handles \(\mathrm{KL}(q(x|z)\|p(x|z))\).
+</p>
+
+
+
+<!-- ----- 3.3 Latent Diffusion Framework ----- -->
+<h3 id="latent-framework">3.3 Latent Diffusion Framework</h3>
+<p>
+  In latent space, the forward SDE becomes:
+</p>
+
+<div class="eq-scroll">
+  \[
+  dz = \tilde{f}(z,t)\, dt + \tilde{g}(t)\, dB_t,
+  \tag{13}
+  \]
+</div>
+
+<p>
+  where \(\tilde{f}\) and \(\tilde{g}\) are drift and diffusion coefficients adapted for latent variables. After denoising, the decoder \(x = D(z)\) reconstructs samples back to pixel space.
+</p>
+
+<p>
+  This pipeline significantly reduces computational load and allows larger reverse SDE timesteps in latent space.
+</p>
+
+
+
+<!-- ----- 3.4 Multi-Scale & Hierarchical Diffusion ----- -->
+<h3 id="hierarchical-diffusion">3.4 Multi-Scale & Hierarchical Diffusion</h3>
+<p>
+  Hierarchical diffusion models apply successive denoising stages in increasingly fine-grained latent spaces. The first stage operates in a coarse latent space, capturing global semantics, while subsequent stages refine details.
+</p>
+
+<p>
+  This multi-resolution strategy mirrors progressive GANs and enables generation of megapixel-scale images efficiently.
+</p>
+
+<p class="bridge">
+  By operating on compressed high-level representations, latent diffusion achieves orders-of-magnitude speedups while maintaining sample fidelity.
+</p>
+
+
+<!-- ========== Section 4: Convergence Theory ========== -->
+<h2 id="convergence-theory">4. Convergence Theory</h2>
+
+<!-- ----- 4.1 Non-Asymptotic Convergence Rates ----- -->
+<h3 id="convergence-rates">4.1 Non-Asymptotic Convergence Rates</h3>
+<p class="lead">
+  How fast does a diffusion model approach the target distribution as the number of denoising steps increases? Recent theoretical advances provide non-asymptotic bounds on the convergence rate.
+</p>
+
+<p>
+  Lee et al. (2024) show that for score-based generative models, the Wasserstein-2 distance \(W_2(p_T, p_0)\) between the generated distribution \(p_T\) and the data distribution \(p_0\) satisfies:
+</p>
+
+<div class="eq-scroll">
+  \[
+  W_2(p_T, p_0) \leq C\sqrt{\frac{1}{T}},
+  \tag{14}
+  \]
+</div>
+
+<p>
+  where \(T\) is the number of steps and \(C\) depends on the Lipschitz constants of the score network.
+</p>
+
+<details>
+  <summary><strong>Step-by-step proof sketch of Eq. (14)</strong></summary>
+  <p>
+    The key idea is to analyze the reverse-time SDE:
+  </p>
+
+  <div class="eq-scroll">
+    \[
+    dx = \big[f(x,t) - g(t)^2 s_\theta(x,t)\big]\, dt + g(t)\, d\bar{B}_t.
+    \]
+  </div>
+
+  <p>
+    Assuming the learned score \(s_\theta\) satisfies a Lipschitz condition:
+  </p>
+
+  <div class="eq-scroll">
+    \[
+    \|\nabla_x s_\theta(x,t)\| \leq L,
+    \]
+  </div>
+
+  <p>
+    and applying a Grönwall-type inequality over the stochastic flow, one can derive the error bound scaling as \(\mathcal{O}(1/\sqrt{T})\).
+  </p>
+</details>
+
+<p class="note">
+  <strong>Key Insight:</strong> This result highlights a fundamental tradeoff: fewer steps lead to faster sampling but higher error.
+</p>
+
+
+
+<!-- ----- 4.2 Wasserstein Gradient Flows ----- -->
+<h3 id="wasserstein-flows">4.2 Wasserstein Gradient Flows</h3>
+<p>
+  The reverse SDE dynamics can also be interpreted as a gradient flow in Wasserstein space. The evolution of densities \(p_t(x)\) is governed by:
+</p>
+
+<div class="eq-scroll">
+  \[
+  \partial_t p_t = \nabla \cdot \left(p_t \nabla \frac{\delta \mathcal{F}}{\delta p}\right),
+  \tag{15}
+  \]
+</div>
+
+<p>
+  where \(\mathcal{F}(p)\) is a free energy functional and \(\delta \mathcal{F}/\delta p\) its variational derivative.
+</p>
+
+<details>
+  <summary><strong>Step-by-step derivation of Eq. (15)</strong></summary>
+  <p>
+    Start from the Fokker–Planck equation for the reverse SDE:
+  </p>
+
+  <div class="eq-scroll">
+    \[
+    \partial_t p_t = -\nabla \cdot \big(p_t \nabla_x \log p_t(x)\big) + \nabla^2 p_t.
+    \]
+  </div>
+
+  <p>
+    Recognizing \(\nabla_x \log p_t(x)\) as the variational derivative of KL divergence leads to:
+  </p>
+
+  <div class="eq-scroll">
+    \[
+    \frac{\delta}{\delta p} \mathrm{KL}(p\|p_0) = \log p - \log p_0.
+    \]
+  </div>
+
+  <p>
+    This frames the evolution as a Wasserstein gradient flow minimizing \(\mathcal{F}(p)\).
+  </p>
+</details>
+
+<p class="bridge">
+  This perspective connects diffusion models to optimal transport, treating denoising as a mass transport problem in probability space.
+</p>
+
+
+
+<!-- ----- 4.3 Jordan-Kinderlehrer-Otto (JKO) Scheme ----- -->
+<h3 id="jko-scheme">4.3 Jordan–Kinderlehrer–Otto (JKO) Scheme</h3>
+<p>
+  The JKO scheme provides a discrete approximation to the Wasserstein gradient flow by solving:
+</p>
+
+<div class="eq-scroll">
+  \[
+  p_{k+1} = \arg\min_p \frac{1}{2\tau} W_2^2(p, p_k) + \mathcal{F}(p),
+  \tag{16}
+  \]
+</div>
+
+<p>
+  where \(\tau\) is a step size in Wasserstein space.
+</p>
+
+<details>
+  <summary><strong>Step-by-step derivation of Eq. (16)</strong></summary>
+  <p>
+    Starting from the continuous-time flow:
+  </p>
+
+  <div class="eq-scroll">
+    \[
+    \partial_t p_t = -\nabla_{W_2} \mathcal{F}(p),
+    \]
+  </div>
+
+  <p>
+    an implicit Euler discretization yields:
+  </p>
+
+  <div class="eq-scroll">
+    \[
+    \frac{p_{k+1} - p_k}{\tau} = -\nabla_{W_2} \mathcal{F}(p_{k+1}).
+    \]
+  </div>
+
+  <p>
+    Rearranging leads directly to Eq. (16).
+  </p>
+</details>
+
+<p class="note">
+  <strong>Key Insight:</strong> In diffusion models, each denoising step can be viewed as approximately solving a JKO minimization.
+</p>
+
+
+
+<!-- ----- 4.4 Continuous-Time Generative Flows ----- -->
+<h3 id="generative-flows">4.4 Continuous-Time Generative Flows</h3>
+<p>
+  This gradient flow view also relates diffusion to continuous normalizing flows (CNFs), where probability mass evolves under ODEs:
+</p>
+
+<div class="eq-scroll">
+  \[
+  \frac{dx}{dt} = v(x,t),
+  \tag{17}
+  \]
+</div>
+
+<p>
+  Here, \(v(x,t)\) is a learned vector field analogous to the reverse SDE drift.
+</p>
+
+<p class="bridge">
+  CNFs trade stochasticity for deterministic dynamics, but both share the same geometric intuition of moving probability mass along optimal paths.
+</p>
+
+
+<!-- ========== Section 5: Inverse Problems & Control Connections ========== -->
+<h2 id="inverse-control">5. Inverse Problems &amp; Control Connections</h2>
+
+<!-- ----- 5.1 Reverse SDE as Stochastic Control ----- -->
+<h3 id="stochastic-control">5.1 Reverse SDE as Stochastic Control</h3>
+<p class="lead">
+  The reverse SDE of diffusion models can be reinterpreted as an optimal stochastic control problem: find a control policy that guides noisy trajectories to the data distribution while minimizing energy cost.
+</p>
+
+<p>
+  Formally, consider controlled dynamics:
+</p>
+
+<div class="eq-scroll">
+  \[
+  dx_t = f(x_t, t)\,dt + g(t)\,u(t)\,dt + g(t)\,dB_t,
+  \tag{18}
+  \]
+</div>
+
+<p>
+  where \(u(t)\) is the control function we wish to optimize. The cost functional is:
+</p>
+
+<div class="eq-scroll">
+  \[
+  J(u) = \mathbb{E}\left[\int_0^T \frac{1}{2}\|u(t)\|^2\,dt + \Phi(x_T)\right],
+  \tag{19}
+  \]
+</div>
+
+<p>
+  where \(\Phi(x_T)\) penalizes deviation from the target distribution at time \(T\).
+</p>
+
+<details>
+  <summary><strong>Step-by-step derivation of the optimal control</strong></summary>
+  <p>
+    Using Pontryagin’s Maximum Principle, define the Hamiltonian:
+  </p>
+
+  <div class="eq-scroll">
+    \[
+    H(x,u,\lambda,t) = \frac{1}{2}\|u(t)\|^2 + \lambda^\top [f(x,t) + g(t)u(t)].
+    \tag{20}
+    \]
+  </div>
+
+  <p>
+    Minimizing \(H\) w.r.t. \(u(t)\) yields:
+  </p>
+
+  <div class="eq-scroll">
+    \[
+    u^*(t) = -g(t)\lambda(t).
+    \tag{21}
+    \]
+  </div>
+
+  <p>
+    Here, \(\lambda(t)\) is the adjoint process solving a backward stochastic differential equation (BSDE).
+  </p>
+</details>
+
+<p class="bridge">
+  This control-theoretic perspective shows the learned score function \(s_\theta(x,t)\) acts as an optimal control driving trajectories toward \(p(x_0)\).
+</p>
+
+
+
+<!-- ----- 5.2 Plug-and-Play Priors ----- -->
+<h3 id="pnp-priors">5.2 Plug-and-Play Priors</h3>
+<p>
+  Plug-and-Play (PnP) priors exploit the denoising capability of diffusion models for inverse problems. Given a linear forward model \(y = Ax + \epsilon\), we wish to recover \(x\).
+</p>
+
+<p>
+  The optimization formulation is:
+</p>
+
+<div class="eq-scroll">
+  \[
+  x^* = \arg\min_x \|Ax - y\|^2 + \lambda R(x),
+  \tag{22}
+  \]
+</div>
+
+<p>
+  where \(R(x)\) is a regularizer represented implicitly by a pre-trained diffusion model.
+</p>
+
+<p>
+  Iteratively, we alternate between data consistency (solving for \(\|Ax - y\|^2\)) and denoising via the diffusion prior.
+</p>
+
+<p class="note">
+  <strong>Key Insight:</strong> PnP bridges model-based inverse solvers and deep generative priors.
+</p>
+
+
+
+<!-- ----- 5.3 Regularized Score Distillation (RSD) ----- -->
+<h3 id="rsd">5.3 Regularized Score Distillation (RSD)</h3>
+<p>
+  Regularized Score Distillation (RSD) extends the denoising score matching objective by adding a regularization term to enhance stability in inverse tasks. The objective is:
+</p>
+
+<div class="eq-scroll">
+  \[
+  \mathcal{L}_{RSD} = \mathbb{E}_{q(x)}\left[\|s_\theta(x) - \nabla_x \log p(x)\|^2 + \lambda \|s_\theta(x)\|^2\right].
+  \tag{23}
+  \]
+</div>
+
+<details>
+  <summary><strong>Step-by-step derivation of Eq. (23)</strong></summary>
+  <p>
+    Start from the original score matching objective:
+  </p>
+
+  <div class="eq-scroll">
+    \[
+    \mathcal{L}_{SM} = \mathbb{E}_{q(x)}\left[\|s_\theta(x) - \nabla_x \log p(x)\|^2\right].
+    \tag{24}
+    \]
+  </div>
+
+  <p>
+    To prevent overfitting and stabilize updates, introduce an \(\ell_2\) penalty on \(s_\theta(x)\):
+  </p>
+
+  <div class="eq-scroll">
+    \[
+    \lambda \|s_\theta(x)\|^2,
+    \]
+  </div>
+
+  <p>
+    resulting in the RSD objective Eq. (23).
+  </p>
+</details>
+
+<p>
+  This modification has proven effective in ill-posed inverse problems, where strong regularization is critical.
+</p>
+
+<p class="bridge">
+  RSD highlights how diffusion models can act as flexible, robust priors beyond pure generative tasks.
+</p>
+
+
+<!-- ========== Section 6: Unified Perspective ========== -->
+<h2 id="unified-perspective">6. Unified Perspective: Control, Scalability, and Geometry</h2>
+
+<p class="lead">
+  Having explored guidance, latent diffusion, convergence theory, and control connections individually, we now tie them into a coherent framework. This reveals how advanced diffusion models unify concepts from stochastic calculus, variational inference, and optimal transport.
+</p>
+
+---
+
+<!-- ----- 6.1 Reverse SDE as Gradient Flow ----- -->
+<h3 id="gradient-flow-view">6.1 Reverse SDE as Gradient Flow</h3>
+<p>
+  At its core, a diffusion model learns a reverse SDE:
+</p>
+
+<div class="eq-scroll">
+  \[
+  dx = \big[f(x,t) - g(t)^2 s_\theta(x,t)\big]\, dt + g(t)\, d\bar{B}_t,
+  \tag{25}
+  \]
+</div>
+
+<p>
+  where the score \(s_\theta(x,t)\) acts as a control signal driving samples towards \(p(x_0)\). From the Wasserstein gradient flow perspective (see Eq. (15)), each denoising step can be viewed as minimizing a free energy functional while transporting probability mass optimally.
+</p>
+
+<p class="bridge">
+  This duality — between stochastic control and variational optimization — underpins much of the recent theory on diffusion models.
+</p>
+
+---
+
+<!-- ----- 6.2 Latent Space Compression ----- -->
+<h3 id="latent-compression">6.2 Latent Space Compression</h3>
+<p>
+  Latent diffusion augments this picture by performing denoising in a compressed representation \(z\), reducing dimensionality and improving efficiency. Recall the factorized KL divergence:
+</p>
+
+<div class="eq-scroll">
+  \[
+  \mathrm{KL}(q(z, x)\|p(z, x)) = \mathrm{KL}(q(z)\|p(z)) + \mathbb{E}_{q(z)}[\mathrm{KL}(q(x|z)\|p(x|z))].
+  \tag{26}
+  \]
+</div>
+
+<p>
+  By focusing only on \(\mathrm{KL}(q(z)\|p(z))\), the diffusion model learns global structure, leaving fine details to the decoder.
+</p>
+
+<p class="note">
+  <strong>Key Insight:</strong> Guidance and latent diffusion are complementary: one modifies the drift for control, the other compresses the state space for scalability.
+</p>
+
+---
+
+<!-- ----- 6.3 Convergence and Control Synergy ----- -->
+<h3 id="convergence-control">6.3 Convergence and Control Synergy</h3>
+<p>
+  Non-asymptotic convergence bounds (Eq. (14)) and the JKO scheme (Eq. (16)) provide theoretical guarantees for diffusion models, framing denoising as discrete steps along Wasserstein geodesics.
+</p>
+
+<p>
+  The stochastic control view (Eq. (18)) extends this by treating the score function as an optimal policy minimizing energy expenditure while achieving target distribution alignment.
+</p>
+
+<p class="bridge">
+  Together, these perspectives elevate diffusion models from heuristic generative tools to rigorously grounded probabilistic solvers.
+</p>
+
+
+<!-- ========== Section 7: Conclusion ========== -->
+<h2 id="conclusion">7. Conclusion</h2>
+
+<p class="lead">
+  This final part of the series brought together advanced techniques and theoretical insights that define the modern landscape of diffusion models. From guidance strategies and latent-space architectures to convergence guarantees and stochastic control, we’ve seen how diffusion models integrate concepts from stochastic calculus, variational inference, and optimal transport.
+</p>
+
+<p>
+  Guidance modifies reverse SDE drift terms for conditional generation, latent diffusion compresses the state space for scalability, and convergence theory frames denoising as discrete steps along Wasserstein geodesics. The control perspective unifies these ideas, treating learned scores as optimal policies driving trajectories toward data distributions.
+</p>
+
+<p class="bridge">
+  Together, these threads reveal diffusion models not merely as generative tools, but as a rich probabilistic framework with applications far beyond image synthesis — extending to inverse problems, scientific computing, and beyond.
+</p>
+
+<p class="note">
+  <strong>Final Takeaway:</strong> This series provides a complete, mathematical understanding of diffusion models, equipping you to both analyze and extend these systems in practice.
+</p>
+
+---
+
+<!-- ========== Series Recap Footer ========== -->
+<h3 id="series-recap"> Diffusion Series Recap</h3>
+<ul>
+  <li><a href="https://backpropthoughts.netlify.app/post?postId=diffusion-maths" target="_blank">Part 1: Diffusion Maths – Reverse SDEs and Score Functions</a></li>
+  <li><a href="https://backpropthoughts.netlify.app/post?postId=stochastic-to-diffusion" target="_blank">Part 2: From Stochastic Processes to Diffusion Models</a></li>
+  <li><a href="https://backpropthoughts.netlify.app/post?postId=continious-time-diffuision-models" target="_blank">Part 3: Continuous-Time Diffusion and Variational Bounds</a></li>
+  <li><strong>This post:</strong> Part 4: Advanced Diffusion Models – Guidance, Latent Spaces, Convergence & Control</li>
+</ul>
+
+<p class="bridge">
+  Together, these posts form a self-contained reference for mastering diffusion models from first principles to cutting-edge innovations.
 </p>
 
