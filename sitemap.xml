@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://backpropthoughts.netlify.app/</loc>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://backpropthoughts.netlify.app/allBlogs.html</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://backpropthoughts.netlify.app/privacy.html</loc>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://backpropthoughts.netlify.app/post?postId=slug1</loc>
+  </url>
+  <url>
+    <loc>https://backpropthoughts.netlify.app/post?postId=slug2</loc>
+  </url>
+  <url>
+    <loc>https://backpropthoughts.netlify.app/post?postId=slug3</loc>
+  </url>
+  <url>
+    <loc>https://backpropthoughts.netlify.app/post?postId=slug4</loc>
+  </url>
+  <url>
+    <loc>https://backpropthoughts.netlify.app/post?postId=slug5</loc>
+  </url>
+  <url>
+    <loc>https://backpropthoughts.netlify.app/post?postId=slug6</loc>
+  </url>
+  <url>
+    <loc>https://backpropthoughts.netlify.app/post?postId=slug7</loc>
+  </url>
+  <!-- add more posts here -->
+</urlset>
