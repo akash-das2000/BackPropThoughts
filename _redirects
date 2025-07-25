@@ -1,1 +1,9 @@
-/post            /post.html                   200
+# 1) Pass‐through any “file” under /posts/:slug/ — so images, CSS, etc., are served normally
+/posts/:slug/:file.:ext   /posts/:slug/:file.:ext   200
+
+# 2) Now do your pretty‐URL → post.html loader
+/posts/:slug              /post.html?postId=:slug   200
+/posts/:slug/*            /post.html?postId=:slug   200
+
+# 3) And finally your legacy /post endpoint
+/post                     /post.html                200
