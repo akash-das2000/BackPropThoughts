@@ -1,22 +1,22 @@
-# ───────────────────────────────────────────────────
-# 1) Pass-through real assets (images, CSS, JS) under /posts/:slug/
+# ───────────────────────────────────────────────────────────
+# 1) Let assets under /posts/:slug/ load normally
 [[redirects]]
   from   = "/posts/:slug/:file.:ext"
   to     = "/posts/:slug/:file.:ext"
   status = 200
   force  = true
 
-# ───────────────────────────────────────────────────
-# 2) Redirect old query-string URL → pretty URL
+# ───────────────────────────────────────────────────────────
+# 2) Redirect old query-string → pretty URL
 [[redirects]]
-  from       = "/post"
-  to         = "/posts/:slug/"
-  status     = 301
-  force      = true
-  conditions = { Query = { postId = ":slug" } }
+  from   = "/post"
+  to     = "/posts/:slug/"
+  status = 301
+  force  = true
+  query  = { postId = ":slug" }
 
-# ───────────────────────────────────────────────────
-# 3) Rewrite pretty → your SPA loader
+# ───────────────────────────────────────────────────────────
+# 3) Internally rewrite pretty URL → your SPA loader
 [[redirects]]
   from   = "/posts/:slug"
   to     = "/post.html?postId=:slug"
