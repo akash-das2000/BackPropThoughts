@@ -1,3 +1,11 @@
+/* ==============  Forcfully hiding the ads blocks (remove when necessary)  ============== */
+/* completely hide all ad slots */
+.left-ad-slot,
+.ad-slot.top-ad,
+.ad-slot.bottom-ad {
+  display: none !important;
+}
+
 /* ==============  General Blog Layout  ============== */
 .blog-wrapper {
   display: flex;
