@@ -1,6 +1,6 @@
-/post    /post.html   200
+# 1) First, map /posts/:slug → post.html with query-string in one go
+/posts/:slug     /post.html?postId=:slug      200
+/posts/:slug/*   /post.html?postId=:slug      200
 
-
-# map /posts/slug/ → /post?postId=slug
-/posts/:slug    /post?postId=:slug   200
-/posts/:slug/*  /post?postId=:slug   200
+# 2) Then map the “legacy” /post route → post.html
+/post            /post.html                   200
