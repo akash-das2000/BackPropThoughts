@@ -1,0 +1,22 @@
+[[redirects]]
+  from     = "/post"
+  to       = "/posts/:slug/"
+  status   = 301
+  force    = true
+  conditions = { query = { postId = ":slug" } }
+
+[[redirects]]
+  from     = "/posts/:slug"
+  to       = "/post.html?postId=:slug"
+  status   = 200
+
+[[redirects]]
+  from     = "/posts/:slug/*"
+  to       = "/post.html?postId=:slug"
+  status   = 200
+
+# allow static assets under posts/ to pass through
+[[redirects]]
+  from     = "/posts/:slug/:file.:ext"
+  to       = "/posts/:slug/:file.:ext"
+  status   = 200
