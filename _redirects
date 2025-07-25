@@ -1,1 +1,5 @@
 /post    /post.html   200
+
+
+# map /posts/slug/ → /post?postId=slug
+/posts/:slug/  /post?postId=:slug   200
