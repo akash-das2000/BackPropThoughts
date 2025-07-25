@@ -1,22 +1,29 @@
+# ───────────────────────────────────────────────────────────
+# 1) Asset pass-through: serve any file under /posts/:slug/ 
+#    (images, CSS, JS…) exactly as-is
 [[redirects]]
-  from     = "/post"
-  to       = "/posts/:slug/"
-  status   = 301
-  force    = true
+  from   = "/posts/:slug/:file.:ext"
+  to     = "/posts/:slug/:file.:ext"
+  status = 200
+
+# ───────────────────────────────────────────────────────────
+# 2) Old query-string redirect → pretty URL
+#    (301 so browsers & crawlers learn the new path)
+[[redirects]]
+  from       = "/post"
+  to         = "/posts/:slug/"
+  status     = 301
   conditions = { query = { postId = ":slug" } }
 
+# ───────────────────────────────────────────────────────────
+# 3) Loader rewrite: serve your SPA shell with the right slug
+#    but keep the browser’s address bar on /posts/:slug/
 [[redirects]]
-  from     = "/posts/:slug"
-  to       = "/post.html?postId=:slug"
-  status   = 200
+  from   = "/posts/:slug"
+  to     = "/post.html?postId=:slug"
+  status = 200
 
 [[redirects]]
-  from     = "/posts/:slug/*"
-  to       = "/post.html?postId=:slug"
-  status   = 200
-
-# allow static assets under posts/ to pass through
-[[redirects]]
-  from     = "/posts/:slug/:file.:ext"
-  to       = "/posts/:slug/:file.:ext"
-  status   = 200
+  from   = "/posts/:slug/*"
+  to     = "/post.html?postId=:slug"
+  status = 200
