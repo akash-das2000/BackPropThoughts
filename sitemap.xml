@@ -1,37 +1,65 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Home page -->
   <url>
     <loc>https://backpropthoughts.netlify.app/</loc>
-    <priority>1.0</priority>
+    <lastmod>2025-07-25</lastmod>
+    <priority>1.00</priority>
   </url>
+
+  <!-- All Blogs listing -->
   <url>
     <loc>https://backpropthoughts.netlify.app/allBlogs.html</loc>
-    <priority>0.8</priority>
+    <lastmod>2025-07-25</lastmod>
+    <priority>0.80</priority>
+  </url>
+
+  <!-- Individual blog posts -->
+  <url>
+    <loc>https://backpropthoughts.netlify.app/post?postId=seal-llm</loc>
+    <lastmod>2025-06-29</lastmod>
+    <priority>0.70</priority>
   </url>
   <url>
-    <loc>https://backpropthoughts.netlify.app/privacy.html</loc>
-    <priority>0.3</priority>
+    <loc>https://backpropthoughts.netlify.app/post?postId=random-forest-algorithm</loc>
+    <lastmod>2025-06-30</lastmod>
+    <priority>0.70</priority>
   </url>
   <url>
-    <loc>https://backpropthoughts.netlify.app/post?postId=slug1</loc>
+    <loc>https://backpropthoughts.netlify.app/post?postId=support-vector-machine-algorithm</loc>
+    <lastmod>2025-06-30</lastmod>
+    <priority>0.70</priority>
   </url>
   <url>
-    <loc>https://backpropthoughts.netlify.app/post?postId=slug2</loc>
+    <loc>https://backpropthoughts.netlify.app/post?postId=tokens-to-thought</loc>
+    <lastmod>2025-07-01</lastmod>
+    <priority>0.70</priority>
   </url>
   <url>
-    <loc>https://backpropthoughts.netlify.app/post?postId=slug3</loc>
+    <loc>https://backpropthoughts.netlify.app/post?postId=survey-eval-llm-agent</loc>
+    <lastmod>2025-07-01</lastmod>
+    <priority>0.70</priority>
   </url>
   <url>
-    <loc>https://backpropthoughts.netlify.app/post?postId=slug4</loc>
+    <loc>https://backpropthoughts.netlify.app/post?postId=diffusion-maths</loc>
+    <lastmod>2025-07-01</lastmod>
+    <priority>0.70</priority>
   </url>
   <url>
-    <loc>https://backpropthoughts.netlify.app/post?postId=slug5</loc>
+    <loc>https://backpropthoughts.netlify.app/post?postId=stochastic-to-diffusion</loc>
+    <lastmod>2025-07-01</lastmod>
+    <priority>0.70</priority>
   </url>
   <url>
-    <loc>https://backpropthoughts.netlify.app/post?postId=slug6</loc>
+    <loc>https://backpropthoughts.netlify.app/post?postId=continious-time-diffuision-models</loc>
+    <lastmod>2025-07-01</lastmod>
+    <priority>0.70</priority>
   </url>
   <url>
-    <loc>https://backpropthoughts.netlify.app/post?postId=slug7</loc>
+    <loc>https://backpropthoughts.netlify.app/post?postId=advanced-diffusion-models</loc>
+    <lastmod>2025-07-01</lastmod>
+    <priority>0.70</priority>
   </url>
-  <!-- add more posts here -->
+
 </urlset>
