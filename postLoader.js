@@ -8,43 +8,11 @@
    🗂 Meta info bar (date, share icons, reading time)
    ------------------------------------------------------------- */
 
-// ───────────────────────────────────────────────────────────────────
-// 1) Redirect legacy /post?postId=slug → /posts/slug/
-// ───────────────────────────────────────────────────────────────────
-(() => {
-  const url = new URL(window.location.href);
-  const id  = url.searchParams.get("postId");
-  if (id && window.location.pathname === "/post") {
-    // Swap into the pretty URL and reload
-    window.location.replace(`/posts/${id}/`);
-    return;
-  }
-})();
-
-// ───────────────────────────────────────────────────────────────────
-// 2) Determine the `postId` from either query-string or pathname
-// ───────────────────────────────────────────────────────────────────
+const params = new URLSearchParams(window.location.search);
+const postId = params.get("postId"); // Example: ?postId=random-forest
 const contentDiv = document.getElementById("post-content");
-let postId = null;
 
-(() => {
-  const url = new URL(window.location.href);
-  // Try query-string first
-  const paramId = url.searchParams.get("postId");
-  if (paramId) {
-    postId = paramId;
-    return;
-  }
-  // Otherwise, match /posts/<slug>/ in the path
-  const match = window.location.pathname.match(/^\/posts\/([^\/]+)\/?$/);
-  if (match) {
-    postId = decodeURIComponent(match[1]);
-  }
-})();
-
-// ───────────────────────────────────────────────────────────────────
-// 3) Kick off loading or show “not found”
-// ───────────────────────────────────────────────────────────────────
+// If no postId provided → show error
 if (!postId) {
   contentDiv.innerHTML = "<p>Post not found.</p>";
 } else {
@@ -94,14 +62,15 @@ async function loadPost() {
 
 /* ====================== Meta Bar ============================ */
 function buildMetaBar(pubDateISO) {
-  const wpm = 200;
+  const wpm = 200; // Words per minute for reading time
   const text = contentDiv.innerText || contentDiv.textContent || "";
   const words = text.trim().split(/\s+/).length;
-  const minutes = Math.max(1, Math.ceil(words / wpm));
+  const minutes = Math.max(1, Math.ceil(words / wpm)); // At least 1 min
 
   const bar = document.createElement("div");
   bar.className = "reading-time-display";
 
+  /* 📅 Date */
   const dateSpan = document.createElement("span");
   dateSpan.className = "post-date";
   if (pubDateISO) {
@@ -109,48 +78,62 @@ function buildMetaBar(pubDateISO) {
   }
   bar.appendChild(dateSpan);
 
+  /* 📌 Icons (PDF, link, email, clock) */
   const iconsWrap = document.createElement("div");
   iconsWrap.className = "meta-icons";
 
-  // PDF download
+  /* 🖨 Printer-friendly PDF button */
   const pdfIcon = document.createElement("i");
   pdfIcon.className = "fa-solid fa-download";
   pdfIcon.title = "Download Printer-friendly PDF";
   pdfIcon.addEventListener("click", async () => {
     try {
+      // 1️⃣ Expand all dropdowns (<details>)
       const details = contentDiv.querySelectorAll("details");
       details.forEach(d => d.open = true);
+
+      // 2️⃣ Force MathJax to finish rendering
       await window.MathJax?.typesetPromise?.([contentDiv]);
+
+      // 3️⃣ Move TOC below <h1> (for print layout)
       const h1 = contentDiv.querySelector("h1");
       const tocBox = document.querySelector(".toc-box");
       if (h1 && tocBox) h1.after(tocBox);
-      await new Promise(r => setTimeout(r, 500));
+
+      // 4️⃣ Small delay to stabilize layout
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // 5️⃣ Open browser print dialog (user can save as PDF)
       window.print();
     } catch (err) {
-      console.error("Print prep failed:", err);
-      alert("Failed to prepare PDF.");
+      console.error("Print preparation failed:", err);
+      alert("Failed to prepare print-friendly version.");
     }
   });
 
+  /* ♻ After printing → restore TOC & collapse dropdowns */
   window.onafterprint = () => {
+    // Restore TOC back to sidebar
     const rightSlot = document.querySelector(".right-toc-slot");
     const tocBox = document.querySelector(".toc-box");
     if (rightSlot && tocBox) rightSlot.appendChild(tocBox);
+
+    // Collapse all <details> again
     const details = contentDiv.querySelectorAll("details");
     details.forEach(d => d.open = false);
   };
 
-  // Copy link
+  /* 🔗 Copy link button */
   const linkIcon = document.createElement("i");
   linkIcon.className = "fa-solid fa-link";
   linkIcon.title = "Copy link";
   linkIcon.addEventListener("click", () => {
     navigator.clipboard.writeText(window.location.href)
-      .then(() => alert("Link copied!"))
-      .catch(() => alert("Copy failed."));
+      .then(() => alert("Link copied to clipboard"))
+      .catch(() => alert("Failed to copy link"));
   });
 
-  // Email share
+  /* ✉ Email share button */
   const emailIcon = document.createElement("i");
   emailIcon.className = "fa-solid fa-envelope";
   emailIcon.title = "Share via Email";
@@ -160,26 +143,27 @@ function buildMetaBar(pubDateISO) {
     window.location.href = `mailto:?subject=${subj}&body=${body}`;
   });
 
-  // Reading time
+  /* ⏱ Reading time */
   const clockIcon = document.createElement("i");
   clockIcon.className = "fa-solid fa-clock";
   const timeText = document.createElement("span");
   timeText.textContent = ` ${minutes} min`;
 
+  // Append icons
   iconsWrap.append(pdfIcon, linkIcon, emailIcon, clockIcon, timeText);
   bar.appendChild(iconsWrap);
 
+  // Insert meta bar after <h1> or at top
   const firstH1 = contentDiv.querySelector("h1");
-  firstH1
-    ? firstH1.insertAdjacentElement("afterend", bar)
-    : contentDiv.prepend(bar);
+  firstH1 ? firstH1.insertAdjacentElement("afterend", bar) : contentDiv.prepend(bar);
 }
 
+/* 📅 Helper: YYYY-MM-DD → "6 Jul 2025" */
 function formatDate(iso) {
   const [y, m, d] = iso.split("-");
   const months = ["Jan","Feb","Mar","Apr","May","Jun",
                   "Jul","Aug","Sep","Oct","Nov","Dec"];
-  return `${+d} ${months[+m - 1]} ${y}`;
+  return `${parseInt(d, 10)} ${months[+m - 1]} ${y}`;
 }
 
 /* =================== Table of Contents ======================= */
@@ -195,6 +179,7 @@ function buildTOC() {
     tocList.appendChild(li);
   });
 
+  /* Active link highlighting on scroll */
   const links = tocList.querySelectorAll("a");
   const obs = new IntersectionObserver(entries => {
     entries.forEach(e => {
@@ -207,6 +192,7 @@ function buildTOC() {
   }, { rootMargin: "-40% 0px -50% 0px", threshold: 0 });
   headings.forEach(h => obs.observe(h));
 
+  /* Collapse toggle for TOC */
   const tocBox = document.querySelector(".toc-box");
   const header = document.createElement("div");
   header.className = "toc-header";
@@ -221,6 +207,7 @@ function buildTOC() {
       tocBox.classList.contains("collapsed") ? "▼" : "▲";
   });
 
+  /* Smooth scroll on TOC link click */
   tocList.addEventListener("click", e => {
     const link = e.target.closest("a[href^='#']");
     if (link) {
@@ -242,9 +229,7 @@ function initScrollToTop() {
     window.scrollTo({ top: 0, behavior: "smooth" }));
 
   window.addEventListener("scroll", () =>
-    window.scrollY > 500
-      ? btn.classList.add("show")
-      : btn.classList.remove("show"));
+    window.scrollY > 500 ? btn.classList.add("show") : btn.classList.remove("show"));
 }
 
 /* ========== Relocate TOC for Mobile (below H1) =============== */
@@ -252,13 +237,13 @@ function relocateMobileTOC() {
   try {
     if (window.innerWidth > 768) return;
     const rightSlot = document.querySelector(".right-toc-slot");
+    if (!rightSlot) return;
     const h1 = contentDiv.querySelector("h1");
-    if (rightSlot && h1) {
-      const wrapper = document.createElement("div");
-      wrapper.className = "mobile-toc-wrapper";
-      wrapper.appendChild(rightSlot);
-      h1.after(wrapper);
-    }
+    if (!h1) return;
+    const wrapper = document.createElement("div");
+    wrapper.className = "mobile-toc-wrapper";
+    wrapper.appendChild(rightSlot);
+    h1.after(wrapper);
   } catch (e) {
     console.warn("Mobile TOC placement failed:", e);
   }
@@ -267,9 +252,7 @@ function relocateMobileTOC() {
 /* ========== Load optional meta.json title ==================== */
 function loadTitleFromMeta() {
   fetch(`posts/${postId}/meta.json`)
-    .then(r => (r.ok ? r.json() : {}))
-    .then(m => {
-      if (m.title) document.title = m.title;
-    })
+    .then(r => r.ok ? r.json() : {})
+    .then(m => { if (m.title) document.title = m.title; })
     .catch(() => {});
 }
