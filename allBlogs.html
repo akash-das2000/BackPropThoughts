@@ -17,12 +17,12 @@
 
     <h2 class="section-heading">All Blogs</h2>
 
-    <!-- 🏷 Category Filters (scrollable with arrows) -->
-    <div class="category-bar">
-      <button class="cat-arrow left" id="catLeft" aria-label="Scroll tags left">‹</button>
-      <div id="categoryFilters" class="category-filters scroller"></div>
-      <button class="cat-arrow right" id="catRight" aria-label="Scroll tags right">›</button>
+    <!-- 🏷 Category Filter (dropdown multi-select) -->
+    <div class="tag-filter">
+      <label for="tagSelect">Filter by Tag:</label>
+      <select id="tagSelect" class="tag-dropdown" multiple></select>
     </div>
+    <div id="activeTags" class="active-tags"></div>
 
     <!-- 🔍 Search & Sort -->
     <div class="blog-controls">
