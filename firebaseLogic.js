@@ -92,9 +92,10 @@ const btnApple   = document.getElementById("btn-apple");
 const btnEmail   = document.getElementById("btn-emaillink");
 const btnSignout = document.getElementById("btn-signout");
 
-const commentForm  = document.getElementById("comment-form");
-const commentInput = document.getElementById("comment");
-const commentsList = document.getElementById("comments-list");
+const commentForm       = document.getElementById("comment-form");
+const commentInput      = document.getElementById("comment");
+const commentSubmitBtn  = document.getElementById("comment-submit"); // PATCH 2: reference submit button
+const commentsList      = document.getElementById("comments-list");
 
 // Providers
 const google = new GoogleAuthProvider();
@@ -146,31 +147,26 @@ onAuthStateChanged(auth, (user) => {
       userPhoto.style.display = "none";
       userPhoto.removeAttribute("src");
     }
-    // Hide sign-in buttons; show sign-out
-    if (btnGoogle)  btnGoogle.style.display = "inline-block";
-    if (btnGithub)  btnGithub.style.display = "inline-block";
-    if (btnApple)   btnApple.style.display  = "inline-block";
-    if (btnEmail)   btnEmail.style.display  = "inline-block";
-    // If you prefer to hide providers once signed in, uncomment next 4 lines:
-    // if (btnGoogle)  btnGoogle.style.display = "none";
-    // if (btnGithub)  btnGithub.style.display = "none";
-    // if (btnApple)   btnApple.style.display  = "none";
-    // if (btnEmail)   btnEmail.style.display  = "none";
+    // Show provider buttons or hide them—your choice. Keeping visible here.
     if (btnSignout) btnSignout.style.display = "inline-block";
   } else {
     userNameEl.textContent = "Not signed in";
     userPhoto.style.display = "none";
     userPhoto.removeAttribute("src");
-    // Show sign-in buttons; hide sign-out
-    if (btnGoogle)  btnGoogle.style.display = "inline-block";
-    if (btnGithub)  btnGithub.style.display = "inline-block";
-    if (btnApple)   btnApple.style.display  = "inline-block";
-    if (btnEmail)   btnEmail.style.display  = "inline-block";
     if (btnSignout) btnSignout.style.display = "none";
   }
 });
 
-// Submit a comment (requires sign-in)
+// --- PATCH 1: Comments toggle (uses your existing toggle button + section) ---
+const toggleCommentsButton = document.getElementById("toggle-comments");
+const commentsSection = document.getElementById("comments-section");
+
+toggleCommentsButton?.addEventListener("click", () => {
+  const isHidden = commentsSection.style.display === "none" || !commentsSection.style.display;
+  commentsSection.style.display = isHidden ? "block" : "none";
+});
+
+// Submit a comment (requires sign-in) — PATCH 2: disable/enable submit to prevent rapid double-posts
 commentForm?.addEventListener("submit", async (e) => {
   e.preventDefault();
   const user = auth.currentUser;
@@ -185,6 +181,9 @@ commentForm?.addEventListener("submit", async (e) => {
     alert("Could not resolve post id.");
     return;
   }
+
+  // Disable submit during write (prevents double-click spam)
+  commentSubmitBtn?.setAttribute("disabled", "true");
 
   try {
     await addDoc(collection(db, "comments"), {
@@ -202,6 +201,9 @@ commentForm?.addEventListener("submit", async (e) => {
   } catch (err) {
     console.error("Failed to post comment:", err);
     alert("Failed to post comment.");
+  } finally {
+    // Re-enable submit regardless of success/failure
+    commentSubmitBtn?.removeAttribute("disabled");
   }
 });
 
