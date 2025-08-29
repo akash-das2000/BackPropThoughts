@@ -1,3 +1,4 @@
+// ===== Firebase app init =====
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
   getFirestore,
@@ -14,6 +15,18 @@ import {
   onSnapshot,
   serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import {
+  getAuth,
+  onAuthStateChanged,
+  signOut,
+  GoogleAuthProvider,
+  GithubAuthProvider,
+  OAuthProvider,
+  signInWithPopup,
+  sendSignInLinkToEmail,
+  isSignInWithEmailLink,
+  signInWithEmailLink,
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA3AkLphGPQy35cLP1rEt0g3hp4SQpt4XE",
@@ -26,93 +39,230 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
 
+// ===== Resolve current postId from URL =====
 const params = new URLSearchParams(window.location.search);
 const postId = params.get("postId");
 
-// Clap functionality
+// -------------------------------------------------------------------------------------------------
+// CLAPS (unchanged behavior)
+// -------------------------------------------------------------------------------------------------
 const clapButton = document.getElementById("clap-button");
 const clapCountSpan = document.getElementById("clap-count");
-const clapDocRef = doc(db, "likes", postId);
 
-getDoc(clapDocRef).then((docSnap) => {
-  if (docSnap.exists()) {
-    clapCountSpan.textContent = docSnap.data().claps || 0;
-  } else {
-    setDoc(clapDocRef, { claps: 0 });
-    clapCountSpan.textContent = 0;
-  }
+if (clapButton && clapCountSpan && postId) {
+  const clapDocRef = doc(db, "likes", postId);
 
-  const hasClapped = localStorage.getItem(`clapped_${postId}`);
-  if (hasClapped) {
+  getDoc(clapDocRef).then((docSnap) => {
+    if (docSnap.exists()) {
+      clapCountSpan.textContent = docSnap.data().claps || 0;
+    } else {
+      setDoc(clapDocRef, { claps: 0 });
+      clapCountSpan.textContent = 0;
+    }
+
+    const hasClapped = localStorage.getItem(`clapped_${postId}`);
+    if (hasClapped) {
+      clapButton.classList.add("active");
+    }
+  });
+
+  clapButton.addEventListener("click", () => {
+    const hasClapped = localStorage.getItem(`clapped_${postId}`);
+    if (hasClapped) return;
+
+    updateDoc(clapDocRef, { claps: increment(1) });
+    localStorage.setItem(`clapped_${postId}`, "true");
+    clapCountSpan.textContent = String(parseInt(clapCountSpan.textContent, 10) + 1);
     clapButton.classList.add("active");
-  }
-});
+  });
+}
 
-clapButton.addEventListener("click", () => {
-  const hasClapped = localStorage.getItem(`clapped_${postId}`);
-  if (hasClapped) return;
+// -------------------------------------------------------------------------------------------------
+// COMMENTS with Firebase Auth (auto-uses user displayName + photo)
+// -------------------------------------------------------------------------------------------------
 
-  updateDoc(clapDocRef, { claps: increment(1) });
-  localStorage.setItem(`clapped_${postId}`, "true");
-  clapCountSpan.textContent = parseInt(clapCountSpan.textContent) + 1;
-  clapButton.classList.add("active");
-});
+// Elements
+const userPhoto = document.getElementById("user-photo");
+const userNameEl = document.getElementById("user-name");
+const btnGoogle  = document.getElementById("btn-google");
+const btnGithub  = document.getElementById("btn-github");
+const btnApple   = document.getElementById("btn-apple");
+const btnEmail   = document.getElementById("btn-emaillink");
+const btnSignout = document.getElementById("btn-signout");
 
-// Comments toggle
-const toggleCommentsButton = document.getElementById("toggle-comments");
-const commentsSection = document.getElementById("comments-section");
-
-toggleCommentsButton.addEventListener("click", () => {
-  commentsSection.style.display =
-    commentsSection.style.display === "none" ? "block" : "none";
-});
-
-// Submit comment
-const commentForm = document.getElementById("comment-form");
-commentForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const name = document.getElementById("name").value.trim();
-  const comment = document.getElementById("comment").value.trim();
-
-  if (name && comment) {
-    await addDoc(collection(db, "comments"), {
-      name,
-      comment,
-      postId,
-      timestamp: serverTimestamp(),
-    });
-    commentForm.reset();
-  }
-});
-
-// Load comments in real-time
+const commentForm  = document.getElementById("comment-form");
+const commentInput = document.getElementById("comment");
 const commentsList = document.getElementById("comments-list");
-const q = query(
-  collection(db, "comments"),
-  where("postId", "==", postId),
-  orderBy("timestamp", "desc")
-);
 
-onSnapshot(q, (snapshot) => {
-  commentsList.innerHTML = "";
-  if (snapshot.empty) {
-    commentsList.innerHTML = "<p>No comments yet. Be the first!</p>";
+// Providers
+const google = new GoogleAuthProvider();
+const github = new GithubAuthProvider();
+const apple  = new OAuthProvider("apple.com");
+
+// Sign-in button handlers
+btnGoogle?.addEventListener("click", () => signInWithPopup(auth, google).catch(console.error));
+btnGithub?.addEventListener("click", () => signInWithPopup(auth, github).catch(console.error));
+btnApple ?.addEventListener("click", () => signInWithPopup(auth, apple ).catch(console.error));
+
+btnEmail?.addEventListener("click", async () => {
+  const email = prompt("Enter your email to receive a sign-in link:");
+  if (!email) return;
+  try {
+    await sendSignInLinkToEmail(auth, email, {
+      url: window.location.href, // return to same page
+      handleCodeInApp: true,
+    });
+    localStorage.setItem("emailForSignIn", email);
+    alert("Sign-in link sent. Check your inbox.");
+  } catch (e) {
+    console.error(e);
+    alert("Could not send link.");
+  }
+});
+
+// Complete email-link sign-in if returning via link
+if (isSignInWithEmailLink(auth, window.location.href)) {
+  let email = localStorage.getItem("emailForSignIn");
+  if (!email) email = prompt("Confirm your email to finish sign-in:");
+  if (email) {
+    signInWithEmailLink(auth, email, window.location.href)
+      .then(() => localStorage.removeItem("emailForSignIn"))
+      .catch(console.error);
+  }
+}
+
+btnSignout?.addEventListener("click", () => signOut(auth));
+
+// Update UI on auth state change
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    userNameEl.textContent = `Commenting as ${user.displayName || "Anonymous"}`;
+    if (user.photoURL) {
+      userPhoto.style.display = "inline-block";
+      userPhoto.src = user.photoURL;
+    } else {
+      userPhoto.style.display = "none";
+      userPhoto.removeAttribute("src");
+    }
+    // Hide sign-in buttons; show sign-out
+    if (btnGoogle)  btnGoogle.style.display = "inline-block";
+    if (btnGithub)  btnGithub.style.display = "inline-block";
+    if (btnApple)   btnApple.style.display  = "inline-block";
+    if (btnEmail)   btnEmail.style.display  = "inline-block";
+    // If you prefer to hide providers once signed in, uncomment next 4 lines:
+    // if (btnGoogle)  btnGoogle.style.display = "none";
+    // if (btnGithub)  btnGithub.style.display = "none";
+    // if (btnApple)   btnApple.style.display  = "none";
+    // if (btnEmail)   btnEmail.style.display  = "none";
+    if (btnSignout) btnSignout.style.display = "inline-block";
+  } else {
+    userNameEl.textContent = "Not signed in";
+    userPhoto.style.display = "none";
+    userPhoto.removeAttribute("src");
+    // Show sign-in buttons; hide sign-out
+    if (btnGoogle)  btnGoogle.style.display = "inline-block";
+    if (btnGithub)  btnGithub.style.display = "inline-block";
+    if (btnApple)   btnApple.style.display  = "inline-block";
+    if (btnEmail)   btnEmail.style.display  = "inline-block";
+    if (btnSignout) btnSignout.style.display = "none";
+  }
+});
+
+// Submit a comment (requires sign-in)
+commentForm?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const user = auth.currentUser;
+  if (!user) {
+    alert("Please sign in to comment.");
     return;
   }
-  snapshot.forEach((doc) => {
-    const data = doc.data();
-    let time = "Just now";
-    try {
-      if (data.timestamp && data.timestamp.toDate) {
-        time = data.timestamp.toDate().toLocaleString();
-      }
-    } catch (e) {
-      console.warn("Invalid timestamp:", e);
-    }
-    const div = document.createElement("div");
-    div.classList.add("comment");
-    div.innerHTML = `<strong>${data.name}</strong> <em>${time}</em><p>${data.comment}</p><hr>`;
-    commentsList.appendChild(div);
-  });
+  const text = (commentInput.value || "").trim();
+  if (!text) return;
+
+  if (!postId) {
+    alert("Could not resolve post id.");
+    return;
+  }
+
+  try {
+    await addDoc(collection(db, "comments"), {
+      postId,
+      text,
+      author: {
+        uid: user.uid,
+        name: user.displayName || "Anonymous",
+        photoURL: user.photoURL || null,
+        provider: user.providerData?.[0]?.providerId || null,
+      },
+      createdAt: serverTimestamp(),
+    });
+    commentInput.value = "";
+  } catch (err) {
+    console.error("Failed to post comment:", err);
+    alert("Failed to post comment.");
+  }
 });
+
+// Live list (query by createdAt desc)
+if (commentsList && postId) {
+  const q = query(
+    collection(db, "comments"),
+    where("postId", "==", postId),
+    orderBy("createdAt", "desc")
+  );
+
+  onSnapshot(q, (snapshot) => {
+    commentsList.innerHTML = "";
+    if (snapshot.empty) {
+      const empty = document.createElement("li");
+      empty.className = "comment-item";
+      empty.textContent = "No comments yet. Be the first!";
+      commentsList.appendChild(empty);
+      return;
+    }
+    snapshot.forEach((d) => {
+      const data = d.data();
+      commentsList.appendChild(renderCommentItem(data));
+    });
+  });
+}
+
+// Render a single comment (XSS-safe)
+function renderCommentItem(data) {
+  const li = document.createElement("li");
+  li.className = "comment-item";
+
+  const head = document.createElement("div");
+  head.className = "comment-head";
+
+  if (data.author?.photoURL) {
+    const av = document.createElement("img");
+    av.className = "cmt-avatar";
+    av.alt = "";
+    av.src = data.author.photoURL;
+    head.appendChild(av);
+  }
+
+  const nm = document.createElement("span");
+  nm.className = "comment-name";
+  nm.textContent = data.author?.name ?? "Anonymous";
+
+  const tsSpan = document.createElement("span");
+  tsSpan.className = "comment-time";
+  try {
+    const dt = data.createdAt?.toDate?.();
+    if (dt) tsSpan.textContent = " • " + dt.toLocaleString();
+  } catch (_) {}
+
+  head.appendChild(nm);
+  head.appendChild(tsSpan);
+
+  const body = document.createElement("p");
+  body.textContent = data.text ?? ""; // never innerHTML for user text
+
+  li.appendChild(head);
+  li.appendChild(body);
+  return li;
+}
