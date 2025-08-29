@@ -18,9 +18,7 @@
     <h2 class="section-heading">All Blogs</h2>
 
     <!-- 🏷 Category Filters -->
-    <div id="categoryFilters" class="category-filters">
-      <!-- JS-generated filter buttons -->
-    </div>
+    <div id="categoryFilters" class="category-filters"></div>
 
     <!-- 🔍 Search & Sort -->
     <div class="blog-controls">
@@ -41,8 +39,14 @@
 
     <!-- 📚 Blog Grid -->
     <section id="blogGrid" class="blog-grid">
-      <!-- JS will populate blog cards here -->
+      <!-- JS will populate blog cards here.
+           Make sure your <img> inside each card uses class="blog-thumbnail" -->
     </section>
+
+    <!-- ⬇️ Centered Load More -->
+    <div class="load-more-wrap">
+      <button id="loadMoreBtn" class="load-more-btn" aria-label="Load more blogs">Load More</button>
+    </div>
 
   </main>
 
