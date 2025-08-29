@@ -21,7 +21,6 @@ import {
   signOut,
   GoogleAuthProvider,
   GithubAuthProvider,
-  OAuthProvider,
   signInWithPopup,
   sendSignInLinkToEmail,
   isSignInWithEmailLink,
@@ -80,7 +79,7 @@ if (clapButton && clapCountSpan && postId) {
 }
 
 // -------------------------------------------------------------------------------------------------
-// COMMENTS with Firebase Auth (auto-uses user displayName + photo)
+// COMMENTS with Firebase Auth (Google / GitHub / Email link)
 // -------------------------------------------------------------------------------------------------
 
 // Elements
@@ -88,24 +87,21 @@ const userPhoto = document.getElementById("user-photo");
 const userNameEl = document.getElementById("user-name");
 const btnGoogle  = document.getElementById("btn-google");
 const btnGithub  = document.getElementById("btn-github");
-const btnApple   = document.getElementById("btn-apple");
 const btnEmail   = document.getElementById("btn-emaillink");
 const btnSignout = document.getElementById("btn-signout");
 
 const commentForm       = document.getElementById("comment-form");
 const commentInput      = document.getElementById("comment");
-const commentSubmitBtn  = document.getElementById("comment-submit"); // PATCH 2: reference submit button
+const commentSubmitBtn  = document.getElementById("comment-submit");
 const commentsList      = document.getElementById("comments-list");
 
 // Providers
 const google = new GoogleAuthProvider();
 const github = new GithubAuthProvider();
-const apple  = new OAuthProvider("apple.com");
 
 // Sign-in button handlers
 btnGoogle?.addEventListener("click", () => signInWithPopup(auth, google).catch(console.error));
 btnGithub?.addEventListener("click", () => signInWithPopup(auth, github).catch(console.error));
-btnApple ?.addEventListener("click", () => signInWithPopup(auth, apple ).catch(console.error));
 
 btnEmail?.addEventListener("click", async () => {
   const email = prompt("Enter your email to receive a sign-in link:");
@@ -138,26 +134,28 @@ btnSignout?.addEventListener("click", () => signOut(auth));
 
 // Update UI on auth state change
 onAuthStateChanged(auth, (user) => {
+  const show = (el) => { if (el) el.style.display = "inline-flex"; };
+  const hide = (el) => { if (el) el.style.display = "none"; };
+
   if (user) {
     userNameEl.textContent = `Commenting as ${user.displayName || "Anonymous"}`;
-    if (user.photoURL) {
-      userPhoto.style.display = "inline-block";
-      userPhoto.src = user.photoURL;
-    } else {
-      userPhoto.style.display = "none";
-      userPhoto.removeAttribute("src");
-    }
-    // Show provider buttons or hide them—your choice. Keeping visible here.
-    if (btnSignout) btnSignout.style.display = "inline-block";
+    if (user.photoURL) { userPhoto.src = user.photoURL; userPhoto.style.display = "inline-block"; }
+    else { userPhoto.removeAttribute("src"); userPhoto.style.display = "none"; }
+
+    // Hide providers, show sign out
+    hide(btnGoogle); hide(btnGithub); hide(btnEmail);
+    show(btnSignout);
   } else {
     userNameEl.textContent = "Not signed in";
-    userPhoto.style.display = "none";
-    userPhoto.removeAttribute("src");
-    if (btnSignout) btnSignout.style.display = "none";
+    userPhoto.removeAttribute("src"); userPhoto.style.display = "none";
+
+    // Show providers, hide sign out
+    show(btnGoogle); show(btnGithub); show(btnEmail);
+    hide(btnSignout);
   }
 });
 
-// --- PATCH 1: Comments toggle (uses your existing toggle button + section) ---
+// --- Comments toggle (uses your existing toggle button + section) ---
 const toggleCommentsButton = document.getElementById("toggle-comments");
 const commentsSection = document.getElementById("comments-section");
 
@@ -166,23 +164,17 @@ toggleCommentsButton?.addEventListener("click", () => {
   commentsSection.style.display = isHidden ? "block" : "none";
 });
 
-// Submit a comment (requires sign-in) — PATCH 2: disable/enable submit to prevent rapid double-posts
+// Submit a comment (requires sign-in) — disable/enable submit to prevent rapid double-posts
 commentForm?.addEventListener("submit", async (e) => {
   e.preventDefault();
   const user = auth.currentUser;
-  if (!user) {
-    alert("Please sign in to comment.");
-    return;
-  }
+  if (!user) { alert("Please sign in to comment."); return; }
+
   const text = (commentInput.value || "").trim();
   if (!text) return;
 
-  if (!postId) {
-    alert("Could not resolve post id.");
-    return;
-  }
+  if (!postId) { alert("Could not resolve post id."); return; }
 
-  // Disable submit during write (prevents double-click spam)
   commentSubmitBtn?.setAttribute("disabled", "true");
 
   try {
@@ -202,7 +194,6 @@ commentForm?.addEventListener("submit", async (e) => {
     console.error("Failed to post comment:", err);
     alert("Failed to post comment.");
   } finally {
-    // Re-enable submit regardless of success/failure
     commentSubmitBtn?.removeAttribute("disabled");
   }
 });
