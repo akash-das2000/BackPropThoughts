@@ -1,10 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const blogGrid     = document.getElementById("blogGrid");
-  const searchInput  = document.getElementById("searchInput");
-  const sortSelect   = document.getElementById("sortSelect");
-  const categoryWrap = document.getElementById("categoryFilters");
-  const blogCount    = document.getElementById("blogCount");
-  const loadMoreBtn  = document.getElementById("loadMoreBtn"); // ✅ select existing button
+  const blogGrid      = document.getElementById("blogGrid");
+  const searchInput   = document.getElementById("searchInput");
+  const sortSelect    = document.getElementById("sortSelect");
+  const categoryWrap  = document.getElementById("categoryFilters");
+  const blogCount     = document.getElementById("blogCount");
+  const loadMoreBtn   = document.getElementById("loadMoreBtn");
+  const catLeft       = document.getElementById("catLeft");
+  const catRight      = document.getElementById("catRight");
 
   let blogs = [];
   let activeCategory = "All";
@@ -30,22 +32,23 @@ document.addEventListener("DOMContentLoaded", () => {
     blogs = entries.filter(Boolean);
     renderFilters();
     renderBlogs();
+    updateTagArrows();
   }
 
+  /* ---------- Filters ---------- */
   function renderFilters() {
     const allTags = new Set();
-    blogs.forEach(blog => {
-      (blog.category || []).forEach(tag => allTags.add(tag));
-    });
+    blogs.forEach(b => (b.category || []).forEach(t => allTags.add(t)));
 
     categoryWrap.innerHTML = "";
-    const allBtn = createFilterButton("All", true);
-    categoryWrap.appendChild(allBtn);
-
-    [...allTags].sort().forEach(tag => {
-      const btn = createFilterButton(tag);
-      categoryWrap.appendChild(btn);
+    categoryWrap.appendChild(createFilterButton("All", true));
+    [...allTags].sort((a, b) => a.localeCompare(b)).forEach(tag => {
+      categoryWrap.appendChild(createFilterButton(tag));
     });
+
+    // When tags overflow, show arrows state
+    categoryWrap.addEventListener("scroll", throttle(updateTagArrows, 100));
+    window.addEventListener("resize", updateTagArrows);
   }
 
   function createFilterButton(name, isActive = false) {
@@ -53,7 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.textContent = name;
     btn.className = "category-btn" + (isActive ? " active" : "");
     btn.addEventListener("click", () => {
-      document.querySelectorAll(".category-btn").forEach(b => b.classList.remove("active"));
+      [...categoryWrap.querySelectorAll(".category-btn")].forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
       activeCategory = name;
       visibleCount = 0;
@@ -62,91 +65,93 @@ document.addEventListener("DOMContentLoaded", () => {
     return btn;
   }
 
+  /* ---------- Render ---------- */
   function renderBlogs() {
     const query = searchInput.value.trim().toLowerCase();
     const sortBy = sortSelect.value;
 
-    let filtered = blogs.filter(blog => {
-      const inTitle = blog.title.toLowerCase().includes(query);
-      const inSummary = blog.summary?.toLowerCase().includes(query);
-      const inCategory = activeCategory === "All" || (blog.category || []).includes(activeCategory);
-      return (inTitle || inSummary) && inCategory;
+    let filtered = blogs.filter(b => {
+      const inTitle   = b.title.toLowerCase().includes(query);
+      const inSummary = (b.summary || "").toLowerCase().includes(query);
+      const inCat     = activeCategory === "All" || (b.category || []).includes(activeCategory);
+      return (inTitle || inSummary) && inCat;
     });
 
-    if (sortBy === "title") {
-      filtered.sort((a, b) => a.title.localeCompare(b.title));
-    } else {
-      filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+    // ✅ Correct, explicit sorting
+    switch (sortBy) {
+      case "oldest":
+        filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
+        break;
+      case "title":
+        filtered.sort((a, b) => a.title.localeCompare(b.title));
+        break;
+      case "title-desc":
+        filtered.sort((a, b) => b.title.localeCompare(a.title));
+        break;
+      case "latest":
+      default:
+        filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+        break;
     }
 
     blogGrid.innerHTML = "";
     const blogsToShow = filtered.slice(0, visibleCount + LOAD_COUNT);
-    blogsToShow.forEach(blog => blogGrid.appendChild(createBlogCard(blog)));
-
+    blogsToShow.forEach(b => blogGrid.appendChild(createBlogCard(b)));
     visibleCount += LOAD_COUNT;
+
     blogCount.textContent = `${filtered.length} blog${filtered.length !== 1 ? "s" : ""}`;
 
-    // ✅ Show/hide existing Load More button instead of recreating it
-    if (visibleCount < filtered.length) {
-      loadMoreBtn.style.display = "inline-flex";
-    } else {
-      loadMoreBtn.style.display = "none";
-    }
+    // Show/hide centered Load More
+    loadMoreBtn.style.display = visibleCount < filtered.length ? "inline-flex" : "none";
   }
 
   function createBlogCard(blog) {
     const card = document.createElement("div");
     card.className = "blog-card";
 
-    // ✅ Thumbnail with correct CSS class
     const img = document.createElement("img");
-    img.className = "blog-thumbnail";
+    img.className = "blog-thumbnail";                 // ✅ matches CSS
     img.src = blog.image;
     img.alt = blog.title;
 
-    // Content container
     const content = document.createElement("div");
     content.className = "blog-content";
 
-    // Tags
     const tags = document.createElement("div");
     tags.className = "blog-tags";
-    (blog.category || []).forEach(tagText => {
-      const tag = document.createElement("span");
-      tag.className = "tag-badge";
-      tag.textContent = tagText;
-      tags.appendChild(tag);
+    (blog.category || []).forEach(t => {
+      const span = document.createElement("span");
+      span.className = "tag-badge";
+      span.textContent = t;
+      tags.appendChild(span);
     });
-    content.appendChild(tags);
 
-    // Title
     const title = document.createElement("h3");
     title.className = "blog-title";
     title.textContent = blog.title;
-    content.appendChild(title);
 
-    // Summary
     const summary = document.createElement("p");
     summary.className = "blog-summary";
     summary.textContent = blog.summary;
-    content.appendChild(summary);
 
-    // Read more link
     const link = document.createElement("a");
     link.className = "read-more-link";
     link.href = `post?postId=${blog.slug}`;
     link.textContent = "Read More →";
+
+    content.appendChild(tags);
+    content.appendChild(title);
+    content.appendChild(summary);
     content.appendChild(link);
 
-    // Final assembly
     card.appendChild(img);
     card.appendChild(content);
     return card;
   }
 
   async function findFeaturedImage(slug) {
-    const extensions = ["jpg", "jpeg", "png", "webp"];
-    for (const ext of extensions) {
+    const exts = ["jpg", "jpeg", "png", "webp"];
+    for (const ext of exts) {
       const path = `posts/${slug}/featured.${ext}`;
       try {
         const res = await fetch(path, { method: "HEAD" });
@@ -156,19 +161,34 @@ document.addEventListener("DOMContentLoaded", () => {
     return "images/featured_blog.jpg";
   }
 
-  // Event listeners
-  searchInput.addEventListener("input", () => {
-    visibleCount = 0;
-    renderBlogs();
+  /* ---------- Tag scroller arrows ---------- */
+  function updateTagArrows() {
+    const canScrollLeft  = categoryWrap.scrollLeft > 0;
+    const canScrollRight = categoryWrap.scrollLeft + categoryWrap.clientWidth < categoryWrap.scrollWidth - 1;
+    catLeft.disabled  = !canScrollLeft;
+    catRight.disabled = !canScrollRight;
+  }
+  const SCROLL_STEP = 220;
+  catLeft.addEventListener("click", () => {
+    categoryWrap.scrollBy({ left: -SCROLL_STEP, behavior: "smooth" });
+  });
+  catRight.addEventListener("click", () => {
+    categoryWrap.scrollBy({ left:  SCROLL_STEP, behavior: "smooth" });
   });
 
-  sortSelect.addEventListener("change", () => {
-    visibleCount = 0;
-    renderBlogs();
-  });
-
-  // ✅ Load More button handler
+  /* ---------- Events ---------- */
+  searchInput.addEventListener("input", () => { visibleCount = 0; renderBlogs(); });
+  sortSelect.addEventListener("change", () => { visibleCount = 0; renderBlogs(); });
   loadMoreBtn.addEventListener("click", () => renderBlogs());
+
+  // util: cheap throttle for scroll/resize
+  function throttle(fn, wait) {
+    let t = 0;
+    return (...args) => {
+      const now = Date.now();
+      if (now - t >= wait) { t = now; fn(...args); }
+    };
+  }
 
   fetchBlogs();
 });
