@@ -17,8 +17,12 @@
 
     <h2 class="section-heading">All Blogs</h2>
 
-    <!-- 🏷 Category Filters -->
-    <div id="categoryFilters" class="category-filters"></div>
+    <!-- 🏷 Category Filters (scrollable with arrows) -->
+    <div class="category-bar">
+      <button class="cat-arrow left" id="catLeft" aria-label="Scroll tags left">‹</button>
+      <div id="categoryFilters" class="category-filters scroller"></div>
+      <button class="cat-arrow right" id="catRight" aria-label="Scroll tags right">›</button>
+    </div>
 
     <!-- 🔍 Search & Sort -->
     <div class="blog-controls">
@@ -39,8 +43,7 @@
 
     <!-- 📚 Blog Grid -->
     <section id="blogGrid" class="blog-grid">
-      <!-- JS will populate blog cards here.
-           Make sure your <img> inside each card uses class="blog-thumbnail" -->
+      <!-- JS will populate blog cards here -->
     </section>
 
     <!-- ⬇️ Centered Load More -->
