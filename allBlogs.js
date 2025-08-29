@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const sortSelect   = document.getElementById("sortSelect");
   const categoryWrap = document.getElementById("categoryFilters");
   const blogCount    = document.getElementById("blogCount");
+  const loadMoreBtn  = document.getElementById("loadMoreBtn"); // ✅ select existing button
 
   let blogs = [];
   let activeCategory = "All";
@@ -85,12 +86,11 @@ document.addEventListener("DOMContentLoaded", () => {
     visibleCount += LOAD_COUNT;
     blogCount.textContent = `${filtered.length} blog${filtered.length !== 1 ? "s" : ""}`;
 
+    // ✅ Show/hide existing Load More button instead of recreating it
     if (visibleCount < filtered.length) {
-      const btn = document.createElement("button");
-      btn.className = "load-more-btn";
-      btn.textContent = "Load More";
-      btn.addEventListener("click", () => renderBlogs());
-      blogGrid.appendChild(btn);
+      loadMoreBtn.style.display = "inline-flex";
+    } else {
+      loadMoreBtn.style.display = "none";
     }
   }
 
@@ -98,9 +98,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const card = document.createElement("div");
     card.className = "blog-card";
 
-    // Thumbnail
+    // ✅ Thumbnail with correct CSS class
     const img = document.createElement("img");
-    img.className = "blog-image";
+    img.className = "blog-thumbnail";
     img.src = blog.image;
     img.alt = blog.title;
 
@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const content = document.createElement("div");
     content.className = "blog-content";
 
-    // Tags (as badges)
+    // Tags
     const tags = document.createElement("div");
     tags.className = "blog-tags";
     (blog.category || []).forEach(tagText => {
@@ -166,6 +166,9 @@ document.addEventListener("DOMContentLoaded", () => {
     visibleCount = 0;
     renderBlogs();
   });
+
+  // ✅ Load More button handler
+  loadMoreBtn.addEventListener("click", () => renderBlogs());
 
   fetchBlogs();
 });
