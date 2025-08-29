@@ -1,5 +1,5 @@
 {
-  "title": "Part 4: Advanced Diffusion Models – Guidance, Latent Spaces, Convergence & Control",
-  "summary": "An in-depth mathematical journey through score-based diffusion: derive the analytic noising kernel, obtain unbiased score labels via Bayes’ rule, eliminate partition functions with Hyvärinen’s integration-by-parts, connect denoising auto-encoders through Vincent’s Taylor expansion, and implement everything in four lines of PyTorch with numerical hacks like the Hutchinson trace trick.",
-  "category": ["Foundations", "Algorithms"]
+  "title": "Part 4: Advanced Diffusion Models – Guidance, Latent Spaces, Convergence & Control",
+  "summary": "Explore advanced techniques in diffusion models: steer generation with classifier-free and model-guidance, scale to high-resolution synthesis via latent diffusion and KL factorization, establish non-asymptotic convergence rates using Wasserstein gradient flows and the JKO scheme, and reformulate reverse SDEs as stochastic control problems with applications to inverse tasks through Plug-and-Play priors and Regularized Score Distillation.",
+  "category": ["Foundations", "Algorithms", "Theory"]
 }
