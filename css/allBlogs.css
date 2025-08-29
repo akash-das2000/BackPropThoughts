@@ -13,37 +13,76 @@
   margin-bottom: 1rem;
 }
 
-/* Filters */
-.category-filters {
+/* --- Category bar (scroller with arrows) --- */
+.category-bar {
+  position: relative;
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
   gap: 0.5rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
 }
 
-.category-filters button {
-  padding: 0.4rem 0.9rem;
-  margin: 0.4rem;
-  border: 1.5px solid #ccc;
-  background-color: white;
+/* Scroller */
+.category-filters.scroller {
+  flex: 1;
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.25rem;
+  overflow-x: auto;
+  scrollbar-width: none;          /* Firefox */
+  -ms-overflow-style: none;       /* IE/Edge */
+  scroll-behavior: smooth;
+  scroll-snap-type: x proximity;
+  mask-image: linear-gradient(to right,
+    transparent, black 24px,
+    black calc(100% - 24px),
+    transparent);
+}
+.category-filters.scroller::-webkit-scrollbar { display: none; }
+
+/* Filter buttons */
+.category-btn {
+  padding: 0.45rem 0.95rem;
+  border: 1.5px solid #ddd;
+  background: #fff;
   color: #333;
-  border-radius: 20px;
-  font-size: 0.9rem;
+  border-radius: 999px;
+  font-size: 0.92rem;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background .2s, color .2s, border-color .2s;
+  white-space: nowrap;
+  scroll-snap-align: start;
 }
-
-.category-filters button.active {
-  background-color: #005fa3;
-  border-color: #005fa3;
+.category-btn:hover {
+  background: #f6f9ff;
+  border-color: #b6d2ff;
+  color: #0b63ce;
+}
+.category-btn.active {
+  background: #0b63ce;
+  border-color: #0b63ce;
   color: #fff;
 }
 
-.category-filters button:hover {
-  background-color: #e6f0fb;
-  border-color: #005fa3;
-  color: #005fa3;
+/* Arrows */
+.cat-arrow {
+  border: 1px solid #e5e5e5;
+  background: #fff;
+  border-radius: 10px;
+  width: 32px; height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,.05);
+  transition: background .2s, transform .05s;
+  user-select: none;
 }
+.cat-arrow:hover { background: #f7f7f7; }
+.cat-arrow:active { transform: translateY(1px); }
+.cat-arrow[disabled] { opacity: .35; cursor: default; }
 
 /* Search + Sort */
 .blog-controls {
@@ -64,16 +103,8 @@
   border-radius: 6px;
 }
 
-.sort-group {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.sort-label {
-  font-size: 0.9rem;
-}
-
+.sort-group { display: flex; align-items: center; gap: 0.5rem; }
+.sort-label { font-size: 0.9rem; }
 .sort-dropdown {
   padding: 0.5rem 0.75rem;
   font-size: 0.95rem;
@@ -101,21 +132,20 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  max-width: 360px;       /* Prevent overly wide cards */
+  max-width: 360px;
   width: 100%;
-  margin: 0 auto;         /* Center a lone card */
+  margin: 0 auto;
 }
-
 .blog-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
-/* Featured Image — uniform size across cards */
+/* Thumbnail uniform */
 .blog-thumbnail {
   width: 100%;
-  height: 200px;            /* fixed height for consistency */
-  object-fit: cover;        /* crop without distortion */
+  height: 200px;
+  object-fit: cover;
   border-top-left-radius: 12px;
   border-top-right-radius: 12px;
   background-color: #f0f0f0;
@@ -129,7 +159,7 @@
   flex-grow: 1;
 }
 
-/* Title with line clamp */
+/* Title */
 .blog-title {
   font-size: 1.1rem;
   font-weight: 600;
@@ -144,10 +174,7 @@
   -webkit-box-orient: vertical;
 }
 
-.blog-tags {
-  margin-bottom: 0.5rem;
-}
-
+.blog-tags { margin-bottom: 0.5rem; }
 .tag-badge {
   display: inline-block;
   background-color: #eaf3fc;
@@ -159,7 +186,7 @@
   border-radius: 20px;
 }
 
-/* Summary with line clamp */
+/* Summary */
 .blog-summary {
   font-size: 0.95rem;
   color: #555;
@@ -180,12 +207,9 @@
   color: #007bff;
   font-weight: 500;
 }
+.read-more-link:hover { text-decoration: underline; }
 
-.read-more-link:hover {
-  text-decoration: underline;
-}
-
-/* No results fallback */
+/* No results */
 .no-results {
   font-size: 1rem;
   color: #777;
@@ -193,21 +217,20 @@
   margin-top: 2rem;
 }
 
-/* Blog count text */
+/* Count */
 .blog-count {
   font-size: 0.9rem;
   color: #666;
   margin-bottom: 1rem;
 }
 
-/* Centered Load More */
+/* Load More */
 .load-more-wrap {
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 1.5rem 0 2.5rem;
 }
-
 .load-more-btn {
   display: inline-flex;
   align-items: center;
@@ -222,6 +245,5 @@
   transition: background-color 0.2s ease, transform 0.05s ease;
   box-shadow: 0 2px 6px rgba(0,0,0,0.06);
 }
-
 .load-more-btn:hover { background-color: #555; }
 .load-more-btn:active { transform: translateY(1px); }
