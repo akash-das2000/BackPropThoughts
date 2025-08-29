@@ -1,5 +1,5 @@
 {
   "title": "Part 3: Continuous-Time Diffusion Models: SDE Formulations and Variational Objectives",
-  "summary": "An in-depth mathematical journey through score-based diffusion: derive the analytic noising kernel, obtain unbiased score labels via Bayes’ rule, eliminate partition functions with Hyvärinen’s integration-by-parts, connect denoising auto-encoders through Vincent’s Taylor expansion, and implement everything in four lines of PyTorch with numerical hacks like the Hutchinson trace trick.",
+  "summary": "We extend diffusion models from discrete timesteps to a continuous-time framework. Starting from forward and reverse SDEs, we derive how noise schedules map to drift and diffusion coefficients, use Girsanov’s theorem to obtain a continuous-time ELBO, and show its connection to denoising score matching and Fisher information. We then explore the duality between stochastic SDE sampling and deterministic probability flow ODEs, and introduce Predictor–Corrector samplers. Finally, a toy 2D Gaussian example illustrates forward and reverse diffusion in practice.",
   "category": ["Foundations", "Algorithms"]
 }
