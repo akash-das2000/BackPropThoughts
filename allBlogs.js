@@ -1,83 +1,113 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const blogGrid      = document.getElementById("blogGrid");
-  const searchInput   = document.getElementById("searchInput");
-  const sortSelect    = document.getElementById("sortSelect");
-  const categoryWrap  = document.getElementById("categoryFilters");
-  const blogCount     = document.getElementById("blogCount");
-  const loadMoreBtn   = document.getElementById("loadMoreBtn");
-  const catLeft       = document.getElementById("catLeft");
-  const catRight      = document.getElementById("catRight");
+// allBlogs.js
 
+document.addEventListener("DOMContentLoaded", () => {
+  // DOM
+  const blogGrid     = document.getElementById("blogGrid");
+  const searchInput  = document.getElementById("searchInput");
+  const sortSelect   = document.getElementById("sortSelect");
+  const blogCount    = document.getElementById("blogCount");
+  const loadMoreBtn  = document.getElementById("loadMoreBtn");
+  const tagSelect    = document.getElementById("tagSelect");   // <select multiple>
+  const activeTagsEl = document.getElementById("activeTags");  // chips container
+
+  // State
   let blogs = [];
-  let activeCategory = "All";
+  let allTags = [];
   let visibleCount = 0;
   const LOAD_COUNT = 6;
+
+  // ------- Boot -------
+  fetchBlogs();
 
   async function fetchBlogs() {
     const res = await fetch("data/index.json");
     const index = await res.json();
 
-    const entries = await Promise.all(index.map(async ({ slug, date }) => {
-      try {
-        const metaRes = await fetch(`posts/${slug}/meta.json`);
-        if (!metaRes.ok) throw new Error();
-        const meta = await metaRes.json();
-        const image = await findFeaturedImage(slug);
-        return { slug, date, ...meta, image };
-      } catch {
-        return null;
-      }
-    }));
+    const entries = await Promise.all(
+      index.map(async ({ slug, date }) => {
+        try {
+          const metaRes = await fetch(`posts/${slug}/meta.json`);
+          if (!metaRes.ok) throw new Error();
+          const meta = await metaRes.json();
+          const image = await findFeaturedImage(slug);
+          return { slug, date, ...meta, image };
+        } catch {
+          return null;
+        }
+      })
+    );
 
     blogs = entries.filter(Boolean);
-    renderFilters();
+
+    // Build tag universe
+    const set = new Set();
+    blogs.forEach(b => (b.category || []).forEach(t => set.add(t)));
+    allTags = [...set].sort((a, b) => a.localeCompare(b));
+
+    populateTagDropdown();
+    // Initial page
+    visibleCount = LOAD_COUNT;
+    renderActiveTagChips();
     renderBlogs();
-    updateTagArrows();
   }
 
-  /* ---------- Filters ---------- */
-  function renderFilters() {
-    const allTags = new Set();
-    blogs.forEach(b => (b.category || []).forEach(t => allTags.add(t)));
-
-    categoryWrap.innerHTML = "";
-    categoryWrap.appendChild(createFilterButton("All", true));
-    [...allTags].sort((a, b) => a.localeCompare(b)).forEach(tag => {
-      categoryWrap.appendChild(createFilterButton(tag));
+  // ------- UI: Tag dropdown + chips -------
+  function populateTagDropdown() {
+    tagSelect.innerHTML = "";
+    allTags.forEach(tag => {
+      const opt = document.createElement("option");
+      opt.value = tag;
+      opt.textContent = tag;
+      tagSelect.appendChild(opt);
     });
-
-    // When tags overflow, show arrows state
-    categoryWrap.addEventListener("scroll", throttle(updateTagArrows, 100));
-    window.addEventListener("resize", updateTagArrows);
   }
 
-  function createFilterButton(name, isActive = false) {
-    const btn = document.createElement("button");
-    btn.textContent = name;
-    btn.className = "category-btn" + (isActive ? " active" : "");
-    btn.addEventListener("click", () => {
-      [...categoryWrap.querySelectorAll(".category-btn")].forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      activeCategory = name;
-      visibleCount = 0;
-      renderBlogs();
+  function getSelectedTags() {
+    return [...tagSelect.selectedOptions].map(o => o.value);
+  }
+
+  function renderActiveTagChips() {
+    const selected = getSelectedTags();
+    activeTagsEl.innerHTML = "";
+    selected.forEach(tag => {
+      const chip = document.createElement("span");
+      chip.className = "active-tag";
+      chip.innerHTML = `${tag} <button aria-label="Remove ${tag}" title="Remove ${tag}">×</button>`;
+      chip.querySelector("button").addEventListener("click", () => {
+        // deselect in <select>
+        [...tagSelect.options].forEach(o => {
+          if (o.value === tag) o.selected = false;
+        });
+        visibleCount = LOAD_COUNT;
+        renderActiveTagChips();
+        renderBlogs();
+      });
+      activeTagsEl.appendChild(chip);
     });
-    return btn;
   }
 
-  /* ---------- Render ---------- */
+  // ------- Render -------
   function renderBlogs() {
-    const query = searchInput.value.trim().toLowerCase();
+    const query = (searchInput.value || "").trim().toLowerCase();
+    const selectedTags = new Set(getSelectedTags());
     const sortBy = sortSelect.value;
 
+    // Filter
     let filtered = blogs.filter(b => {
-      const inTitle   = b.title.toLowerCase().includes(query);
+      const inTitle   = (b.title || "").toLowerCase().includes(query);
       const inSummary = (b.summary || "").toLowerCase().includes(query);
-      const inCat     = activeCategory === "All" || (b.category || []).includes(activeCategory);
-      return (inTitle || inSummary) && inCat;
+
+      // Tag logic: if no tags selected -> allow all
+      const tags = b.category || [];
+      const tagMatch =
+        selectedTags.size === 0
+          ? true
+          : tags.some(t => selectedTags.has(t));
+
+      return (inTitle || inSummary) && tagMatch;
     });
 
-    // ✅ Correct, explicit sorting
+    // Sort
     switch (sortBy) {
       case "oldest":
         filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -94,51 +124,71 @@ document.addEventListener("DOMContentLoaded", () => {
         break;
     }
 
+    // Grid
     blogGrid.innerHTML = "";
-    const blogsToShow = filtered.slice(0, visibleCount + LOAD_COUNT);
-    blogsToShow.forEach(b => blogGrid.appendChild(createBlogCard(b)));
-    visibleCount += LOAD_COUNT;
+    const shown = filtered.slice(0, visibleCount);
+    shown.forEach(b => blogGrid.appendChild(createBlogCard(b)));
 
+    // Count + Load more visibility
     blogCount.textContent = `${filtered.length} blog${filtered.length !== 1 ? "s" : ""}`;
-
-    // Show/hide centered Load More
     loadMoreBtn.style.display = visibleCount < filtered.length ? "inline-flex" : "none";
+
+    // If nothing to show
+    if (shown.length === 0) {
+      const empty = document.createElement("div");
+      empty.className = "no-results";
+      empty.textContent = "No blogs match your filters.";
+      blogGrid.appendChild(empty);
+    }
+
+    // Attach handler for load more with current filtered length in scope
+    loadMoreBtn.onclick = () => {
+      visibleCount += LOAD_COUNT;
+      renderBlogs();
+    };
   }
 
   function createBlogCard(blog) {
     const card = document.createElement("div");
     card.className = "blog-card";
 
+    // Thumbnail
     const img = document.createElement("img");
-    img.className = "blog-thumbnail";                 // ✅ matches CSS
+    img.className = "blog-thumbnail"; // matches CSS for uniform height
     img.src = blog.image;
-    img.alt = blog.title;
+    img.alt = blog.title || "Blog thumbnail";
 
+    // Content
     const content = document.createElement("div");
     content.className = "blog-content";
 
+    // Tags in card
     const tags = document.createElement("div");
     tags.className = "blog-tags";
-    (blog.category || []).forEach(t => {
-      const span = document.createElement("span");
-      span.className = "tag-badge";
-      span.textContent = t;
-      tags.appendChild(span);
+    (blog.category || []).forEach(tagText => {
+      const tag = document.createElement("span");
+      tag.className = "tag-badge";
+      tag.textContent = tagText;
+      tags.appendChild(tag);
     });
 
+    // Title
     const title = document.createElement("h3");
     title.className = "blog-title";
     title.textContent = blog.title;
 
+    // Summary
     const summary = document.createElement("p");
     summary.className = "blog-summary";
     summary.textContent = blog.summary;
 
+    // Link
     const link = document.createElement("a");
     link.className = "read-more-link";
     link.href = `post?postId=${blog.slug}`;
     link.textContent = "Read More →";
 
+    // Assemble
     content.appendChild(tags);
     content.appendChild(title);
     content.appendChild(summary);
@@ -161,34 +211,32 @@ document.addEventListener("DOMContentLoaded", () => {
     return "images/featured_blog.jpg";
   }
 
-  /* ---------- Tag scroller arrows ---------- */
-  function updateTagArrows() {
-    const canScrollLeft  = categoryWrap.scrollLeft > 0;
-    const canScrollRight = categoryWrap.scrollLeft + categoryWrap.clientWidth < categoryWrap.scrollWidth - 1;
-    catLeft.disabled  = !canScrollLeft;
-    catRight.disabled = !canScrollRight;
-  }
-  const SCROLL_STEP = 220;
-  catLeft.addEventListener("click", () => {
-    categoryWrap.scrollBy({ left: -SCROLL_STEP, behavior: "smooth" });
-  });
-  catRight.addEventListener("click", () => {
-    categoryWrap.scrollBy({ left:  SCROLL_STEP, behavior: "smooth" });
+  // ------- Events -------
+  // Debounce search input for nicer UX
+  const debouncedSearch = debounce(() => {
+    visibleCount = LOAD_COUNT;
+    renderBlogs();
+  }, 150);
+
+  searchInput.addEventListener("input", debouncedSearch);
+
+  sortSelect.addEventListener("change", () => {
+    visibleCount = LOAD_COUNT;
+    renderBlogs();
   });
 
-  /* ---------- Events ---------- */
-  searchInput.addEventListener("input", () => { visibleCount = 0; renderBlogs(); });
-  sortSelect.addEventListener("change", () => { visibleCount = 0; renderBlogs(); });
-  loadMoreBtn.addEventListener("click", () => renderBlogs());
+  tagSelect.addEventListener("change", () => {
+    visibleCount = LOAD_COUNT;
+    renderActiveTagChips();
+    renderBlogs();
+  });
 
-  // util: cheap throttle for scroll/resize
-  function throttle(fn, wait) {
-    let t = 0;
+  // ------- Utils -------
+  function debounce(fn, wait) {
+    let t = null;
     return (...args) => {
-      const now = Date.now();
-      if (now - t >= wait) { t = now; fn(...args); }
+      clearTimeout(t);
+      t = setTimeout(() => fn.apply(this, args), wait);
     };
   }
-
-  fetchBlogs();
 });
