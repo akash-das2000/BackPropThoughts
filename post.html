@@ -76,15 +76,23 @@
           <div id="comment-user-bar" class="comment-user-bar">
             <img id="user-photo" alt="" class="cmt-avatar" style="display:none;">
             <span id="user-name" class="cmt-user muted">Not signed in</span>
-
+          
             <div id="auth-buttons" class="auth-buttons">
-              <button type="button" id="btn-google" class="btn btn-ghost">Google</button>
-              <button type="button" id="btn-github" class="btn btn-ghost">GitHub</button>
-              <button type="button" id="btn-apple" class="btn btn-ghost">Apple</button>
-              <button type="button" id="btn-emaillink" class="btn btn-ghost">Email link</button>
-              <button type="button" id="btn-signout" class="btn btn-ghost danger" style="display:none;">Sign out</button>
+              <button type="button" id="btn-google" class="provider-btn">
+                <i class="fa-brands fa-google"></i><span>Google</span>
+              </button>
+              <button type="button" id="btn-github" class="provider-btn">
+                <i class="fa-brands fa-github"></i><span>GitHub</span>
+              </button>
+              <button type="button" id="btn-emaillink" class="provider-btn">
+                <i class="fa-regular fa-envelope"></i><span>Email link</span>
+              </button>
+              <button type="button" id="btn-signout" class="provider-btn danger" style="display:none;">
+                <i class="fa-solid fa-right-from-bracket"></i><span>Sign out</span>
+              </button>
             </div>
           </div>
+
 
           <!-- Form (no name input now) -->
           <form id="comment-form" class="comment-form">
