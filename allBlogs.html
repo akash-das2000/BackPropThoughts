@@ -17,14 +17,13 @@
 
     <h2 class="section-heading">All Blogs</h2>
 
-    <!-- 🏷 Category Filter (dropdown multi-select) -->
-    <div class="tag-filter">
-      <label for="tagSelect">Filter by Tag:</label>
-      <select id="tagSelect" class="tag-dropdown" multiple></select>
-    </div>
-    <div id="activeTags" class="active-tags"></div>
+    <!-- Featured tags row + selected chips -->
+    <section class="tag-section" aria-label="Filter by tags">
+      <div id="featuredTags" class="featured-tags"></div>
+      <div id="activeTags" class="active-tags"></div>
+    </section>
 
-    <!-- 🔍 Search & Sort -->
+    <!-- Search & Sort -->
     <div class="blog-controls">
       <input type="text" id="searchInput" placeholder="Search blogs..." class="search-bar" />
       <div class="sort-group">
@@ -38,15 +37,13 @@
       </div>
     </div>
 
-    <!-- 📊 Count -->
+    <!-- Count -->
     <p id="blogCount" class="blog-count"></p>
 
-    <!-- 📚 Blog Grid -->
-    <section id="blogGrid" class="blog-grid">
-      <!-- JS will populate blog cards here -->
-    </section>
+    <!-- Blog Grid -->
+    <section id="blogGrid" class="blog-grid"></section>
 
-    <!-- ⬇️ Centered Load More -->
+    <!-- Centered Load More -->
     <div class="load-more-wrap">
       <button id="loadMoreBtn" class="load-more-btn" aria-label="Load more blogs">Load More</button>
     </div>
@@ -56,6 +53,28 @@
   <footer>
     <p>© 2025 Akash D</p>
   </footer>
+
+  <!-- Modal: Browse all tags -->
+  <div id="tagModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="tagModalTitle">
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="tagModalTitle">Browse all tags</h3>
+        <button class="icon-btn" id="tagModalClose" aria-label="Close">×</button>
+      </div>
+
+      <div class="modal-body">
+        <input id="tagSearch" type="text" class="modal-search" placeholder="Search tags…" />
+        <div id="tagList" class="tag-list" aria-label="All tags"></div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="clearTagsBtn" class="btn-secondary">Clear</button>
+        <div class="spacer"></div>
+        <button id="applyTagsBtn" class="btn-primary">Apply</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Navbar Loader -->
   <script>
@@ -74,8 +93,7 @@
       });
   </script>
 
-  <!-- Blog Logic -->
+  <!-- Page logic -->
   <script src="allBlogs.js" defer></script>
-
 </body>
 </html>
