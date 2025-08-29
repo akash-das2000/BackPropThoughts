@@ -33,7 +33,6 @@
     gtag('js', new Date());
     gtag('config', 'G-1ZKCW35T1J');
   </script>
-
 </head>
 
 <body>
@@ -64,22 +63,39 @@
             <span id="clap-count">0</span>
           </div>
 
-          <div id="toggle-comments" class="icon-button">
+          <div id="toggle-comments" class="icon-button" title="Show/Hide comments">
             <i class="fa-solid fa-comment-dots"></i>
           </div>
         </section>
 
-        <!-- Comments -->
+        <!-- ===== Comments (auth-based) ===== -->
         <section id="comments-section" style="display:none;">
-          <h2>Leave a Comment</h2>
-          <form id="comment-form">
-            <input type="text" id="name" placeholder="Your name" required />
-            <textarea id="comment" placeholder="Your comment" rows="5" required></textarea>
-            <button type="submit">Post Comment</button>
+          <h2>Comments</h2>
+
+          <!-- Auth/User bar -->
+          <div id="comment-user-bar" class="comment-user-bar">
+            <img id="user-photo" alt="" class="cmt-avatar" style="display:none;">
+            <span id="user-name" class="cmt-user muted">Not signed in</span>
+
+            <div id="auth-buttons" class="auth-buttons">
+              <button type="button" id="btn-google" class="btn btn-ghost">Google</button>
+              <button type="button" id="btn-github" class="btn btn-ghost">GitHub</button>
+              <button type="button" id="btn-apple" class="btn btn-ghost">Apple</button>
+              <button type="button" id="btn-emaillink" class="btn btn-ghost">Email link</button>
+              <button type="button" id="btn-signout" class="btn btn-ghost danger" style="display:none;">Sign out</button>
+            </div>
+          </div>
+
+          <!-- Form (no name input now) -->
+          <form id="comment-form" class="comment-form">
+            <textarea id="comment" class="comment-input" placeholder="Write your comment…" minlength="1" required></textarea>
+            <div class="comment-actions">
+              <button type="submit" id="comment-submit" class="btn">Post</button>
+            </div>
           </form>
 
-          <h2>Comments</h2>
-          <div id="comments-list">Loading comments...</div>
+          <!-- List -->
+          <ul id="comments-list" class="comments-list"></ul>
         </section>
 
       </main>
@@ -88,16 +104,11 @@
     <!-- Right TOC -->
     <aside class="right-toc-slot">
       <div class="toc-box">
-
-        <!-- Header stays visible while list scrolls -->
         <div class="toc-header" id="tocToggle" aria-expanded="true">
-          <!--<span>Table of Contents</span> -->
-          <!--<i class="fa-solid fa-chevron-down toggle-icon"></i> -->
+          <!-- TOC header kept minimal per your style -->
         </div>
-
-        <!-- Scrollable wrapper -->
         <div class="toc-body">
-          <ul id="toc-list"></ul>   <!-- JS injects links here -->
+          <ul id="toc-list"></ul>
         </div>
       </div>
     </aside>
