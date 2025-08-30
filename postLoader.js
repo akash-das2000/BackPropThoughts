@@ -75,7 +75,7 @@ async function loadPost() {
 /* =================== SEO Tag Updater ========================= */
 function updateSEOTags(meta) {
   const title = meta.title || "BackPropThoughts Blog";
-  const desc = meta.description || "BackPropThoughts — Deep Learning, Math, and AI explained.";
+  const desc = meta.summary || meta.description || "BackPropThoughts — Deep Learning, Math, and AI explained.";
   const image = meta.image || "https://backpropthoughts.netlify.app/images/featured_blog.jpg";
   const url = `https://backpropthoughts.netlify.app/posts/${postId}/`;
 
