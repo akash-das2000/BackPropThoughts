@@ -1,1 +1,5 @@
-/post    /post.html   200
+# Rule 1: Serve clean URLs like /posts/slug/ → internally load post.html?postId=slug
+/posts/:slug/    /post.html?postId=:slug    200
+
+# Rule 2: Redirect old query-style URLs to the clean ones
+/post?postId=:slug    /posts/:slug/    301
