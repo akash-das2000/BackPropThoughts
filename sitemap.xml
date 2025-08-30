@@ -4,61 +4,61 @@
   <!-- Home page -->
   <url>
     <loc>https://backpropthoughts.netlify.app/</loc>
-    <lastmod>2025-07-25</lastmod>
+    <lastmod>2025-08-30</lastmod>
     <priority>1.00</priority>
   </url>
 
   <!-- All Blogs listing -->
   <url>
     <loc>https://backpropthoughts.netlify.app/allBlogs.html</loc>
-    <lastmod>2025-07-25</lastmod>
+    <lastmod>2025-08-30</lastmod>
     <priority>0.80</priority>
   </url>
 
-  <!-- Individual blog posts (clean URLs) -->
+  <!-- Individual blog posts -->
   <url>
     <loc>https://backpropthoughts.netlify.app/posts/seal-llm/</loc>
-    <lastmod>2025-06-29</lastmod>
+    <lastmod>2025-08-30</lastmod>
     <priority>0.70</priority>
   </url>
   <url>
     <loc>https://backpropthoughts.netlify.app/posts/random-forest-algorithm/</loc>
-    <lastmod>2025-06-30</lastmod>
+    <lastmod>2025-08-30</lastmod>
     <priority>0.70</priority>
   </url>
   <url>
     <loc>https://backpropthoughts.netlify.app/posts/support-vector-machine-algorithm/</loc>
-    <lastmod>2025-06-30</lastmod>
+    <lastmod>2025-08-30</lastmod>
     <priority>0.70</priority>
   </url>
   <url>
     <loc>https://backpropthoughts.netlify.app/posts/tokens-to-thought/</loc>
-    <lastmod>2025-07-01</lastmod>
+    <lastmod>2025-08-30</lastmod>
     <priority>0.70</priority>
   </url>
   <url>
     <loc>https://backpropthoughts.netlify.app/posts/survey-eval-llm-agent/</loc>
-    <lastmod>2025-07-01</lastmod>
+    <lastmod>2025-08-30</lastmod>
     <priority>0.70</priority>
   </url>
   <url>
     <loc>https://backpropthoughts.netlify.app/posts/diffusion-maths/</loc>
-    <lastmod>2025-07-01</lastmod>
+    <lastmod>2025-08-30</lastmod>
     <priority>0.70</priority>
   </url>
   <url>
     <loc>https://backpropthoughts.netlify.app/posts/stochastic-to-diffusion/</loc>
-    <lastmod>2025-07-01</lastmod>
+    <lastmod>2025-08-30</lastmod>
     <priority>0.70</priority>
   </url>
   <url>
     <loc>https://backpropthoughts.netlify.app/posts/continious-time-diffuision-models/</loc>
-    <lastmod>2025-07-01</lastmod>
+    <lastmod>2025-08-30</lastmod>
     <priority>0.70</priority>
   </url>
   <url>
     <loc>https://backpropthoughts.netlify.app/posts/advanced-diffusion-models/</loc>
-    <lastmod>2025-07-01</lastmod>
+    <lastmod>2025-08-30</lastmod>
     <priority>0.70</priority>
   </url>
 
