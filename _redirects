@@ -1,5 +1,5 @@
 # Clean URLs → internally rewrite to post.html
 /posts/:slug/    /post.html?postId=:slug    200
 
-# Old query links → redirect to clean
-/post?postId=:slug    /posts/:slug/    301
+# Old query links (?postId=...) → clean URLs
+/post    /posts/:slug/    301!    query=postId=:slug
