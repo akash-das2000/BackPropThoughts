@@ -6,11 +6,12 @@
    🧮 Rendering MathJax
    📃 Printer-friendly PDF (with TOC and dropdown fixes)
    🗂 Meta info bar (date, share icons, reading time)
-   🆕 Dynamic SEO tags injection (title, description, canonical, OG/Twitter)
+   🆕 Dynamic SEO tags (title, desc, canonical, OG/Twitter)
+   🆕 JSON-LD structured data (BlogPosting schema.org)
    ------------------------------------------------------------- */
 
 const params = new URLSearchParams(window.location.search);
-const postId = params.get("postId"); // Example: ?postId=random-forest
+const postId = params.get("postId"); 
 const contentDiv = document.getElementById("post-content");
 
 // If no postId provided → show error
@@ -40,7 +41,7 @@ async function loadPost() {
     console.warn("index.json not found:", e);
   }
 
-  // 2️⃣ Try to load per-post meta.json for SEO info
+  // 2️⃣ Load per-post meta.json if available
   try {
     const metaRes = await fetch(`posts/${postId}/meta.json`);
     if (metaRes.ok) metaInfo = await metaRes.json();
@@ -57,16 +58,19 @@ async function loadPost() {
   // 4️⃣ Update SEO tags dynamically
   updateSEOTags(metaInfo);
 
-  // 5️⃣ Render MathJax equations
+  // 5️⃣ Inject JSON-LD structured data
+  injectJSONLD(metaInfo, pubDate);
+
+  // 6️⃣ Render MathJax equations
   requestAnimationFrame(() => {
     window.MathJax?.typesetPromise?.([contentDiv])
       .catch(err => console.error("MathJax typeset failed:", err));
   });
 
-  // 6️⃣ Build meta bar (date + icons)
+  // 7️⃣ Build meta bar (date + icons)
   buildMetaBar(pubDate);
 
-  // 7️⃣ Build TOC and other UI helpers
+  // 8️⃣ Build TOC and other UI helpers
   buildTOC();
   initScrollToTop();
   relocateMobileTOC();
@@ -76,19 +80,14 @@ async function loadPost() {
 function updateSEOTags(meta) {
   const title = meta.title || "BackPropThoughts Blog";
   const desc = meta.summary || meta.description || "BackPropThoughts — Deep Learning, Math, and AI explained.";
-  const image = meta.image || "https://backpropthoughts.netlify.app/images/featured_blog.jpg";
+  const image = meta.image || "https://backpropthoughts.netlify.app/images/blog-banner.png";
   const url = `https://backpropthoughts.netlify.app/posts/${postId}/`;
 
-  // Title
   document.title = title;
 
-  // Description
   setOrCreateMeta("name", "description", desc);
-
-  // Canonical
   setOrCreateLink("canonical", url);
 
-  // Open Graph
   setOrCreateMeta("property", "og:type", "article");
   setOrCreateMeta("property", "og:site_name", "BackPropThoughts");
   setOrCreateMeta("property", "og:title", title);
@@ -96,7 +95,6 @@ function updateSEOTags(meta) {
   setOrCreateMeta("property", "og:url", url);
   setOrCreateMeta("property", "og:image", image);
 
-  // Twitter
   setOrCreateMeta("name", "twitter:card", "summary_large_image");
   setOrCreateMeta("name", "twitter:title", title);
   setOrCreateMeta("name", "twitter:description", desc);
@@ -123,17 +121,55 @@ function setOrCreateLink(rel, href) {
   el.setAttribute("href", href);
 }
 
+/* ================= JSON-LD Injector ========================== */
+function injectJSONLD(meta, pubDate) {
+  const url = `https://backpropthoughts.netlify.app/posts/${postId}/`;
+  const jsonld = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": meta.title || "BackPropThoughts Blog",
+    "description": meta.summary || meta.description || "Deep Learning, Math, and AI explained.",
+    "datePublished": pubDate || "2025-08-30",
+    "dateModified": pubDate || "2025-08-30",
+    "author": {
+      "@type": "Person",
+      "name": "Akash Das"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "BackPropThoughts",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://backpropthoughts.netlify.app/images/logo.png"
+      }
+    },
+    "image": meta.image || "https://backpropthoughts.netlify.app/images/blog-banner.png",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": url
+    }
+  };
+
+  let script = document.querySelector("script#jsonld");
+  if (!script) {
+    script = document.createElement("script");
+    script.type = "application/ld+json";
+    script.id = "jsonld";
+    document.head.appendChild(script);
+  }
+  script.textContent = JSON.stringify(jsonld, null, 2);
+}
+
 /* ====================== Meta Bar ============================ */
 function buildMetaBar(pubDateISO) {
-  const wpm = 200; // Words per minute for reading time
+  const wpm = 200;
   const text = contentDiv.innerText || contentDiv.textContent || "";
   const words = text.trim().split(/\s+/).length;
-  const minutes = Math.max(1, Math.ceil(words / wpm)); // At least 1 min
+  const minutes = Math.max(1, Math.ceil(words / wpm));
 
   const bar = document.createElement("div");
   bar.className = "reading-time-display";
 
-  /* 📅 Date */
   const dateSpan = document.createElement("span");
   dateSpan.className = "post-date";
   if (pubDateISO) {
@@ -141,11 +177,9 @@ function buildMetaBar(pubDateISO) {
   }
   bar.appendChild(dateSpan);
 
-  /* 📌 Icons (PDF, link, email, clock) */
   const iconsWrap = document.createElement("div");
   iconsWrap.className = "meta-icons";
 
-  /* 🖨 Printer-friendly PDF button */
   const pdfIcon = document.createElement("i");
   pdfIcon.className = "fa-solid fa-download";
   pdfIcon.title = "Download Printer-friendly PDF";
@@ -173,7 +207,6 @@ function buildMetaBar(pubDateISO) {
     details.forEach(d => d.open = false);
   };
 
-  /* 🔗 Copy link button */
   const linkIcon = document.createElement("i");
   linkIcon.className = "fa-solid fa-link";
   linkIcon.title = "Copy link";
@@ -183,7 +216,6 @@ function buildMetaBar(pubDateISO) {
       .catch(() => alert("Failed to copy link"));
   });
 
-  /* ✉ Email share button */
   const emailIcon = document.createElement("i");
   emailIcon.className = "fa-solid fa-envelope";
   emailIcon.title = "Share via Email";
@@ -193,7 +225,6 @@ function buildMetaBar(pubDateISO) {
     window.location.href = `mailto:?subject=${subj}&body=${body}`;
   });
 
-  /* ⏱ Reading time */
   const clockIcon = document.createElement("i");
   clockIcon.className = "fa-solid fa-clock";
   const timeText = document.createElement("span");
@@ -206,11 +237,9 @@ function buildMetaBar(pubDateISO) {
   firstH1 ? firstH1.insertAdjacentElement("afterend", bar) : contentDiv.prepend(bar);
 }
 
-/* 📅 Helper: YYYY-MM-DD → "6 Jul 2025" */
 function formatDate(iso) {
   const [y, m, d] = iso.split("-");
-  const months = ["Jan","Feb","Mar","Apr","May","Jun",
-                  "Jul","Aug","Sep","Oct","Nov","Dec"];
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   return `${parseInt(d, 10)} ${months[+m - 1]} ${y}`;
 }
 
