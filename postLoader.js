@@ -6,6 +6,7 @@
    🧮 Rendering MathJax
    📃 Printer-friendly PDF (with TOC and dropdown fixes)
    🗂 Meta info bar (date, share icons, reading time)
+   🆕 Dynamic SEO tags injection (title, description, canonical, OG/Twitter)
    ------------------------------------------------------------- */
 
 const params = new URLSearchParams(window.location.search);
@@ -25,6 +26,7 @@ if (!postId) {
 /* ========================== MAIN ============================ */
 async function loadPost() {
   let pubDate = "";
+  let metaInfo = {};
 
   // 1️⃣ Load publication date from data/index.json
   try {
@@ -38,26 +40,87 @@ async function loadPost() {
     console.warn("index.json not found:", e);
   }
 
-  // 2️⃣ Load blog HTML content
+  // 2️⃣ Try to load per-post meta.json for SEO info
+  try {
+    const metaRes = await fetch(`posts/${postId}/meta.json`);
+    if (metaRes.ok) metaInfo = await metaRes.json();
+  } catch (e) {
+    console.warn("meta.json not found for", postId);
+  }
+
+  // 3️⃣ Load blog HTML content
   const htmlRes = await fetch(`posts/${postId}/index.html`);
   if (!htmlRes.ok) throw new Error("Post HTML not found");
   const html = await htmlRes.text();
   contentDiv.innerHTML = html;
 
-  // 3️⃣ Render MathJax equations
+  // 4️⃣ Update SEO tags dynamically
+  updateSEOTags(metaInfo);
+
+  // 5️⃣ Render MathJax equations
   requestAnimationFrame(() => {
     window.MathJax?.typesetPromise?.([contentDiv])
       .catch(err => console.error("MathJax typeset failed:", err));
   });
 
-  // 4️⃣ Build meta bar (date + icons)
+  // 6️⃣ Build meta bar (date + icons)
   buildMetaBar(pubDate);
 
-  // 5️⃣ Build TOC and other UI helpers
+  // 7️⃣ Build TOC and other UI helpers
   buildTOC();
   initScrollToTop();
   relocateMobileTOC();
-  loadTitleFromMeta();
+}
+
+/* =================== SEO Tag Updater ========================= */
+function updateSEOTags(meta) {
+  const title = meta.title || "BackPropThoughts Blog";
+  const desc = meta.description || "BackPropThoughts — Deep Learning, Math, and AI explained.";
+  const image = meta.image || "https://backpropthoughts.netlify.app/images/featured_blog.jpg";
+  const url = `https://backpropthoughts.netlify.app/posts/${postId}/`;
+
+  // Title
+  document.title = title;
+
+  // Description
+  setOrCreateMeta("name", "description", desc);
+
+  // Canonical
+  setOrCreateLink("canonical", url);
+
+  // Open Graph
+  setOrCreateMeta("property", "og:type", "article");
+  setOrCreateMeta("property", "og:site_name", "BackPropThoughts");
+  setOrCreateMeta("property", "og:title", title);
+  setOrCreateMeta("property", "og:description", desc);
+  setOrCreateMeta("property", "og:url", url);
+  setOrCreateMeta("property", "og:image", image);
+
+  // Twitter
+  setOrCreateMeta("name", "twitter:card", "summary_large_image");
+  setOrCreateMeta("name", "twitter:title", title);
+  setOrCreateMeta("name", "twitter:description", desc);
+  setOrCreateMeta("name", "twitter:image", image);
+}
+
+function setOrCreateMeta(attr, name, content) {
+  let el = document.querySelector(`meta[${attr}='${name}']`);
+  if (!el) {
+    el = document.createElement("meta");
+    el.setAttribute(attr, name);
+    document.head.appendChild(el);
+  }
+  el.setAttribute("content", content);
+}
+
+function setOrCreateLink(rel, href) {
+  let el = document.querySelector(`link[rel='${rel}']`);
+  if (!el) {
+    el = document.createElement("link");
+    el.setAttribute("rel", rel);
+    document.head.appendChild(el);
+  }
+  el.setAttribute("href", href);
 }
 
 /* ====================== Meta Bar ============================ */
@@ -88,22 +151,13 @@ function buildMetaBar(pubDateISO) {
   pdfIcon.title = "Download Printer-friendly PDF";
   pdfIcon.addEventListener("click", async () => {
     try {
-      // 1️⃣ Expand all dropdowns (<details>)
       const details = contentDiv.querySelectorAll("details");
       details.forEach(d => d.open = true);
-
-      // 2️⃣ Force MathJax to finish rendering
       await window.MathJax?.typesetPromise?.([contentDiv]);
-
-      // 3️⃣ Move TOC below <h1> (for print layout)
       const h1 = contentDiv.querySelector("h1");
       const tocBox = document.querySelector(".toc-box");
       if (h1 && tocBox) h1.after(tocBox);
-
-      // 4️⃣ Small delay to stabilize layout
       await new Promise(resolve => setTimeout(resolve, 500));
-
-      // 5️⃣ Open browser print dialog (user can save as PDF)
       window.print();
     } catch (err) {
       console.error("Print preparation failed:", err);
@@ -111,14 +165,10 @@ function buildMetaBar(pubDateISO) {
     }
   });
 
-  /* ♻ After printing → restore TOC & collapse dropdowns */
   window.onafterprint = () => {
-    // Restore TOC back to sidebar
     const rightSlot = document.querySelector(".right-toc-slot");
     const tocBox = document.querySelector(".toc-box");
     if (rightSlot && tocBox) rightSlot.appendChild(tocBox);
-
-    // Collapse all <details> again
     const details = contentDiv.querySelectorAll("details");
     details.forEach(d => d.open = false);
   };
@@ -149,11 +199,9 @@ function buildMetaBar(pubDateISO) {
   const timeText = document.createElement("span");
   timeText.textContent = ` ${minutes} min`;
 
-  // Append icons
   iconsWrap.append(pdfIcon, linkIcon, emailIcon, clockIcon, timeText);
   bar.appendChild(iconsWrap);
 
-  // Insert meta bar after <h1> or at top
   const firstH1 = contentDiv.querySelector("h1");
   firstH1 ? firstH1.insertAdjacentElement("afterend", bar) : contentDiv.prepend(bar);
 }
@@ -179,7 +227,6 @@ function buildTOC() {
     tocList.appendChild(li);
   });
 
-  /* Active link highlighting on scroll */
   const links = tocList.querySelectorAll("a");
   const obs = new IntersectionObserver(entries => {
     entries.forEach(e => {
@@ -192,7 +239,6 @@ function buildTOC() {
   }, { rootMargin: "-40% 0px -50% 0px", threshold: 0 });
   headings.forEach(h => obs.observe(h));
 
-  /* Collapse toggle for TOC */
   const tocBox = document.querySelector(".toc-box");
   const header = document.createElement("div");
   header.className = "toc-header";
@@ -207,7 +253,6 @@ function buildTOC() {
       tocBox.classList.contains("collapsed") ? "▼" : "▲";
   });
 
-  /* Smooth scroll on TOC link click */
   tocList.addEventListener("click", e => {
     const link = e.target.closest("a[href^='#']");
     if (link) {
@@ -247,12 +292,4 @@ function relocateMobileTOC() {
   } catch (e) {
     console.warn("Mobile TOC placement failed:", e);
   }
-}
-
-/* ========== Load optional meta.json title ==================== */
-function loadTitleFromMeta() {
-  fetch(`posts/${postId}/meta.json`)
-    .then(r => r.ok ? r.json() : {})
-    .then(m => { if (m.title) document.title = m.title; })
-    .catch(() => {});
 }
